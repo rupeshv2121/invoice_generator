@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes as RouterRoutes } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
 import NotFound from "./pages/NotFound";
+import CompanyManagement from "./pages/company-management";
 import CompanyProfile from "./pages/company-profile";
 import CustomerManagement from "./pages/customer-management";
 import Dashboard from "./pages/dashboard";
@@ -26,6 +27,8 @@ const Routes = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/company-profile" element={<CompanyProfile />} />
                     <Route path="/customer-management" element={<CustomerManagement />} />
+                    <Route path="/company-management" element={<CompanyManagement />} />
+
                     <Route path="/reports" element={<Reports />} />
                     <Route path="*" element={<NotFound />} />
                 </RouterRoutes>

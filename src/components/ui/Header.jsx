@@ -10,9 +10,10 @@ const Header = () => {
 
     const navigationItems = [
         { label: 'Dashboard', path: '/dashboard', icon: 'LayoutDashboard' },
+        { label: 'Customers', path: '/customer-management', icon: 'Users' },
+        { label: 'Company', path: '/company-management', icon: 'Building' },
         { label: 'Create Invoice', path: '/invoice-creation', icon: 'FileText' },
         { label: 'Invoice List', path: '/invoice-list', icon: 'List' },
-        { label: 'Customers', path: '/customer-management', icon: 'Users' },
         { label: 'Reports', path: '/reports', icon: 'BarChart3' },
     ];
 
