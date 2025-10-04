@@ -25,20 +25,20 @@ const GSTSummary = ({ gstData }) => {
         switch (status?.toLowerCase()) {
             case 'compliant':
                 return {
-                    color: 'text-success',
-                    bgColor: 'bg-success',
+                    color: 'text-white',
+                    bgColor: 'bg-green-600',
                     icon: 'CheckCircle'
                 };
             case 'pending':
                 return {
-                    color: 'text-warning',
-                    bgColor: 'bg-warning',
+                    color: 'text-white',
+                    bgColor: 'bg-yellow-500',
                     icon: 'Clock'
                 };
             case 'overdue':
                 return {
                     color: 'text-error',
-                    bgColor: 'bg-error',
+                    bgColor: 'bg-red-600',
                     icon: 'AlertTriangle'
                 };
             default:
@@ -100,7 +100,7 @@ const GSTSummary = ({ gstData }) => {
                             <span className="text-xs text-text-secondary">Due: {gstData?.gstr1DueDate}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${gstData?.gstr1Status === 'filed' ? 'bg-success' : 'bg-warning'}`} />
+                            <div className={`w-2 h-2 rounded-full ${gstData?.gstr1Status === 'filed' ? 'bg-green-600' : 'bg-yellow-500'}`} />
                             <span className="text-sm text-text-secondary capitalize">{gstData?.gstr1Status}</span>
                         </div>
                     </div>
@@ -111,7 +111,7 @@ const GSTSummary = ({ gstData }) => {
                             <span className="text-xs text-text-secondary">Due: {gstData?.gstr3bDueDate}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${gstData?.gstr3bStatus === 'filed' ? 'bg-success' : 'bg-warning'}`} />
+                            <div className={`w-2 h-2 rounded-full ${gstData?.gstr3bStatus === 'filed' ? 'bg-green-600' : 'bg-yellow-500'}`} />
                             <span className="text-sm text-text-secondary capitalize">{gstData?.gstr3bStatus}</span>
                         </div>
                     </div>

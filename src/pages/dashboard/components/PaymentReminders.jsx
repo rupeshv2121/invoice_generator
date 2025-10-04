@@ -55,8 +55,8 @@ const PaymentReminders = ({ reminders }) => {
                             return (
                                 <div key={reminder?.id} className="flex items-center justify-between p-4 bg-surface-secondary rounded-lg border border-border">
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-10 h-10 bg-error rounded-full flex items-center justify-center">
-                                            <Icon name="AlertTriangle" size={20} color="white" />
+                                        <div className="w-8 h-6 bg-red-500 bg-error rounded-full flex items-center justify-center">
+                                            <Icon name="AlertTriangle" size={16} color="white" />
                                         </div>
                                         <div>
                                             <p className="font-medium text-foreground">{reminder?.customerName}</p>

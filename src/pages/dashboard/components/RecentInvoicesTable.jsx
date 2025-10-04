@@ -8,15 +8,15 @@ const RecentInvoicesTable = ({ invoices }) => {
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
             case 'paid':
-                return 'bg-success text-success-foreground';
+                return 'bg-green-600 text-white';
             case 'pending':
-                return 'bg-warning text-warning-foreground';
+                return 'bg-yellow-500 text-white';
             case 'overdue':
-                return 'bg-error text-error-foreground';
+                return 'bg-red-600 text-white';
             case 'draft':
-                return 'bg-muted text-muted-foreground';
+                return 'bg-gray-300 text-gray-600';
             default:
-                return 'bg-muted text-muted-foreground';
+                return 'bg-gray-300 text-gray-600';
         }
     };
 

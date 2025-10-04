@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
 const QuickActions = () => {
@@ -29,22 +30,20 @@ const QuickActions = () => {
     ];
 
     return (
-        <div className="bg-card border border-border rounded-lg p-6 invoice-shadow-sm">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
+        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {actions?.map((action, index) => (
-                    <div key={index} className="p-4 border border-border rounded-lg hover:bg-muted transition-colors duration-200">
+                    <div key={index} className="p-4 flex flex-col justify-center border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                         <Button
                             variant={action?.color}
-                            fullWidth
-                            iconName={action?.icon}
-                            iconPosition="left"
                             onClick={action?.onClick}
-                            className="mb-2"
+                            className="mb-2 flex items-center justify-center"
                         >
+                            <Icon name={action?.icon} size={16} className="mr-2" />
                             {action?.title}
                         </Button>
-                        <p className="text-sm text-text-secondary text-center">{action?.description}</p>
+                        <p className="text-sm text-gray-600 text-center">{action?.description}</p>
                     </div>
                 ))}
             </div>

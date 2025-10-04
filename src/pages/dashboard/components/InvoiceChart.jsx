@@ -20,7 +20,7 @@ const InvoiceChart = ({ monthlyData, statusData }) => {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload?.length) {
             return (
-                <div className="bg-popover border border-border rounded-lg p-3 invoice-shadow-md">
+                <div className="bg-white border border-border rounded-lg p-3 invoice-shadow-md">
                     <p className="text-sm font-medium text-popover-foreground">{`${label}`}</p>
                     <p className="text-sm text-popover-foreground">
                         Amount: {formatCurrency(payload?.[0]?.value)}
@@ -34,7 +34,7 @@ const InvoiceChart = ({ monthlyData, statusData }) => {
     const PieTooltip = ({ active, payload }) => {
         if (active && payload && payload?.length) {
             return (
-                <div className="bg-popover border border-border rounded-lg p-3 invoice-shadow-md">
+                <div className="bg-white border border-border rounded-lg p-3 invoice-shadow-md">
                     <p className="text-sm font-medium text-popover-foreground capitalize">
                         {payload?.[0]?.name}: {payload?.[0]?.value} invoices
                     </p>

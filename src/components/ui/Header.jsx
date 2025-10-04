@@ -35,11 +35,11 @@ const Header = () => {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-surface border-b border-border">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-border">
             <div className="flex items-center justify-between h-16 px-4 lg:px-6">
                 {/* Logo */}
                 <Link to="/dashboard" className="flex items-center space-x-2">
-                    <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
+                    <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg">
                         <Icon name="Receipt" size={20} color="white" />
                     </div>
                     <span className="text-xl font-semibold text-foreground">InvoicePro</span>
@@ -52,8 +52,8 @@ const Header = () => {
                             key={item?.path}
                             to={item?.path}
                             className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${isActivePath(item?.path)
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'text-text-secondary hover:text-foreground hover:bg-muted'
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-text-secondary hover:text-foreground hover:bg-muted'
                                 }`}
                         >
                             <Icon name={item?.icon} size={16} />
@@ -72,7 +72,7 @@ const Header = () => {
                             onClick={toggleUserMenu}
                             className="flex items-center space-x-2"
                         >
-                            <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                                 <Icon name="User" size={16} color="white" />
                             </div>
                             <Icon name="ChevronDown" size={16} />
@@ -138,8 +138,8 @@ const Header = () => {
                                     to={item?.path}
                                     onClick={closeMobileMenu}
                                     className={`flex items-center space-x-3 px-3 py-3 rounded-md text-base font-medium transition-colors duration-200 ${isActivePath(item?.path)
-                                            ? 'bg-primary text-primary-foreground'
-                                            : 'text-text-secondary hover:text-foreground hover:bg-muted'
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'text-text-secondary hover:text-foreground hover:bg-muted'
                                         }`}
                                 >
                                     <Icon name={item?.icon} size={20} />

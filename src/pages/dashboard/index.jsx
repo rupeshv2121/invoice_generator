@@ -155,15 +155,15 @@ const Dashboard = () => {
         <div className="min-h-screen bg-background">
             <Header />
             <main className="pt-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <Breadcrumb />
 
                     {/* Welcome Section */}
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-foreground mb-2">
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
                             Welcome back, Business Owner!
                         </h1>
-                        <p className="text-text-secondary">
+                        <p className="text-gray-600">
                             Here's what's happening with your invoices today.
                         </p>
                     </div>
