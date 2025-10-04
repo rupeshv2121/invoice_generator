@@ -1,0 +1,113 @@
+import { useNavigate } from 'react-router-dom';
+
+import Button from '../../../components/ui/Button';
+
+const RecentInvoicesTable = ({ invoices }) => {
+    const navigate = useNavigate();
+
+    const getStatusColor = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'paid':
+                return 'bg-success text-success-foreground';
+            case 'pending':
+                return 'bg-warning text-warning-foreground';
+            case 'overdue':
+                return 'bg-error text-error-foreground';
+            case 'draft':
+                return 'bg-muted text-muted-foreground';
+            default:
+                return 'bg-muted text-muted-foreground';
+        }
+    };
+
+    const formatDate = (dateString) => {
+        return new Date(dateString)?.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR'
+        })?.format(amount);
+    };
+
+    return (
+        <div className="bg-card border border-border rounded-lg invoice-shadow-sm">
+            <div className="flex items-center justify-between p-6 border-b border-border">
+                <h3 className="text-lg font-semibold text-foreground">Recent Invoices</h3>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate('/invoice-list')}
+                    iconName="ArrowRight"
+                    iconPosition="right"
+                >
+                    View All
+                </Button>
+            </div>
+            <div className="overflow-x-auto">
+                <table className="w-full">
+                    <thead className="bg-muted">
+                        <tr>
+                            <th className="text-left py-3 px-6 text-sm font-medium text-text-secondary">Invoice No.</th>
+                            <th className="text-left py-3 px-6 text-sm font-medium text-text-secondary">Customer</th>
+                            <th className="text-left py-3 px-6 text-sm font-medium text-text-secondary">Amount</th>
+                            <th className="text-left py-3 px-6 text-sm font-medium text-text-secondary">Due Date</th>
+                            <th className="text-left py-3 px-6 text-sm font-medium text-text-secondary">Status</th>
+                            <th className="text-left py-3 px-6 text-sm font-medium text-text-secondary">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {invoices?.map((invoice, index) => (
+                            <tr key={invoice?.id} className={index % 2 === 0 ? 'bg-surface' : 'bg-surface-secondary'}>
+                                <td className="py-4 px-6 text-sm font-medium text-foreground">
+                                    {invoice?.invoiceNumber}
+                                </td>
+                                <td className="py-4 px-6 text-sm text-foreground">
+                                    {invoice?.customerName}
+                                </td>
+                                <td className="py-4 px-6 text-sm font-medium text-foreground">
+                                    {formatCurrency(invoice?.amount)}
+                                </td>
+                                <td className="py-4 px-6 text-sm text-foreground">
+                                    {formatDate(invoice?.dueDate)}
+                                </td>
+                                <td className="py-4 px-6">
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(invoice?.status)}`}>
+                                        {invoice?.status}
+                                    </span>
+                                </td>
+                                <td className="py-4 px-6">
+                                    <div className="flex items-center space-x-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            iconName="Eye"
+                                            onClick={() => navigate(`/invoice-list?view=${invoice?.id}`)}
+                                        >
+                                            <span className="sr-only">View Invoice</span>
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            iconName="Download"
+                                            onClick={() => {/* Handle download */ }}
+                                        >
+                                            <span className="sr-only">Download Invoice</span>
+                                        </Button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
+export default RecentInvoicesTable;
