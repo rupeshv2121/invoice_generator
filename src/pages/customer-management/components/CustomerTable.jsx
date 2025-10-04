@@ -92,13 +92,13 @@ const CustomerTable = ({
                                     <div className="text-foreground">{customer?.location}</div>
                                 </td>
                                 <td className="p-4">
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${customer?.gstStatus === 'Registered' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
+                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${customer?.gstStatus === 'Registered' ? 'bg-green-600 text-white font-bold' : 'bg-yellow-500 text-white font-bold'
                                         }`}>
                                         {customer?.gstStatus}
                                     </span>
                                 </td>
                                 <td className="p-4">
-                                    <div className="flex items-center justify-end space-x-2">
+                                    <div className="flex items-center  justify-center space-x-2">
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -123,7 +123,7 @@ const CustomerTable = ({
                                             onClick={() => onDeleteCustomer(customer)}
                                             iconName="Trash2"
                                             iconSize={16}
-                                            className="text-destructive hover:text-destructive"
+                                            className="text-red-600 hover:text-destructive"
                                         >
                                             <span className="sr-only">Delete</span>
                                         </Button>

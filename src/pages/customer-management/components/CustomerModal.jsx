@@ -248,7 +248,7 @@ const CustomerModal = ({
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-card rounded-lg border border-border w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="bg-white rounded-lg border border-border w-full max-w-4xl max-h-[90vh] overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-border">
                     <h2 className="text-xl font-semibold text-foreground">
@@ -273,7 +273,7 @@ const CustomerModal = ({
                                 key={tab?.id}
                                 onClick={() => setActiveTab(tab?.id)}
                                 className={`flex items-center space-x-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab?.id
-                                        ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-text-secondary hover:text-foreground hover:border-border'
+                                    ? 'border-blue-600 text-black bg-gray-100' : 'border-transparent text-black hover:text-foreground '
                                     }`}
                             >
                                 <Icon name={tab?.icon} size={16} />

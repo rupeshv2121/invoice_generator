@@ -6,29 +6,26 @@ const CustomerStats = ({ stats }) => {
             label: 'Total Customers',
             value: stats?.totalCustomers,
             icon: 'Users',
-            color: 'text-primary',
-            bgColor: 'bg-primary/10'
+            color: 'text-blue-600',
+
         },
         {
             label: 'Active Customers',
             value: stats?.activeCustomers,
             icon: 'UserCheck',
-            color: 'text-success',
-            bgColor: 'bg-success/10'
+            color: 'text-green-600',
         },
         {
             label: 'GST Registered',
             value: stats?.gstRegistered,
             icon: 'FileText',
-            color: 'text-secondary',
-            bgColor: 'bg-secondary/10'
+            color: 'text-blue-600',
         },
         {
             label: 'Outstanding Amount',
             value: `₹${stats?.outstandingAmount?.toLocaleString('en-IN')}`,
             icon: 'IndianRupee',
-            color: 'text-warning',
-            bgColor: 'bg-warning/10'
+            color: 'text-yellow-500',
         }
     ];
 

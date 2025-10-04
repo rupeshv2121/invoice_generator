@@ -63,11 +63,11 @@ const CustomerHistoryModal = ({ isOpen, onClose, customer }) => {
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
             case 'paid': case 'completed':
-                return 'bg-success/10 text-success';
+                return 'bg-green-600 text-white';
             case 'overdue':
-                return 'bg-destructive/10 text-destructive';
+                return 'bg-red-600 text-white';
             case 'draft':
-                return 'bg-warning/10 text-warning';
+                return 'bg-yellow-600 text-white';
             default:
                 return 'bg-muted text-text-secondary';
         }
@@ -93,7 +93,7 @@ const CustomerHistoryModal = ({ isOpen, onClose, customer }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-card rounded-lg border border-border w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            <div className="bg-white rounded-lg border border-border w-full max-w-6xl max-h-[90vh] overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-border">
                     <div>
@@ -120,8 +120,8 @@ const CustomerHistoryModal = ({ isOpen, onClose, customer }) => {
                                     <p className="text-sm text-text-secondary">Total Invoiced</p>
                                     <p className="text-xl font-bold text-foreground">{formatAmount(totalInvoiced)}</p>
                                 </div>
-                                <div className="p-2 bg-primary/10 rounded-lg">
-                                    <Icon name="FileText" size={20} className="text-primary" />
+                                <div className="p-2 bg-blue-100 rounded-lg">
+                                    <Icon name="FileText" size={20} className="text-blue-600" />
                                 </div>
                             </div>
                         </div>
@@ -130,10 +130,10 @@ const CustomerHistoryModal = ({ isOpen, onClose, customer }) => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-text-secondary">Total Paid</p>
-                                    <p className="text-xl font-bold text-success">{formatAmount(totalPaid)}</p>
+                                    <p className="text-xl font-bold text-green-600">{formatAmount(totalPaid)}</p>
                                 </div>
-                                <div className="p-2 bg-success/10 rounded-lg">
-                                    <Icon name="CheckCircle" size={20} className="text-success" />
+                                <div className="p-2 bg-green-100 rounded-lg">
+                                    <Icon name="CheckCircle" size={20} className="text-green-600" />
                                 </div>
                             </div>
                         </div>
@@ -141,11 +141,11 @@ const CustomerHistoryModal = ({ isOpen, onClose, customer }) => {
                         <div className="bg-surface rounded-lg p-4 border border-border">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-text-secondary">Outstanding</p>
-                                    <p className="text-xl font-bold text-warning">{formatAmount(totalOutstanding)}</p>
+                                    <p className="text-sm ">Outstanding</p>
+                                    <p className="text-xl font-bold text-yellow-600">{formatAmount(totalOutstanding)}</p>
                                 </div>
-                                <div className="p-2 bg-warning/10 rounded-lg">
-                                    <Icon name="Clock" size={20} className="text-warning" />
+                                <div className="p-2 bg-yellow-100 rounded-lg">
+                                    <Icon name="Clock" size={20} className="text-yellow-600" />
                                 </div>
                             </div>
                         </div>
@@ -156,8 +156,8 @@ const CustomerHistoryModal = ({ isOpen, onClose, customer }) => {
                                     <p className="text-sm text-text-secondary">Total Invoices</p>
                                     <p className="text-xl font-bold text-foreground">{invoiceHistory?.length}</p>
                                 </div>
-                                <div className="p-2 bg-secondary/10 rounded-lg">
-                                    <Icon name="Receipt" size={20} className="text-secondary" />
+                                <div className="p-2 bg-blue-100 rounded-lg">
+                                    <Icon name="Receipt" size={20} className="text-blue-600" />
                                 </div>
                             </div>
                         </div>
