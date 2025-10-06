@@ -65,12 +65,12 @@ const ItemsTable = ({
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             {/* Table Header */}
-            <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Items List</h3>
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Items List</h3>
             </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto">
+            {/* Desktop Table */}
+            <div className="hidden lg:block overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -191,10 +191,123 @@ const ItemsTable = ({
                 </table>
             </div>
 
-            {/* Pagination */}
+            {/* Mobile Card View */}
+            <div className="lg:hidden p-4 space-y-4">
+                {items.length === 0 ? (
+                    <div className="text-center py-8">
+                        <p className="text-gray-500">No items found</p>
+                    </div>
+                ) : (
+                    items.map((item) => (
+                        <div key={item.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                            <div className="flex items-start justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedItems.includes(item.id)}
+                                        onChange={(e) => onSelectItem(item.id, e.target.checked)}
+                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <div>
+                                        <div className="font-medium text-gray-900">{item.name}</div>
+                                        {item.description && (
+                                            <div className="text-sm text-gray-500">{item.description}</div>
+                                        )}
+                                        <div className="text-xs text-gray-400 mt-1">HSN: {item.hsnCode}</div>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-sm font-medium text-gray-900">
+                                        {formatCurrency(item.sellingPrice)}
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        Cost: {formatCurrency(item.purchasePrice)}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                                <div className="text-sm">
+                                    <span className={`font-medium ${calculateProfit(item.purchasePrice, item.sellingPrice) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                        {formatCurrency(calculateProfit(item.purchasePrice, item.sellingPrice))}
+                                    </span>
+                                    <span className={`text-xs ml-2 ${calculateMargin(item.purchasePrice, item.sellingPrice) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                        ({calculateMargin(item.purchasePrice, item.sellingPrice)}%)
+                                    </span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => onEditItem(item)}
+                                        iconName="Edit"
+                                        className="text-blue-600"
+                                    />
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => onDeleteItem(item.id)}
+                                        iconName="Trash2"
+                                        className="text-red-600"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Responsive Pagination */}
             {items.length > 0 && (
-                <div className="px-6 py-4 border-t border-gray-200">
-                    <div className="flex items-center justify-between">
+                <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
+                    {/* Mobile pagination */}
+                    <div className="lg:hidden space-y-4">
+                        <div className="flex items-center justify-center space-x-2">
+                            <span className="text-sm text-gray-700">Show</span>
+                            <select
+                                value={itemsPerPage}
+                                onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+                                className="border border-gray-300 rounded px-2 py-1 text-sm"
+                            >
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={25}>25</option>
+                            </select>
+                            <span className="text-sm text-gray-700">per page</span>
+                        </div>
+                        
+                        <div className="text-center">
+                            <span className="text-sm text-gray-700">
+                                Page {currentPage} of {totalPages} ({totalItems} items)
+                            </span>
+                        </div>
+                        
+                        <div className="flex justify-center space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onPageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                iconName="ChevronLeft"
+                                className="flex-1 max-w-24"
+                            >
+                                Prev
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onPageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                iconName="ChevronRight"
+                                className="flex-1 max-w-24"
+                            >
+                                Next
+                            </Button>
+                        </div>
+                    </div>
+                    
+                    {/* Desktop pagination */}
+                    <div className="hidden lg:flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                             <span className="text-sm text-gray-700">Show</span>
                             <select

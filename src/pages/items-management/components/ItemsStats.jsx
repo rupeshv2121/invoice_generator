@@ -56,16 +56,18 @@ const ItemsStats = ({ stats }) => {
     ];
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
             {statsCards.map((card, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:p-6">
                     <div className="flex items-center">
-                        <div className={`p-3 rounded-lg ${card.bgColor}`}>
-                            {card.icon}
+                        <div className={`p-2 lg:p-3 rounded-lg ${card.bgColor} flex-shrink-0`}>
+                            <div className="w-6 h-6 lg:w-8 lg:h-8 [&>svg]:w-full [&>svg]:h-full">
+                                {card.icon}
+                            </div>
                         </div>
-                        <div className="ml-4 flex-1">
-                            <h3 className="text-sm font-medium text-gray-500">{card.title}</h3>
-                            <p className={`text-2xl font-bold ${card.textColor}`}>
+                        <div className="ml-3 lg:ml-4 flex-1 min-w-0">
+                            <h3 className="text-xs lg:text-sm font-medium text-gray-500 truncate">{card.title}</h3>
+                            <p className={`text-lg lg:text-2xl font-bold ${card.textColor} truncate`}>
                                 {card.value}
                             </p>
                         </div>

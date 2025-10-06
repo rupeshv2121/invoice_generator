@@ -18,11 +18,11 @@ const DateRangeFilter = ({ startDate, endDate, onStartDateChange, onEndDateChang
     };
 
     return (
-        <div className="bg-card rounded-lg border border-border p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-6">Date Range</h2>
-            <div className="space-y-6">
+        <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 sm:mb-6">Date Range</h2>
+            <div className="space-y-4 sm:space-y-6">
                 {/* Custom Date Range */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <Input
                         label="Start Date"
                         type="date"
@@ -42,14 +42,14 @@ const DateRangeFilter = ({ startDate, endDate, onStartDateChange, onEndDateChang
                 {/* Quick Select Options */}
                 <div>
                     <h3 className="text-sm font-medium text-foreground mb-3">Quick Select</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {quickRanges?.map((range) => (
                             <Button
                                 key={range?.value}
                                 variant="outline"
                                 size="sm"
                                 onClick={() => onQuickSelect(range?.value)}
-                                className="text-sm"
+                                className="text-xs sm:text-sm whitespace-nowrap"
                             >
                                 {range?.label}
                             </Button>

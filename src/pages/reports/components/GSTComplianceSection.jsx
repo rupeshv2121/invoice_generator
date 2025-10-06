@@ -55,23 +55,23 @@ const GSTComplianceSection = () => {
     };
 
     return (
-        <div className="bg-card rounded-lg border border-border p-6">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-foreground">GST Compliance</h2>
-                <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" iconName="Download">
+        <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground">GST Compliance</h2>
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                    <Button variant="outline" size="sm" iconName="Download" className="w-full sm:w-auto">
                         Download GSTR-1
                     </Button>
-                    <Button variant="outline" size="sm" iconName="Download">
+                    <Button variant="outline" size="sm" iconName="Download" className="w-full sm:w-auto">
                         Download GSTR-3B
                     </Button>
                 </div>
             </div>
             {/* Current Period Summary */}
-            <div className="bg-muted rounded-lg p-4 mb-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium text-foreground">{currentPeriod?.period}</h3>
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(currentPeriod?.filingStatus)}`}>
+            <div className="bg-muted rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                    <h3 className="text-base sm:text-lg font-medium text-foreground">{currentPeriod?.period}</h3>
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium self-start ${getStatusColor(currentPeriod?.filingStatus)}`}>
                         <div className="flex items-center space-x-1">
                             <Icon
                                 name={currentPeriod?.filingStatus === 'filed' ? 'CheckCircle' : 'Clock'}
@@ -82,7 +82,7 @@ const GSTComplianceSection = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     <div className="text-center">
                         <p className="text-sm text-text-secondary mb-1">Total Sales</p>
                         <p className="text-lg font-semibold text-foreground">
@@ -134,18 +134,18 @@ const GSTComplianceSection = () => {
                 </div>
             </div>
             {/* Quick Actions */}
-            <div className="mt-6 pt-6 border-t border-border">
-                <div className="flex flex-wrap gap-3">
-                    <Button variant="outline" size="sm" iconName="FileText">
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3">
+                    <Button variant="outline" size="sm" iconName="FileText" className="text-xs sm:text-sm">
                         Generate GSTR-1
                     </Button>
-                    <Button variant="outline" size="sm" iconName="FileText">
+                    <Button variant="outline" size="sm" iconName="FileText" className="text-xs sm:text-sm">
                         Generate GSTR-3B
                     </Button>
-                    <Button variant="outline" size="sm" iconName="Calculator">
+                    <Button variant="outline" size="sm" iconName="Calculator" className="text-xs sm:text-sm">
                         Tax Calculator
                     </Button>
-                    <Button variant="outline" size="sm" iconName="History">
+                    <Button variant="outline" size="sm" iconName="History" className="text-xs sm:text-sm">
                         Filing History
                     </Button>
                 </div>

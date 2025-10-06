@@ -195,15 +195,17 @@ const ItemsManagement = () => {
         <div className="min-h-screen bg-gray-50">
             <Header />
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="max-w-[90%] mt-16 mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
                 <div className="mb-6">
                     <Breadcrumb items={breadcrumbItems} />
-                    <div className="mt-4 flex items-center justify-between">
+                    <div className="mt-4 flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Items Management</h1>
-                            <p className="text-gray-600">Manage your products and services</p>
+                            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Items Management</h1>
+                            <p className="text-gray-600 text-sm sm:text-base">Manage your products and services</p>
                         </div>
-                        <div className="flex items-center space-x-3">
+
+                        {/* Desktop buttons */}
+                        <div className="hidden lg:flex items-center space-x-3">
                             <input
                                 type="file"
                                 accept=".json"
@@ -236,6 +238,44 @@ const ItemsManagement = () => {
                                 Add Item
                             </Button>
                         </div>
+
+                        {/* Mobile buttons */}
+                        <div className="lg:hidden grid grid-cols-2 gap-2 w-full">
+                            <input
+                                type="file"
+                                accept=".json"
+                                onChange={handleImport}
+                                className="hidden"
+                                id="import-items-mobile"
+                            />
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => document.getElementById('import-items-mobile').click()}
+                                iconName="Upload"
+                                className="w-full justify-center"
+                            >
+                                Import
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleExport}
+                                iconName="Download"
+                                className="w-full justify-center"
+                            >
+                                Export
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={handleAddItem}
+                                iconName="Plus"
+                                className="col-span-2 w-full justify-center"
+                            >
+                                Add Item
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -243,23 +283,24 @@ const ItemsManagement = () => {
                 <ItemsStats stats={stats} />
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-gray-900">Search & Filter</h2>
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-2 sm:space-y-0">
+                        <h2 className="text-base sm:text-lg font-semibold text-gray-900">Search & Filter</h2>
                         {selectedItems.length > 0 && (
                             <Button
                                 variant="destructive"
                                 size="sm"
                                 onClick={handleBulkDelete}
                                 iconName="Trash2"
+                                className="w-full sm:w-auto"
                             >
                                 Delete Selected ({selectedItems.length})
                             </Button>
                         )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="md:col-span-2">
+                    <div className="flex flex-col space-y-4">
+                        <div className="w-full">
                             <Input
                                 type="text"
                                 placeholder="Search by item name or HSN code..."
@@ -268,7 +309,7 @@ const ItemsManagement = () => {
                                 className="w-full"
                             />
                         </div>
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center justify-center sm:justify-end">
                             <span className="text-sm text-gray-600">
                                 Showing {filteredItems.length} of {items.length} items
                             </span>

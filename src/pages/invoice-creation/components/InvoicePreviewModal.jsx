@@ -113,7 +113,7 @@ const InvoicePreviewModal = ({
                 {/* Modal Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-b border-gray-200 space-y-2 sm:space-y-0">
                     <h2 className="text-base sm:text-lg font-semibold text-gray-900">Export Invoice Preview</h2>
-                    
+
                     {/* Desktop buttons */}
                     <div className="hidden sm:flex items-center space-x-2">
                         <Button
@@ -141,7 +141,7 @@ const InvoicePreviewModal = ({
                             iconName="X"
                         />
                     </div>
-                    
+
                     {/* Mobile buttons */}
                     <div className="flex sm:hidden items-center justify-between w-full space-x-2">
                         <div className="flex items-center space-x-2 flex-1">

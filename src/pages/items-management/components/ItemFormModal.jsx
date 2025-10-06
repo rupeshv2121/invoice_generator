@@ -100,16 +100,16 @@ const ItemFormModal = ({ isOpen, onClose, onSave, editingItem }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full my-8 max-h-full overflow-y-auto">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900">
                         {editingItem ? 'Edit Item' : 'Add New Item'}
                     </h2>
                     <button
                         onClick={handleClose}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 -m-2"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -118,7 +118,7 @@ const ItemFormModal = ({ isOpen, onClose, onSave, editingItem }) => {
                 </div>
 
                 {/* Modal Body */}
-                <form onSubmit={handleSubmit} className="p-6">
+                <form onSubmit={handleSubmit} className="p-4 sm:p-6">
                     <div className="space-y-4">
                         {/* Item Name */}
                         <div>
@@ -216,12 +216,13 @@ const ItemFormModal = ({ isOpen, onClose, onSave, editingItem }) => {
                     </div>
 
                     {/* Modal Footer */}
-                    <div className="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-6 pt-4 border-t border-gray-200">
                         <Button
                             type="button"
                             variant="outline"
                             onClick={handleClose}
                             disabled={saving}
+                            className="w-full sm:w-auto order-2 sm:order-1"
                         >
                             Cancel
                         </Button>
@@ -230,6 +231,7 @@ const ItemFormModal = ({ isOpen, onClose, onSave, editingItem }) => {
                             variant="default"
                             disabled={saving}
                             loading={saving}
+                            className="w-full sm:w-auto order-1 sm:order-2"
                         >
                             {saving ? 'Saving...' : (editingItem ? 'Update Item' : 'Add Item')}
                         </Button>

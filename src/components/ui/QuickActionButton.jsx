@@ -1,3 +1,4 @@
+import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 
@@ -11,14 +12,12 @@ const QuickActionButton = () => {
     return (
         <div className="fixed bottom-6 right-6 z-40 lg:hidden">
             <Button
-                variant="default"
                 size="lg"
                 onClick={handleCreateInvoice}
                 className="rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-200"
-                iconName="Plus"
-                iconSize={24}
+                iconSize={16}
             >
-                <span className="sr-only">Create Invoice</span>
+                <span className="flex items-center justify-center"><Plus /> </span>
             </Button>
         </div>
     );

@@ -157,15 +157,6 @@ const Header = () => {
                                     <span>{item?.label}</span>
                                 </Link>
                             ))}
-                            <div className="border-t border-border my-3" />
-                            <Link
-                                to="/company-profile"
-                                onClick={closeMobileMenu}
-                                className="flex items-center space-x-3 px-3 py-3 rounded-md text-base font-medium text-text-secondary hover:text-foreground hover:bg-muted transition-colors duration-200"
-                            >
-                                <Icon name="Building" size={20} />
-                                <span>Company Profile</span>
-                            </Link>
                         </nav>
                     </div>
                 </>

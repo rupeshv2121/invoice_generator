@@ -101,14 +101,14 @@ const Reports = () => {
                     <Breadcrumb />
 
                     {/* Page Header */}
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 lg:mb-8 space-y-4 lg:space-y-0">
                         <div>
-                            <h1 className="text-3xl font-bold text-foreground">Reports & Analytics</h1>
+                            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Reports & Analytics</h1>
                             <p className="text-text-secondary mt-2">
                                 Comprehensive business insights and GST compliance reporting
                             </p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left lg:text-right">
                             <p className="text-sm text-text-secondary">Last Updated</p>
                             <p className="text-sm font-medium text-foreground">{formatLastUpdated()}</p>
                         </div>
@@ -159,57 +159,57 @@ const Reports = () => {
                     </div>
 
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-card rounded-lg border border-border p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+                        <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
                             <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-text-secondary mb-1">Total Revenue</p>
-                                    <p className="text-2xl font-bold text-foreground">₹45,67,890</p>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Total Revenue</p>
+                                    <p className="text-xl lg:text-2xl font-bold text-foreground truncate">₹45,67,890</p>
                                 </div>
-                                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                                    <div className="w-6 h-6 bg-primary rounded" />
+                                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+                                    <div className="w-5 h-5 lg:w-6 lg:h-6 bg-primary rounded" />
                                 </div>
                             </div>
-                            <p className="text-sm text-success mt-2">+12.5% from last month</p>
+                            <p className="text-xs lg:text-sm text-success mt-2 truncate">+12.5% from last month</p>
                         </div>
 
-                        <div className="bg-card rounded-lg border border-border p-6">
+                        <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
                             <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-text-secondary mb-1">Total Tax Collected</p>
-                                    <p className="text-2xl font-bold text-foreground">₹8,22,221</p>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Total Tax Collected</p>
+                                    <p className="text-xl lg:text-2xl font-bold text-foreground truncate">₹8,22,221</p>
                                 </div>
-                                <div className="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center">
-                                    <div className="w-6 h-6 bg-success rounded" />
+                                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-success/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+                                    <div className="w-5 h-5 lg:w-6 lg:h-6 bg-success rounded" />
                                 </div>
                             </div>
-                            <p className="text-sm text-success mt-2">GST compliant</p>
+                            <p className="text-xs lg:text-sm text-success mt-2 truncate">GST compliant</p>
                         </div>
 
-                        <div className="bg-card rounded-lg border border-border p-6">
+                        <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
                             <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-text-secondary mb-1">Outstanding Amount</p>
-                                    <p className="text-2xl font-bold text-foreground">₹7,00,000</p>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Outstanding Amount</p>
+                                    <p className="text-xl lg:text-2xl font-bold text-foreground truncate">₹7,00,000</p>
                                 </div>
-                                <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center">
-                                    <div className="w-6 h-6 bg-warning rounded" />
+                                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-warning/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+                                    <div className="w-5 h-5 lg:w-6 lg:h-6 bg-warning rounded" />
                                 </div>
                             </div>
-                            <p className="text-sm text-warning mt-2">15% of total sales</p>
+                            <p className="text-xs lg:text-sm text-warning mt-2 truncate">15% of total sales</p>
                         </div>
 
-                        <div className="bg-card rounded-lg border border-border p-6">
+                        <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
                             <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-text-secondary mb-1">Active Customers</p>
-                                    <p className="text-2xl font-bold text-foreground">147</p>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Active Customers</p>
+                                    <p className="text-xl lg:text-2xl font-bold text-foreground truncate">147</p>
                                 </div>
-                                <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
-                                    <div className="w-6 h-6 bg-secondary rounded" />
+                                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+                                    <div className="w-5 h-5 lg:w-6 lg:h-6 bg-secondary rounded" />
                                 </div>
                             </div>
-                            <p className="text-sm text-success mt-2">+8 new this month</p>
+                            <p className="text-xs lg:text-sm text-success mt-2 truncate">+8 new this month</p>
                         </div>
                     </div>
                 </div>

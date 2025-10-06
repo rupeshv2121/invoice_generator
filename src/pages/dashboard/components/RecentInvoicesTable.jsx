@@ -51,7 +51,7 @@ const RecentInvoicesTable = ({ invoices }) => {
                     <span className="sm:hidden">All</span>
                 </Button>
             </div>
-            
+
             {/* Desktop Table View */}
             <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full">
@@ -110,7 +110,7 @@ const RecentInvoicesTable = ({ invoices }) => {
                     </tbody>
                 </table>
             </div>
-            
+
             {/* Mobile Card View */}
             <div className="lg:hidden p-4 space-y-4">
                 {invoices?.map((invoice) => (
@@ -128,7 +128,7 @@ const RecentInvoicesTable = ({ invoices }) => {
                                 {invoice?.status}
                             </span>
                         </div>
-                        
+
                         <div className="space-y-2">
                             <div>
                                 <div className="font-medium text-foreground">{invoice?.customerName}</div>
@@ -137,7 +137,7 @@ const RecentInvoicesTable = ({ invoices }) => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2 pt-2">
                             <Button
                                 variant="outline"
