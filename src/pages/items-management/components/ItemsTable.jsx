@@ -225,7 +225,7 @@ const ItemsTable = ({
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                                 <div className="text-sm">
                                     <span className={`font-medium ${calculateProfit(item.purchasePrice, item.sellingPrice) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -275,13 +275,13 @@ const ItemsTable = ({
                             </select>
                             <span className="text-sm text-gray-700">per page</span>
                         </div>
-                        
+
                         <div className="text-center">
                             <span className="text-sm text-gray-700">
                                 Page {currentPage} of {totalPages} ({totalItems} items)
                             </span>
                         </div>
-                        
+
                         <div className="flex justify-center space-x-2">
                             <Button
                                 variant="outline"
@@ -305,7 +305,7 @@ const ItemsTable = ({
                             </Button>
                         </div>
                     </div>
-                    
+
                     {/* Desktop pagination */}
                     <div className="hidden lg:flex items-center justify-between">
                         <div className="flex items-center space-x-2">

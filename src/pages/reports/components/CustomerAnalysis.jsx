@@ -166,7 +166,7 @@ const CustomerAnalysis = () => {
                                     <span className="capitalize">{customer?.status}</span>
                                 </div>
                             </div>
-                            
+
                             <div className="grid grid-cols-2 gap-3 text-sm mb-3">
                                 <div>
                                     <p className="text-text-secondary">Invoices</p>
@@ -185,7 +185,7 @@ const CustomerAnalysis = () => {
                                     <p className="font-medium text-warning">{formatCurrency(customer?.pendingAmount)}</p>
                                 </div>
                             </div>
-                            
+
                             <div className="pt-3 border-t border-gray-100">
                                 <Button variant="outline" size="sm" iconName="Eye" className="w-full">
                                     View Details

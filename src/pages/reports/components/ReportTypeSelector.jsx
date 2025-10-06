@@ -51,7 +51,7 @@ const ReportTypeSelector = ({ selectedType, onTypeChange, onGenerateReport, isGe
                         key={type?.id}
                         onClick={() => onTypeChange(type?.id)}
                         className={`p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${selectedType === type?.id
-                                ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                            ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-muted/50'
                             }`}
                     >
                         <div className="flex items-start space-x-3">
