@@ -4,7 +4,9 @@ import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
+import { downloadInvoicePDF } from '../../services/pdfService';
 
+import InvoicePreviewModal from '../invoice-creation/components/InvoicePreviewModal';
 import BulkActions from './components/BulkActions';
 import InvoiceFilters from './components/InvoiceFilters';
 import InvoicePagination from './components/InvoicePagination';
@@ -12,6 +14,8 @@ import InvoiceTable from './components/InvoiceTable';
 
 const InvoiceList = () => {
     const navigate = useNavigate();
+    const [previewModalOpen, setPreviewModalOpen] = useState(false);
+    const [selectedInvoiceForPreview, setSelectedInvoiceForPreview] = useState(null);
 
     // Mock invoice data
     const mockInvoices = [
@@ -221,8 +225,9 @@ const InvoiceList = () => {
         switch (action) {
             case 'create': navigate('/invoice-creation');
                 break;
-            case 'view': console.log('Viewing invoice:', invoice?.id);
-                // Navigate to invoice view page
+            case 'view':
+                setSelectedInvoiceForPreview(invoice);
+                setPreviewModalOpen(true);
                 break;
             case 'edit': console.log('Editing invoice:', invoice?.id);
                 navigate('/invoice-creation', { state: { editInvoice: invoice } });
@@ -231,8 +236,13 @@ const InvoiceList = () => {
                 navigate('/invoice-creation', { state: { duplicateInvoice: invoice } });
                 break;
             case 'download':
-                console.log('Downloading invoice:', invoice?.id);
-                // Implement PDF download
+                const invoiceData = transformInvoiceForPreview(invoice);
+                const result = downloadInvoicePDF(invoiceData);
+                if (result.success) {
+                    alert('PDF downloaded successfully!');
+                } else {
+                    alert('Error downloading PDF: ' + result.error);
+                }
                 break;
             case 'send': console.log('Sending invoice:', invoice?.id);
                 // Implement email sending
@@ -250,6 +260,56 @@ const InvoiceList = () => {
             default:
                 console.log('Unknown action:', action);
         }
+    };
+
+    // Transform mock invoice data for preview modal
+    const transformInvoiceForPreview = (invoice) => {
+        return {
+            companyData: {
+                name: 'Your Company Name',
+                address: '123 Business Street, City, State 12345',
+                phone: '+1 (555) 123-4567',
+                email: 'info@yourcompany.com',
+                gstin: '27AAACI1681G1Z8',
+                iecCode: 'IEC123456789',
+                bondNumber: 'BOND12345',
+                state: 'Maharashtra',
+                stateCode: '27'
+            },
+            customerData: {
+                billingAddress: {
+                    name: invoice?.customerName || 'Customer Name',
+                    address: '456 Customer Street, Customer City',
+                    eximCode: 'EXIM123',
+                    city: 'Customer City',
+                    country: 'Nepal'
+                }
+            },
+            invoiceDetails: {
+                invoiceNumber: invoice?.invoiceNumber || 'INV-001',
+                invoiceDate: invoice?.date || new Date().toISOString().split('T')[0],
+                supplyDate: invoice?.date || new Date().toISOString().split('T')[0],
+                marka: 'MARKA001',
+                transport: 'By Road'
+            },
+            items: [
+                {
+                    description: 'Sample Product/Service',
+                    hsnCode: '1001',
+                    unit: 'PCS',
+                    quantity: 1,
+                    rate: invoice?.amount || 0,
+                    grossAmount: invoice?.amount || 0,
+                    cgstAmount: (invoice?.amount || 0) * 0.09,
+                    sgstAmount: (invoice?.amount || 0) * 0.09,
+                    igstAmount: 0
+                }
+            ],
+            additionalCharges: {
+                shipping: 0,
+                other: 0
+            }
+        };
     };
 
     const handleBulkAction = (action) => {
@@ -346,6 +406,18 @@ const InvoiceList = () => {
                 </div>
             </main>
             <QuickActionButton />
+
+            {/* Invoice Preview Modal */}
+            {selectedInvoiceForPreview && (
+                <InvoicePreviewModal
+                    isOpen={previewModalOpen}
+                    onClose={() => {
+                        setPreviewModalOpen(false);
+                        setSelectedInvoiceForPreview(null);
+                    }}
+                    {...transformInvoiceForPreview(selectedInvoiceForPreview)}
+                />
+            )}
         </div>
     );
 };

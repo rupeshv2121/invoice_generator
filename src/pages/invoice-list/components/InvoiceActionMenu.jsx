@@ -1,3 +1,4 @@
+import { FileOutputIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
@@ -82,7 +83,7 @@ const InvoiceActionMenu = ({ invoice, onAction }) => {
                 iconName="MoreVertical"
                 className="h-8 w-8 p-0"
             >
-                <span className="sr-only">Open menu</span>
+                <span className=""><FileOutputIcon /> </span>
             </Button>
             {isOpen && (
                 <>
@@ -90,7 +91,7 @@ const InvoiceActionMenu = ({ invoice, onAction }) => {
                         className="fixed inset-0 z-10"
                         onClick={closeMenu}
                     />
-                    <div className="absolute right-0 top-full mt-1 w-48 bg-popover border border-border rounded-md shadow-lg z-20">
+                    <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-border rounded-md shadow-lg z-20">
                         <div className="py-1">
                             {visibleActions?.map((action, index) => (
                                 <React.Fragment key={action?.action}>
@@ -99,8 +100,8 @@ const InvoiceActionMenu = ({ invoice, onAction }) => {
                                         onClick={() => handleAction(action?.action)}
                                         disabled={action?.disabled}
                                         className={`flex items-center w-full px-3 py-2 text-sm transition-colors duration-150 ${action?.disabled
-                                                ? 'text-text-secondary cursor-not-allowed opacity-50'
-                                                : action?.className
+                                            ? 'text-text-secondary cursor-not-allowed opacity-50'
+                                            : action?.className
                                             }`}
                                     >
                                         <Icon name={action?.icon} size={16} className="mr-3" />

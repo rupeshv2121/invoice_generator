@@ -4,9 +4,12 @@ import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
-import BankDetailsSection from './components/BankDetailsSection';
-import CompanyDetailsSection from './components/CompanyDetailsSection';
-import CustomerDetailsSection from './components/CustomerDetailsSection';
+import { getMyCompanyProfile } from '../../services/companyProfileService';
+import { getAllCustomers } from '../../services/customerService';
+import { downloadInvoicePDF } from '../../services/pdfService';
+import { getDefaultInvoiceValues, getNextInvoiceNumber } from '../../services/settingsService';
+import { downloadSimpleInvoicePDF } from '../../services/simplePdfService';
+import CompanyCustomerSelector from './components/CompanyCustomerSelector';
 import InvoiceDetailsSection from './components/InvoiceDetailsSection';
 import InvoiceItemsTable from './components/InvoiceItemsTable';
 import InvoicePreviewModal from './components/InvoicePreviewModal';
@@ -17,51 +20,43 @@ const InvoiceCreation = () => {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [sameAsShipping, setSameAsShipping] = useState(true);
 
-    // Mock data
-    const mockCustomers = [
-        {
-            id: 1,
-            name: "Rajesh Kumar Enterprises",
-            email: "rajesh@rke.com",
-            address: "123 Business Park, Sector 18",
-            city: "Gurgaon",
-            state: "Haryana",
-            pincode: "122001",
-            gstin: "06ABCDE1234F1Z5"
-        },
-        {
-            id: 2,
-            name: "Mumbai Trading Co.",
-            email: "info@mumbaitrading.com",
-            address: "456 Commercial Street, Andheri East",
-            city: "Mumbai",
-            state: "Maharashtra",
-            pincode: "400069",
-            gstin: "27FGHIJ5678K2L9"
-        },
-        {
-            id: 3,
-            name: "Chennai Software Solutions",
-            email: "contact@chennaisoftware.com",
-            address: "789 IT Park, OMR",
-            city: "Chennai",
-            state: "Tamil Nadu",
-            pincode: "600096",
-            gstin: "33MNOPQ9012R3S4"
+    // Mock data - in real app, these would come from API calls
+
+    // Your business profile (logged-in user's company) - fetched from service
+    const [myCompanyProfile, setMyCompanyProfile] = useState(null);
+
+    // Customers state - loaded from customer service
+    const [customers, setCustomers] = useState([]);
+    const [customersLoading, setCustomersLoading] = useState(true);
+
+    // Selected customer ID
+    const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+
+    // Derived data based on selections
+    const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
+
+    // Load company profile and customers on component mount
+    useEffect(() => {
+        const profile = getMyCompanyProfile();
+        setMyCompanyProfile(profile);
+
+        // Load customers from service
+        try {
+            const customersList = getAllCustomers();
+            console.log('Loaded customers:', customersList);
+            setCustomers(customersList);
+        } catch (error) {
+            console.error('Error loading customers:', error);
+            setCustomers([]);
+        } finally {
+            setCustomersLoading(false);
         }
-    ];
+    }, []);
 
-    // Company data state
-    const [companyData, setCompanyData] = useState({
-        name: "ABC Company Pvt Ltd",
-        gstin: "07ABCDE1234F1Z5",
-        address: "Plot No. 123, Industrial Area, Phase-1, Gurgaon, Haryana - 122016",
-        phone: "+91 9876543210",
-        email: "info@abccompany.com",
-        state: "Haryana"
-    });
+    // Company data state - auto-populated from selected company
+    const [companyData, setCompanyData] = useState({});
 
-    // Customer data state
+    // Customer data state - auto-populated from selected customer
     const [customerData, setCustomerData] = useState({
         selectedCustomer: null,
         billingAddress: {
@@ -70,43 +65,165 @@ const InvoiceCreation = () => {
             city: '',
             state: '',
             pincode: '',
-            gstin: ''
+            gstin: '',
+            eximCode: '',
+            country: ''
         },
         shippingAddress: {
             name: '',
             address: '',
             city: '',
             state: '',
-            pincode: ''
+            pincode: '',
+            country: ''
         }
     });
 
+    // Bank details - auto-populated from selected company
+    const [autoPopulatedBankDetails, setAutoPopulatedBankDetails] = useState({});
+
+    // Load default values from settings
+    const defaultValues = getDefaultInvoiceValues();
+
     // Invoice details state
     const [invoiceDetails, setInvoiceDetails] = useState({
-        invoiceNumber: `INV-${new Date()?.getFullYear()}-${String(Date.now())?.slice(-6)}`,
+        invoiceNumber: getNextInvoiceNumber(),
         invoiceDate: new Date()?.toISOString()?.split('T')?.[0],
-        paymentTerms: 'net30',
-        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)?.toISOString()?.split('T')?.[0]
+        paymentTerms: defaultValues.paymentTerms || '',
+        dueDate: '',
+        marka: defaultValues.marka || '',
+        transport: defaultValues.transport || '',
+        supplyDate: new Date()?.toISOString()?.split('T')?.[0]
     });
+
+    // Auto-populate company data from logged-in user's profile
+    useEffect(() => {
+        if (myCompanyProfile) {
+            // Use the loaded company profile data
+            const fullAddress = `${myCompanyProfile.addressLine1}${myCompanyProfile.addressLine2 ? ', ' + myCompanyProfile.addressLine2 : ''}`;
+
+            setCompanyData({
+                name: myCompanyProfile.companyName,
+                companyName: myCompanyProfile.companyName,
+                gstin: myCompanyProfile.gstNumber,
+                iecCode: myCompanyProfile.iecCode,
+                arn: myCompanyProfile.arn,
+                address: fullAddress,
+                phone: myCompanyProfile.phone,
+                email: myCompanyProfile.email,
+                state: myCompanyProfile.state,
+                stateCode: myCompanyProfile.stateCode,
+                city: myCompanyProfile.city,
+                pincode: myCompanyProfile.postalCode
+            });
+
+            setAutoPopulatedBankDetails({
+                bankName: myCompanyProfile.bankDetails.bankName,
+                accountNumber: myCompanyProfile.bankDetails.accountNumber,
+                ifscCode: myCompanyProfile.bankDetails.ifscCode,
+                accountName: myCompanyProfile.bankDetails.accountName,
+                accountType: myCompanyProfile.bankDetails.accountType,
+                branchName: myCompanyProfile.bankDetails.branchName
+            });
+        }
+    }, [myCompanyProfile]); // Run when company profile is loaded
+
+    // Auto-populate customer data when customer selection changes
+    useEffect(() => {
+        if (selectedCustomer) {
+            setCustomerData({
+                selectedCustomer: selectedCustomer,
+                billingAddress: {
+                    name: selectedCustomer.businessName,
+                    address: selectedCustomer.billingAddress.street,
+                    city: selectedCustomer.billingAddress.city,
+                    state: selectedCustomer.billingAddress.state,
+                    pincode: selectedCustomer.billingAddress.pincode,
+                    gstin: selectedCustomer.gstNumber,
+                    eximCode: selectedCustomer.eximCode,
+                    country: selectedCustomer.billingAddress.country
+                },
+                shippingAddress: {
+                    name: selectedCustomer.businessName,
+                    address: selectedCustomer.shippingAddress.street,
+                    city: selectedCustomer.shippingAddress.city,
+                    state: selectedCustomer.shippingAddress.state,
+                    pincode: selectedCustomer.shippingAddress.pincode,
+                    country: selectedCustomer.shippingAddress.country
+                }
+            });
+        }
+    }, [selectedCustomer]);
 
     // Invoice items state
     const [items, setItems] = useState([
         {
             id: Date.now(),
-            description: '',
-            hsnCode: '',
-            unit: 'pcs',
-            quantity: 1,
-            rate: 0,
+            description: 'Safty 1.5" (Door King Brand)',
+            hsnCode: '83024110',
+            unit: 'gz',
+            quantity: 5,
+            rate: 320,
             discountPercent: 0,
-            taxRate: 18,
-            grossAmount: 0,
+            taxRate: 0, // Export items typically have 0% tax
+            grossAmount: 1600,
             discountAmount: 0,
-            taxableAmount: 0,
+            taxableAmount: 1600,
             cgstAmount: 0,
             sgstAmount: 0,
             igstAmount: 0,
-            totalAmount: 0
+            totalAmount: 1600
+        },
+        {
+            id: Date.now() + 1,
+            description: 'Safty 2" (Door King Brand)',
+            hsnCode: '83024110',
+            unit: 'gz',
+            quantity: 10,
+            rate: 360,
+            discountPercent: 0,
+            taxRate: 0,
+            grossAmount: 3600,
+            discountAmount: 0,
+            taxableAmount: 3600,
+            cgstAmount: 0,
+            sgstAmount: 0,
+            igstAmount: 0,
+            totalAmount: 3600
+        },
+        {
+            id: Date.now() + 2,
+            description: 'Safty 4" (Door King Brand)',
+            hsnCode: '83024110',
+            unit: 'gz',
+            quantity: 5,
+            rate: 500,
+            discountPercent: 0,
+            taxRate: 0,
+            grossAmount: 2500,
+            discountAmount: 0,
+            taxableAmount: 2500,
+            cgstAmount: 0,
+            sgstAmount: 0,
+            igstAmount: 0,
+            totalAmount: 2500
+        },
+        {
+            id: Date.now() + 3,
+            description: 'Tower Bolt 4" (Anti Brand)',
+            hsnCode: '83024110',
+            unit: 'doz',
+            quantity: 200,
+            rate: 174,
+            discountPercent: 0,
+            taxRate: 0,
+            grossAmount: 34800,
+            discountAmount: 0,
+            taxableAmount: 34800,
+            cgstAmount: 0,
+            sgstAmount: 0,
+            igstAmount: 0,
+            totalAmount: 34800
         }
     ]);
 
@@ -114,22 +231,6 @@ const InvoiceCreation = () => {
     const [additionalCharges, setAdditionalCharges] = useState({
         shipping: 0,
         other: 0
-    });
-
-    // Bank details state
-    const [bankDetails, setBankDetails] = useState({
-        template: 'sbi',
-        accountName: 'ABC Company Pvt Ltd',
-        accountNumber: '12345678901234',
-        ifscCode: 'SBIN0001234',
-        bankName: 'State Bank of India',
-        branch: 'Main Branch'
-    });
-
-    // Terms and conditions state
-    const [termsAndConditions, setTermsAndConditions] = useState({
-        template: 'standard',
-        content: `1. Payment is due within the specified payment terms.\n2. Late payments may incur additional charges.\n3. All disputes must be resolved within 30 days of invoice date.\n4. Goods once sold will not be taken back.\n5. Subject to local jurisdiction only.\n6. All payments should be made in favor of the company.\n7. Any discrepancy in the invoice should be reported within 7 days.`
     });
 
     // Handle same as shipping checkbox
@@ -165,14 +266,6 @@ const InvoiceCreation = () => {
         setAdditionalCharges(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleBankDetailsChange = (field, value) => {
-        setBankDetails(prev => ({ ...prev, [field]: value }));
-    };
-
-    const handleTermsChange = (field, value) => {
-        setTermsAndConditions(prev => ({ ...prev, [field]: value }));
-    };
-
     const handleSameAsShippingChange = (checked) => {
         setSameAsShipping(checked);
         if (checked) {
@@ -191,6 +284,43 @@ const InvoiceCreation = () => {
 
     const handlePreview = () => {
         setIsPreviewOpen(true);
+    };
+
+    const handleDownloadPDF = () => {
+        if (!validateForm()) {
+            return;
+        }
+
+        const invoiceData = {
+            companyData,
+            customerData,
+            invoiceDetails,
+            items,
+            additionalCharges
+        };
+
+        try {
+            // Try the main PDF service first
+            const result = downloadInvoicePDF(invoiceData);
+            if (result.success) {
+                alert('PDF downloaded successfully!');
+            } else {
+                throw new Error(result.error);
+            }
+        } catch (error) {
+            console.warn('Main PDF service failed, trying simple PDF service:', error);
+            // Fallback to simple PDF service
+            try {
+                const fallbackResult = downloadSimpleInvoicePDF(invoiceData);
+                if (fallbackResult.success) {
+                    alert('PDF downloaded successfully! (using simplified format)');
+                } else {
+                    alert('Error downloading PDF: ' + fallbackResult.error);
+                }
+            } catch (fallbackError) {
+                alert('Error downloading PDF: ' + fallbackError.message);
+            }
+        }
     };
 
     const handleSaveDraft = () => {
@@ -237,6 +367,14 @@ const InvoiceCreation = () => {
                                 Save Draft
                             </Button>
                             <Button
+                                variant="outline"
+                                onClick={handleDownloadPDF}
+                                iconName="Download"
+                                iconPosition="left"
+                            >
+                                Download PDF
+                            </Button>
+                            <Button
                                 variant="secondary"
                                 onClick={handlePreview}
                                 iconName="Eye"
@@ -260,18 +398,26 @@ const InvoiceCreation = () => {
                     </div>
 
                     <div className="space-y-6">
-                        <CompanyDetailsSection
-                            companyData={companyData}
-                            onCompanyDataChange={handleCompanyDataChange}
+                        <CompanyCustomerSelector
+                            customers={customers}
+                            selectedCustomerId={selectedCustomerId}
+                            onCustomerChange={setSelectedCustomerId}
+                            myCompanyProfile={myCompanyProfile}
+                            loading={customersLoading}
                         />
 
+                        {/* <CompanyDetailsSection
+                            companyData={companyData}
+                            onCompanyDataChange={handleCompanyDataChange}
+                        /> */}
+                        {/* 
                         <CustomerDetailsSection
                             customerData={customerData}
                             onCustomerDataChange={handleCustomerDataChange}
                             customers={mockCustomers}
                             sameAsShipping={sameAsShipping}
                             onSameAsShippingChange={handleSameAsShippingChange}
-                        />
+                        /> */}
 
                         <InvoiceDetailsSection
                             invoiceDetails={invoiceDetails}
@@ -291,13 +437,6 @@ const InvoiceCreation = () => {
                             onAdditionalChargesChange={handleAdditionalChargesChange}
                         />
 
-                        <BankDetailsSection
-                            bankDetails={bankDetails}
-                            onBankDetailsChange={handleBankDetailsChange}
-                            termsAndConditions={termsAndConditions}
-                            onTermsChange={handleTermsChange}
-                        />
-
                         {/* Mobile Action Buttons */}
                         <div className="lg:hidden flex flex-col space-y-3">
                             <Button
@@ -308,6 +447,15 @@ const InvoiceCreation = () => {
                                 fullWidth
                             >
                                 Save Draft
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={handleDownloadPDF}
+                                iconName="Download"
+                                iconPosition="left"
+                                fullWidth
+                            >
+                                Download PDF
                             </Button>
                             <Button
                                 variant="secondary"
@@ -344,8 +492,6 @@ const InvoiceCreation = () => {
                 invoiceDetails={invoiceDetails}
                 items={items}
                 additionalCharges={additionalCharges}
-                bankDetails={bankDetails}
-                termsAndConditions={termsAndConditions}
             />
         </div>
     );

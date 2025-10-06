@@ -17,6 +17,7 @@ const CustomerModal = ({
         email: '',
         phone: '',
         gstNumber: '',
+        eximCode: '',
         customerType: 'Business',
         billingAddress: {
             street: '',
@@ -52,6 +53,7 @@ const CustomerModal = ({
                 email: customer?.email || '',
                 phone: customer?.phone || '',
                 gstNumber: customer?.gstNumber || '',
+                eximCode: customer?.eximCode || '',
                 customerType: customer?.customerType || 'Business',
                 billingAddress: customer?.billingAddress || {
                     street: '',
@@ -82,6 +84,7 @@ const CustomerModal = ({
                 email: '',
                 phone: '',
                 gstNumber: '',
+                eximCode: '',
                 customerType: 'Business',
                 billingAddress: {
                     street: '',
@@ -346,6 +349,17 @@ const CustomerModal = ({
                                         error={errors?.gstNumber}
                                         placeholder="22AAAAA0000A1Z5"
                                         description="15-character GST identification number"
+                                        disabled={mode === 'view'}
+                                    />
+
+                                    <Input
+                                        label="EXIM Code"
+                                        type="text"
+                                        value={formData?.eximCode}
+                                        onChange={(e) => handleInputChange('eximCode', e?.target?.value?.toUpperCase())}
+                                        error={errors?.eximCode}
+                                        placeholder="301806927014NP"
+                                        description="Export-Import code for international trade"
                                         disabled={mode === 'view'}
                                     />
                                 </div>

@@ -64,6 +64,7 @@ const CustomerTable = ({
                                     <Icon name={getSortIcon('location')} size={16} />
                                 </button>
                             </th>
+                            <th className="text-left p-4 font-medium text-foreground">EXIM Code</th>
                             <th className="text-left p-4 font-medium text-foreground">GST Status</th>
                             <th className="text-right p-4 font-medium text-foreground">Actions</th>
                         </tr>
@@ -90,6 +91,11 @@ const CustomerTable = ({
                                 </td>
                                 <td className="p-4">
                                     <div className="text-foreground">{customer?.location}</div>
+                                </td>
+                                <td className="p-4">
+                                    <div className="font-mono text-sm text-foreground bg-muted px-2 py-1 rounded">
+                                        {customer?.eximCode || 'N/A'}
+                                    </div>
                                 </td>
                                 <td className="p-4">
                                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${customer?.gstStatus === 'Registered' ? 'bg-green-600 text-white font-bold' : 'bg-yellow-500 text-white font-bold'

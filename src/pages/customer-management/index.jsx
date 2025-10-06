@@ -4,6 +4,7 @@ import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
+import { addCustomer, deleteCustomer, getAllCustomers, searchCustomers, updateCustomer } from '../../services/customerService';
 import CustomerFilters from './components/CustomerFilters';
 import CustomerHistoryModal from './components/CustomerHistoryModal';
 import CustomerModal from './components/CustomerModal';
@@ -24,8 +25,25 @@ const CustomerManagement = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [modalMode, setModalMode] = useState('add');
 
-    // Mock customer data
-    const mockCustomers = [
+    // Load customers from service on component mount
+    useEffect(() => {
+        loadCustomers();
+    }, []);
+
+    const loadCustomers = () => {
+        try {
+            const customersList = getAllCustomers();
+            setCustomers(customersList);
+            setFilteredCustomers(customersList);
+        } catch (error) {
+            console.error('Error loading customers:', error);
+            setCustomers([]);
+            setFilteredCustomers([]);
+        }
+    };
+
+    // Original mock customers for reference (will be removed)
+    const originalMockCustomers = [
         {
             id: 1,
             businessName: "TechCorp Solutions Pvt Ltd",
@@ -292,24 +310,15 @@ const CustomerManagement = () => {
         }
     ];
 
-    // Initialize customers
-    useEffect(() => {
-        setCustomers(mockCustomers);
-        setFilteredCustomers(mockCustomers);
-    }, []);
+    // This useEffect is now replaced by the loadCustomers function called in the first useEffect
 
     // Filter and search customers
     useEffect(() => {
         let filtered = customers;
 
-        // Search filter
+        // Search filter - use service for more comprehensive search
         if (searchTerm) {
-            filtered = filtered?.filter(customer =>
-                customer?.businessName?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
-                customer?.contactPerson?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
-                customer?.email?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
-                customer?.phone?.includes(searchTerm)
-            );
+            filtered = searchCustomers(searchTerm);
         }
 
         // Location filter
@@ -374,35 +383,43 @@ const CustomerManagement = () => {
 
     const handleDeleteCustomer = (customer) => {
         if (window.confirm(`Are you sure you want to delete ${customer?.businessName}?`)) {
-            setCustomers(prev => prev?.filter(c => c?.id !== customer?.id));
+            try {
+                const success = deleteCustomer(customer.id);
+                if (success) {
+                    loadCustomers(); // Reload customers after deletion
+                } else {
+                    alert('Error deleting customer. Customer not found.');
+                }
+            } catch (error) {
+                console.error('Error deleting customer:', error);
+                alert('Error deleting customer. Please try again.');
+            }
         }
     };
 
     const handleSaveCustomer = (customerData) => {
-        if (modalMode === 'add') {
-            const newCustomer = {
+        try {
+            // Prepare customer data with additional fields
+            const processedData = {
                 ...customerData,
-                id: Math.max(...customers?.map(c => c?.id)) + 1,
-                status: 'Active',
+                status: customerData.status || 'Active',
                 gstStatus: customerData?.gstNumber ? 'Registered' : 'Unregistered',
                 location: customerData?.billingAddress?.city
             };
-            setCustomers(prev => [...prev, newCustomer]);
-        } else {
-            setCustomers(prev => prev?.map(c =>
-                c?.id === selectedCustomer?.id
-                    ? {
-                        ...customerData,
-                        id: selectedCustomer?.id,
-                        status: selectedCustomer?.status,
-                        gstStatus: customerData?.gstNumber ? 'Registered' : 'Unregistered',
-                        location: customerData?.billingAddress?.city
-                    }
-                    : c
-            ));
+
+            if (modalMode === 'add') {
+                addCustomer(processedData);
+            } else {
+                updateCustomer(selectedCustomer.id, processedData);
+            }
+
+            loadCustomers(); // Reload customers after save
+            setIsModalOpen(false);
+            setSelectedCustomer(null);
+        } catch (error) {
+            console.error('Error saving customer:', error);
+            alert('Error saving customer. Please try again.');
         }
-        setIsModalOpen(false);
-        setSelectedCustomer(null);
     };
 
     const handleSort = (field, order) => {

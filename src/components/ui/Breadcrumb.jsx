@@ -13,6 +13,7 @@ const Breadcrumb = () => {
         'customer-management': 'Customers',
         'reports': 'Reports',
         'company-profile': 'Company Profile',
+        'settings': 'Settings',
     };
 
     const getBreadcrumbName = (pathname) => {

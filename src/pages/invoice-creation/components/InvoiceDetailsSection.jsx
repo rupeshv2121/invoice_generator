@@ -3,6 +3,7 @@ import Select from '../../../components/ui/Select';
 
 const InvoiceDetailsSection = ({ invoiceDetails, onInvoiceDetailsChange }) => {
     const paymentTermsOptions = [
+        { value: '', label: 'Select Payment Terms' },
         { value: 'immediate', label: 'Immediate' },
         { value: 'net15', label: 'Net 15 days' },
         { value: 'net30', label: 'Net 30 days' },
@@ -45,14 +46,16 @@ const InvoiceDetailsSection = ({ invoiceDetails, onInvoiceDetailsChange }) => {
     return (
         <div className="bg-card rounded-lg border border-border p-6 mb-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Invoice Details</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Input
                     label="Invoice Number"
                     type="text"
                     value={invoiceDetails?.invoiceNumber}
                     onChange={(e) => onInvoiceDetailsChange('invoiceNumber', e?.target?.value)}
-                    placeholder="INV-001"
+                    placeholder="1001"
                     required
+                    readOnly
+                    className="bg-muted"
                 />
                 <Input
                     label="Invoice Date"
@@ -61,20 +64,45 @@ const InvoiceDetailsSection = ({ invoiceDetails, onInvoiceDetailsChange }) => {
                     onChange={(e) => handleInvoiceDateChange(e?.target?.value)}
                     required
                 />
+                <Input
+                    label="Supply Date"
+                    type="date"
+                    value={invoiceDetails?.supplyDate}
+                    onChange={(e) => onInvoiceDetailsChange('supplyDate', e?.target?.value)}
+                    required
+                />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <Input
+                    label="MARKA"
+                    type="text"
+                    value={invoiceDetails?.marka}
+                    onChange={(e) => onInvoiceDetailsChange('marka', e?.target?.value)}
+                    placeholder="Product marking/branding"
+                />
+                <Input
+                    label="Transport"
+                    type="text"
+                    value={invoiceDetails?.transport}
+                    onChange={(e) => onInvoiceDetailsChange('transport', e?.target?.value)}
+                    placeholder="Transportation method/company"
+                />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <Select
-                    label="Payment Terms"
+                    label="Payment Terms (Optional)"
                     options={paymentTermsOptions}
                     value={invoiceDetails?.paymentTerms}
                     onChange={handlePaymentTermsChange}
-                    required
                 />
                 <Input
-                    label="Due Date"
+                    label="Due Date (Optional)"
                     type="date"
                     value={invoiceDetails?.dueDate}
                     onChange={(e) => onInvoiceDetailsChange('dueDate', e?.target?.value)}
-                    disabled={invoiceDetails?.paymentTerms !== 'custom'}
-                    required
+                    disabled={invoiceDetails?.paymentTerms !== 'custom' && invoiceDetails?.paymentTerms !== ''}
                 />
             </div>
         </div>

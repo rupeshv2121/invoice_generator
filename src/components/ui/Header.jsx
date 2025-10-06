@@ -11,10 +11,12 @@ const Header = () => {
     const navigationItems = [
         { label: 'Dashboard', path: '/dashboard', icon: 'LayoutDashboard' },
         { label: 'Customers', path: '/customer-management', icon: 'Users' },
-        { label: 'Company', path: '/company-management', icon: 'Building' },
+        { label: 'Items', path: '/items-management', icon: 'Package' },
+        // { label: 'Company', path: '/company-management', icon: 'Building' },
         { label: 'Create Invoice', path: '/invoice-creation', icon: 'FileText' },
         { label: 'Invoice List', path: '/invoice-list', icon: 'List' },
         { label: 'Reports', path: '/reports', icon: 'BarChart3' },
+
     ];
 
     const isActivePath = (path) => location?.pathname === path;
@@ -86,7 +88,7 @@ const Header = () => {
                                     className="fixed inset-0 z-10"
                                     onClick={closeUserMenu}
                                 />
-                                <div className="absolute right-0 top-full mt-2 w-48 bg-popover border border-border rounded-md shadow-lg z-20">
+                                <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-border rounded-md shadow-lg z-20">
                                     <div className="py-1">
                                         <Link
                                             to="/company-profile"
@@ -95,6 +97,14 @@ const Header = () => {
                                         >
                                             <Icon name="Building" size={16} className="mr-3" />
                                             Company Profile
+                                        </Link>
+                                        <Link
+                                            to="/settings"
+                                            className="flex items-center px-4 py-2 text-sm text-popover-foreground hover:bg-muted transition-colors duration-150"
+                                            onClick={closeUserMenu}
+                                        >
+                                            <Icon name="Settings" size={16} className="mr-3" />
+                                            Settings
                                         </Link>
                                         <div className="border-t border-border my-1" />
                                         <button
@@ -128,10 +138,10 @@ const Header = () => {
             {isMobileMenuOpen && (
                 <>
                     <div
-                        className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                        className="fixed inset-0  z-40 lg:hidden"
                         onClick={closeMobileMenu}
                     />
-                    <div className="fixed top-16 left-0 right-0 bg-surface border-b border-border shadow-lg z-50 lg:hidden">
+                    <div className="fixed top-16 left-0 right-0 bg-white border-b  border-border shadow-lg z-50 lg:hidden">
                         <nav className="px-4 py-4 space-y-2">
                             {navigationItems?.map((item) => (
                                 <Link
@@ -143,7 +153,7 @@ const Header = () => {
                                         : 'text-text-secondary hover:text-foreground hover:bg-muted'
                                         }`}
                                 >
-                                    <Icon name={item?.icon} size={20} />
+                                    <Icon name={item?.icon} size={20} className='z-10' />
                                     <span>{item?.label}</span>
                                 </Link>
                             ))}
