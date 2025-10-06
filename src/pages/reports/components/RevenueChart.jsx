@@ -51,9 +51,9 @@ const RevenueChart = () => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Monthly Revenue Chart */}
-            <div className="lg:col-span-2 bg-card rounded-lg border border-border p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Monthly Revenue Trends</h3>
-                <div className="h-80">
+            <div className="lg:col-span-2 bg-card rounded-lg border border-border p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4">Monthly Revenue Trends</h3>
+                <div className="h-64 sm:h-80">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={monthlyRevenue} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
@@ -78,9 +78,9 @@ const RevenueChart = () => {
                 </div>
             </div>
             {/* Payment Status Distribution */}
-            <div className="bg-card rounded-lg border border-border p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Payment Status</h3>
-                <div className="h-64">
+            <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4">Payment Status</h3>
+                <div className="h-48 sm:h-64">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie

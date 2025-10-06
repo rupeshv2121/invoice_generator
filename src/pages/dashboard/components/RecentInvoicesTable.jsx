@@ -37,19 +37,23 @@ const RecentInvoicesTable = ({ invoices }) => {
 
     return (
         <div className="bg-card border border-border rounded-lg invoice-shadow-sm">
-            <div className="flex items-center justify-between p-6 border-b border-border">
-                <h3 className="text-lg font-semibold text-foreground">Recent Invoices</h3>
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border">
+                <h3 className="text-base sm:text-lg font-semibold text-foreground">Recent Invoices</h3>
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={() => navigate('/invoice-list')}
                     iconName="ArrowRight"
                     iconPosition="right"
+                    className="text-sm"
                 >
-                    View All
+                    <span className="hidden sm:inline">View All</span>
+                    <span className="sm:hidden">All</span>
                 </Button>
             </div>
-            <div className="overflow-x-auto">
+            
+            {/* Desktop Table View */}
+            <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full">
                     <thead className="bg-muted">
                         <tr>
@@ -105,6 +109,54 @@ const RecentInvoicesTable = ({ invoices }) => {
                         ))}
                     </tbody>
                 </table>
+            </div>
+            
+            {/* Mobile Card View */}
+            <div className="lg:hidden p-4 space-y-4">
+                {invoices?.map((invoice) => (
+                    <div key={invoice?.id} className="border border-border rounded-lg p-4 space-y-3">
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <div className="font-mono text-sm font-medium text-primary">
+                                    {invoice?.invoiceNumber}
+                                </div>
+                                <div className="text-sm text-text-secondary">
+                                    {formatDate(invoice?.dueDate)}
+                                </div>
+                            </div>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(invoice?.status)}`}>
+                                {invoice?.status}
+                            </span>
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <div>
+                                <div className="font-medium text-foreground">{invoice?.customerName}</div>
+                                <div className="font-medium text-foreground">
+                                    {formatCurrency(invoice?.amount)}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 pt-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                iconName="Eye"
+                                onClick={() => navigate(`/invoice-list?view=${invoice?.id}`)}
+                                className="flex-1"
+                            >
+                                View
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                iconName="Download"
+                                onClick={() => {/* Handle download */ }}
+                            />
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

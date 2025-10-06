@@ -28,9 +28,9 @@ const Button = ({
   };
 
   const sizeClasses = {
-    sm: "h-8 px-3 text-sm",
-    md: "h-10 px-4 py-2",
-    lg: "h-12 px-6 text-lg"
+    sm: "h-9 sm:h-8 px-3 text-sm min-w-[44px]", // Minimum 44px touch target for mobile
+    md: "h-11 sm:h-10 px-4 py-2 min-w-[44px]",
+    lg: "h-12 px-6 text-lg min-w-[44px]"
   };
 
   // Icon size based on button size

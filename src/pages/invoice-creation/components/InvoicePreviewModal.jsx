@@ -108,12 +108,14 @@ const InvoicePreviewModal = ({
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-lg max-w-5xl w-full max-h-[95vh] overflow-hidden">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+            <div className="bg-white rounded-lg shadow-lg max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900">Export Invoice Preview</h2>
-                    <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border-b border-gray-200 space-y-2 sm:space-y-0">
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-900">Export Invoice Preview</h2>
+                    
+                    {/* Desktop buttons */}
+                    <div className="hidden sm:flex items-center space-x-2">
                         <Button
                             variant="outline"
                             size="sm"
@@ -139,17 +141,50 @@ const InvoicePreviewModal = ({
                             iconName="X"
                         />
                     </div>
+                    
+                    {/* Mobile buttons */}
+                    <div className="flex sm:hidden items-center justify-between w-full space-x-2">
+                        <div className="flex items-center space-x-2 flex-1">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handlePrint}
+                                iconName="Printer"
+                                className="flex-1"
+                            >
+                                Print
+                            </Button>
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={handleDownloadPDF}
+                                iconName="Download"
+                                className="flex-1"
+                            >
+                                PDF
+                            </Button>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onClose}
+                            iconName="X"
+                            className="ml-2"
+                        />
+                    </div>
                 </div>
 
                 {/* Invoice Content */}
-                <div className="overflow-y-auto max-h-[calc(95vh-80px)]" id="invoice-content">
-                    <ExportInvoiceTemplate
-                        companyData={exportInvoiceData.companyData}
-                        receiverData={exportInvoiceData.receiverData}
-                        consigneeData={exportInvoiceData.consigneeData}
-                        invoiceDetails={exportInvoiceData.invoiceDetails}
-                        items={exportInvoiceData.items}
-                    />
+                <div className="overflow-y-auto max-h-[calc(95vh-120px)] sm:max-h-[calc(90vh-80px)]" id="invoice-content">
+                    <div className="p-2 sm:p-4">
+                        <ExportInvoiceTemplate
+                            companyData={exportInvoiceData.companyData}
+                            receiverData={exportInvoiceData.receiverData}
+                            consigneeData={exportInvoiceData.consigneeData}
+                            invoiceDetails={exportInvoiceData.invoiceDetails}
+                            items={exportInvoiceData.items}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
