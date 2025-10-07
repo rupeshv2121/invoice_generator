@@ -1,6 +1,11 @@
 // Utility function to convert numbers to words in Indian format
 export const numberToWordsIndian = (num) => {
+    // Handle edge cases
+    if (num === null || num === undefined || isNaN(num)) return 'Zero';
     if (num === 0) return 'Zero';
+
+    // Convert to integer to avoid decimal issues
+    num = Math.floor(Math.abs(num));
 
     const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
     const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
@@ -55,14 +60,24 @@ export const numberToWordsIndian = (num) => {
 
 // Format currency for Indian format
 export const formatCurrency = (amount) => {
+    // Handle null, undefined, or NaN values
+    if (amount === null || amount === undefined || isNaN(amount)) {
+        return '₹0.00';
+    }
+
     return new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR',
         minimumFractionDigits: 2
-    }).format(amount);
+    }).format(Number(amount));
 };
 
 // Format number in Indian style (with commas)
 export const formatIndianNumber = (num) => {
-    return new Intl.NumberFormat('en-IN').format(num);
+    // Handle null, undefined, or NaN values
+    if (num === null || num === undefined || isNaN(num)) {
+        return '0';
+    }
+
+    return new Intl.NumberFormat('en-IN').format(Number(num));
 };

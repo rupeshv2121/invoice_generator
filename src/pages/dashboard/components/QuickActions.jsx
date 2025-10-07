@@ -21,6 +21,13 @@ const QuickActions = () => {
             onClick: () => navigate('/customer-management')
         },
         {
+            title: 'PDF Preview Test',
+            description: 'Test PDF generation and preview',
+            icon: 'Eye',
+            color: 'warning',
+            onClick: () => navigate('/pdf-preview')
+        },
+        {
             title: 'Generate Report',
             description: 'View detailed business reports',
             icon: 'BarChart3',
@@ -32,7 +39,7 @@ const QuickActions = () => {
     return (
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {actions?.map((action, index) => (
                     <div key={index} className="p-4 flex flex-col justify-center border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                         <Button

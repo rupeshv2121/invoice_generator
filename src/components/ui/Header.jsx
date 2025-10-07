@@ -16,6 +16,7 @@ const Header = () => {
         { label: 'Create Invoice', path: '/invoice-creation', icon: 'FileText' },
         { label: 'Invoice List', path: '/invoice-list', icon: 'List' },
         { label: 'Reports', path: '/reports', icon: 'BarChart3' },
+        { label: 'PDF Preview', path: '/pdf-preview', icon: 'Eye' },
 
     ];
 

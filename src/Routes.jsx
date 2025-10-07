@@ -9,6 +9,7 @@ import InvoiceCreation from "./pages/invoice-creation";
 import InvoiceList from "./pages/invoice-list";
 import ItemsManagement from "./pages/items-management";
 import Login from "./pages/login/index";
+import PDFPreview from "./pages/pdf-preview";
 import Register from "./pages/register";
 import Reports from "./pages/reports";
 import Settings from "./pages/settings";
@@ -30,6 +31,7 @@ const Routes = () => {
                     <Route path="/customer-management" element={<CustomerManagement />} />
                     <Route path="/items-management" element={<ItemsManagement />} />
                     <Route path="/settings" element={<Settings />} />
+                    <Route path="/pdf-preview" element={<PDFPreview />} />
                     {/* <Route path="/company-management" element={<CompanyManagement />} /> */}
 
                     <Route path="/reports" element={<Reports />} />

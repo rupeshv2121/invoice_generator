@@ -18,7 +18,6 @@ const InvoicePreviewModal = ({
 
     const calculateTotals = () => {
         const subtotal = items?.reduce((sum, item) => sum + (item?.taxableAmount || 0), 0);
-        const totalDiscount = items?.reduce((sum, item) => sum + (item?.discountAmount || 0), 0);
         const totalCGST = items?.reduce((sum, item) => sum + (item?.cgstAmount || 0), 0);
         const totalSGST = items?.reduce((sum, item) => sum + (item?.sgstAmount || 0), 0);
         const totalIGST = items?.reduce((sum, item) => sum + (item?.igstAmount || 0), 0);
@@ -28,7 +27,6 @@ const InvoicePreviewModal = ({
 
         return {
             subtotal,
-            totalDiscount,
             totalCGST,
             totalSGST,
             totalIGST,

@@ -95,297 +95,285 @@ export const generateInvoicePDF = (invoiceData) => {
     // Page dimensions
     const pageWidth = pdf.internal.pageSize.width;
     const pageHeight = pdf.internal.pageSize.height;
-    let yPosition = 10;
-
-    // Colors
-    const blackColor = [0, 0, 0];
-    const grayColor = [240, 240, 240];
-    const primaryColor = [51, 51, 51]; // Dark gray for primary text
-    const lightGray = [245, 245, 245]; // Light gray for backgrounds
+    const margin = 10;
+    const contentWidth = pageWidth - (2 * margin);
+    let yPosition = margin;
 
     // Auto-populate company data from service if not provided
     const autoCompanyData = companyData?.gstin ? companyData : {
-        gstin: myCompanyProfile?.gstNumber,
-        iecCode: myCompanyProfile?.iecCode,
-        arn: myCompanyProfile?.arn,
-        companyName: myCompanyProfile?.companyName,
-        address: `${myCompanyProfile?.addressLine1 || ''}${myCompanyProfile?.addressLine2 ? ', ' + myCompanyProfile.addressLine2 : ''}`,
-        city: myCompanyProfile?.city,
-        state: myCompanyProfile?.state,
+        gstin: myCompanyProfile?.gstNumber || '09AGIPK4533G1ZD',
+        iecCode: myCompanyProfile?.iecCode || 'AGIPK4533G',
+        arn: myCompanyProfile?.arn || 'AA9604180513ZDE',
+        companyName: myCompanyProfile?.companyName || 'SHRI PASHUPATINATH ENTERPRISES',
+        address: `${myCompanyProfile?.addressLine1 || '19/54 Hanuman Puri, Mahendar Nagar, Aligarh'}${myCompanyProfile?.addressLine2 ? ', ' + myCompanyProfile.addressLine2 : ''}`,
+        city: myCompanyProfile?.city || 'Aligarh',
+        state: myCompanyProfile?.state || 'Uttar Pradesh',
         stateCode: myCompanyProfile?.stateCode || '09',
-        pincode: myCompanyProfile?.postalCode,
-        phone: myCompanyProfile?.phone,
-        email: myCompanyProfile?.email
+        pincode: myCompanyProfile?.postalCode || '202001',
+        phone: myCompanyProfile?.phone || '+91 8923646841',
+        email: myCompanyProfile?.email || 'ak6999551@gmail.com'
     };
 
     // Auto-populate bank details
     const autoBankDetails = {
-        bankName: myCompanyProfile?.bankDetails?.bankName,
-        accountNumber: myCompanyProfile?.bankDetails?.accountNumber,
-        ifscCode: myCompanyProfile?.bankDetails?.ifscCode,
-        accountName: myCompanyProfile?.bankDetails?.accountName,
-        accountType: myCompanyProfile?.bankDetails?.accountType,
-        branchName: myCompanyProfile?.bankDetails?.branchName
+        bankName: myCompanyProfile?.bankDetails?.bankName || 'Canara Bank',
+        accountNumber: myCompanyProfile?.bankDetails?.accountNumber || '1250006448551',
+        ifscCode: myCompanyProfile?.bankDetails?.ifscCode || 'CNRB0001274',
+        accountName: myCompanyProfile?.bankDetails?.accountName || autoCompanyData.companyName,
+        accountType: myCompanyProfile?.bankDetails?.accountType || 'Current',
+        branchName: myCompanyProfile?.bankDetails?.branchName || 'Aligarh Main Branch'
     };
 
     // Calculate totals
     const calculateTotals = () => {
-        const subtotal = items?.reduce((sum, item) => sum + (item.totalAmount || 0), 0) || 0;
+        const subtotal = items?.reduce((sum, item) => sum + (item.totalAmount || 0), 0) || 42500;
         return { subtotal, grandTotal: subtotal };
     };
 
     const totals = calculateTotals();
 
-    // Helper functions
+    // Helper functions for consistent styling
     const addText = (text, x, y, options = {}) => {
-        const { fontSize = 10, fontStyle = 'normal', align = 'left', maxWidth = null, color = blackColor } = options;
+        const { fontSize = 9, fontStyle = 'normal', align = 'left', maxWidth = null } = options;
         pdf.setFontSize(fontSize);
         pdf.setFont('helvetica', fontStyle);
-        pdf.setTextColor(...color);
+        pdf.setTextColor(0, 0, 0);
 
         if (maxWidth) {
             const lines = pdf.splitTextToSize(text, maxWidth);
             pdf.text(lines, x, y, { align });
-            return y + (lines.length * (fontSize / 2.83)); // Convert pt to mm
+            return y + (lines.length * (fontSize / 2.5));
         } else {
             pdf.text(text, x, y, { align });
-            return y + (fontSize / 2.83);
+            return y + (fontSize / 2.5);
         }
     };
 
-    const drawRect = (x, y, width, height, style = 'S') => {
-        pdf.setDrawColor(...blackColor);
-        pdf.setLineWidth(0.1);
-        pdf.rect(x, y, width, height, style);
+    const drawBorder = (x, y, width, height) => {
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setLineWidth(0.5);
+        pdf.rect(x, y, width, height);
     };
 
-    const fillRect = (x, y, width, height) => {
-        pdf.setFillColor(...grayColor);
-        pdf.rect(x, y, width, height, 'F');
+    const drawLine = (x1, y1, x2, y2) => {
+        pdf.setDrawColor(0, 0, 0);
+        pdf.setLineWidth(0.3);
+        pdf.line(x1, y1, x2, y2);
     };
 
-    // Manual table creation as fallback
-    const createManualTable = (pdf, headers, data, startY, pageWidth) => {
-        let currentY = startY;
-        const tableWidth = pageWidth - 20;
-        const colWidth = tableWidth / headers.length;
+    // Main document border
+    drawBorder(margin, margin, contentWidth, pageHeight - (2 * margin));
 
-        // Draw header
-        pdf.setFillColor(...grayColor);
-        pdf.rect(10, currentY, tableWidth, 8, 'F');
-        pdf.setDrawColor(...blackColor);
-        pdf.rect(10, currentY, tableWidth, 8, 'S');
+    // Header section with three columns
+    yPosition += 3;
 
-        headers.forEach((header, index) => {
-            const x = 10 + (index * colWidth);
-            pdf.line(x, currentY, x, currentY + 8);
-            addText(header, x + 2, currentY + 5, { fontSize: 7, fontStyle: 'bold' });
-        });
+    // Left column - GSTIN, IEC, ARN
+    addText(`GSTIN: ${autoCompanyData.gstin}`, margin + 2, yPosition + 4, { fontSize: 8 });
+    addText(`IEC: ${autoCompanyData.iecCode}`, margin + 2, yPosition + 8, { fontSize: 8 });
+    addText(`ARN: ${autoCompanyData.arn}`, margin + 2, yPosition + 12, { fontSize: 8 });
 
-        currentY += 8;
+    // Center column - EXPORT INVOICE
+    addText('EXPORT INVOICE', pageWidth / 2, yPosition + 6, {
+        fontSize: 14,
+        fontStyle: 'bold',
+        align: 'center'
+    });
+    addText('Supply / Credit / Cash', pageWidth / 2, yPosition + 11, {
+        fontSize: 10,
+        align: 'center'
+    });
 
-        // Draw data rows
-        data.forEach(row => {
-            pdf.rect(10, currentY, tableWidth, 6, 'S');
-            row.forEach((cell, index) => {
-                const x = 10 + (index * colWidth);
-                pdf.line(x, currentY, x, currentY + 6);
-                const cellText = typeof cell === 'object' ? cell.content || '' : cell || '';
-                addText(cellText.toString(), x + 2, currentY + 4, { fontSize: 7 });
-            });
-            currentY += 6;
-        });
+    // Right column - Checkboxes
+    addText('ORIGINAL', pageWidth - 30, yPosition + 4, { fontSize: 8 });
+    addText('DUPLICATE', pageWidth - 30, yPosition + 8, { fontSize: 8 });
+    addText('TRIPLICATE', pageWidth - 30, yPosition + 12, { fontSize: 8 });
 
-        return currentY + 5;
-    };
+    yPosition += 16;
 
-    // Main border around entire document
-    drawRect(10, yPosition, pageWidth - 20, pageHeight - 20);
+    // Company details section
+    drawLine(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 3;
 
-    // Top header section
-    yPosition += 5;
-
-    // GSTIN, IEC, ARN section (left third)
-    addText(`GSTIN: ${autoCompanyData?.gstin || ''}`, 15, yPosition + 5, { fontSize: 8 });
-    addText(`IEC: ${autoCompanyData?.iecCode || ''}`, 15, yPosition + 10, { fontSize: 8 });
-    addText(`ARN: ${autoCompanyData?.arn || ''}`, 15, yPosition + 15, { fontSize: 8 });
-
-    // EXPORT INVOICE title (center third)
-    addText('EXPORT INVOICE', pageWidth / 2, yPosition + 8, {
+    addText(autoCompanyData.companyName, pageWidth / 2, yPosition + 5, {
         fontSize: 16,
         fontStyle: 'bold',
         align: 'center'
     });
-    addText('Supply / Credit / Cash', pageWidth / 2, yPosition + 15, {
-        fontSize: 10,
+    yPosition += 8;
+
+    addText('Supplement for Export under Bond or Letter of Understanding without Payment of IGST',
+        pageWidth / 2, yPosition + 2, { fontSize: 9, align: 'center' });
+    yPosition += 6;
+
+    addText(`${autoCompanyData.address}, ${autoCompanyData.city}, ${autoCompanyData.state} - ${autoCompanyData.pincode}`,
+        pageWidth / 2, yPosition, { fontSize: 9, align: 'center' });
+    yPosition += 6;
+
+    addText(`Phone: ${autoCompanyData.phone} | Email: ${autoCompanyData.email}`,
+        pageWidth / 2, yPosition, { fontSize: 9, align: 'center' });
+    yPosition += 4;
+
+    // Invoice details grid
+    drawLine(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 2;
+
+    const gridHeight = 12;
+    const col1Width = contentWidth * 0.25;
+    const col2Width = contentWidth * 0.25;
+    const col3Width = contentWidth * 0.25;
+    const col4Width = contentWidth * 0.25;
+
+    // Draw vertical lines for grid
+    drawLine(margin + col1Width, yPosition - 2, margin + col1Width, yPosition + gridHeight);
+    drawLine(margin + col1Width + col2Width, yPosition - 2, margin + col1Width + col2Width, yPosition + gridHeight);
+    drawLine(margin + col1Width + col2Width + col3Width, yPosition - 2, margin + col1Width + col2Width + col3Width, yPosition + gridHeight);
+
+    // Invoice details content
+    addText('Invoice No.', margin + 2, yPosition + 4, { fontSize: 9, fontStyle: 'bold' });
+    addText(invoiceDetails?.invoiceNumber || 'EXP-1001', margin + 2, yPosition + 9, { fontSize: 9 });
+
+    addText('Invoice Date', margin + col1Width + 2, yPosition + 4, { fontSize: 9, fontStyle: 'bold' });
+    const invoiceDate = invoiceDetails?.invoiceDate ? new Date(invoiceDetails.invoiceDate).toLocaleDateString('en-GB') : '06/10/2025';
+    addText(invoiceDate, margin + col1Width + 2, yPosition + 9, { fontSize: 9 });
+
+    addText('MARKA', margin + col1Width + col2Width + 2, yPosition + 4, { fontSize: 9, fontStyle: 'bold' });
+    addText(invoiceDetails?.marka || '', margin + col1Width + col2Width + 2, yPosition + 9, { fontSize: 9 });
+
+    addText('Date of Supply', margin + col1Width + col2Width + col3Width + 2, yPosition + 4, { fontSize: 9, fontStyle: 'bold' });
+    const supplyDate = invoiceDetails?.supplyDate ? new Date(invoiceDetails.supplyDate).toLocaleDateString('en-GB') : '06/10/2025';
+    addText(supplyDate, margin + col1Width + col2Width + col3Width + 2, yPosition + 9, { fontSize: 9 });
+
+    yPosition += gridHeight;
+
+    // State and Transportation row
+    drawLine(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 2;
+
+    const stateRowHeight = 15;
+    const stateCol1 = contentWidth * 0.25;
+    const stateCol2 = contentWidth * 0.25;
+    const transportCol = contentWidth * 0.5;
+
+    drawLine(margin + stateCol1, yPosition - 2, margin + stateCol1, yPosition + stateRowHeight);
+    drawLine(margin + stateCol1 + stateCol2, yPosition - 2, margin + stateCol1 + stateCol2, yPosition + stateRowHeight);
+
+    addText('State', margin + 2, yPosition + 4, { fontSize: 9, fontStyle: 'bold' });
+    addText(autoCompanyData.state, margin + 2, yPosition + 9, { fontSize: 9 });
+
+    addText('State Code', margin + stateCol1 + 2, yPosition + 4, { fontSize: 9, fontStyle: 'bold' });
+    addText(autoCompanyData.stateCode, margin + stateCol1 + 2, yPosition + 9, { fontSize: 9 });
+
+    addText('Transportation', margin + stateCol1 + stateCol2 + 2, yPosition + 4, { fontSize: 9, fontStyle: 'bold' });
+    addText(invoiceDetails?.transport || 'PawanPutra Roadlines', margin + stateCol1 + stateCol2 + 2, yPosition + 9, { fontSize: 9 });
+
+    yPosition += stateRowHeight;
+
+    // Customer details section
+    drawLine(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 0.2;
+
+    const customerSectionHeight = 45;
+    const customerColWidth = contentWidth / 2.01;
+
+    // Draw vertical line between customer sections
+    drawLine(margin + customerColWidth, yPosition, margin + customerColWidth, yPosition + customerSectionHeight);
+
+    // Headers with gray background (simulated with border)
+    pdf.setFillColor(240, 240, 240);
+    pdf.rect(margin + 0.5, yPosition, customerColWidth, 8, 'F');
+    pdf.rect(margin + customerColWidth, yPosition, customerColWidth, 8, 'F');
+
+    addText('Details of Receiver | Billed to:', margin + 1 + customerColWidth / 2, yPosition + 5, {
+        fontSize: 9,
+        fontStyle: 'bold',
+        align: 'center'
+    });
+    addText('Details of Consignee | Shipped to:', margin + customerColWidth + customerColWidth / 2, yPosition + 5, {
+        fontSize: 9,
+        fontStyle: 'bold',
         align: 'center'
     });
 
-    // Checkboxes section (right third)
-    const checkboxX = pageWidth - 80;
-    addText('☐ ORIGINAL', checkboxX, yPosition + 5, { fontSize: 8 });
-    addText('☐ DUPLICATE', checkboxX, yPosition + 10, { fontSize: 8 });
-    addText('☐ TRIPLICATE', checkboxX, yPosition + 15, { fontSize: 8 });
+    yPosition += 10;
+
+    // Customer details content
+    const receiverName = customerData?.billingAddress?.name || 'JEEVAN HARDWARE';
+    const receiverAddress = customerData?.billingAddress?.address || '';
+    const receiverExim = customerData?.billingAddress?.eximCode || '301806927014NP';
+    const receiverCity = customerData?.billingAddress?.city || '';
+    const receiverCountry = customerData?.billingAddress?.country || 'Nepal';
+
+    addText(`Name: ${receiverName}`, margin + 2, yPosition + 2, { fontSize: 8 });
+    addText(`Address: ${receiverAddress}`, margin + 2, yPosition + 6, { fontSize: 8 });
+    addText(`EXIM Code: ${receiverExim}`, margin + 2, yPosition + 10, { fontSize: 8 });
+    addText(`City: ${receiverCity}`, margin + 2, yPosition + 14, { fontSize: 8 });
+    addText(`Country: ${receiverCountry}`, margin + 2, yPosition + 18, { fontSize: 8 });
+
+    // Consignee details
+    const consigneeName = customerData?.shippingAddress?.name || receiverName;
+    const consigneeAddress = customerData?.shippingAddress?.address || 'Kathmandu, kathmandu MC-11, Bhotebahali, 00';
+    const consigneeExim = customerData?.shippingAddress?.eximCode || receiverExim;
+    const consigneeCity = customerData?.shippingAddress?.city || receiverCity;
+    const consigneeCountry = customerData?.shippingAddress?.country || receiverCountry;
+
+    addText(`Name: ${consigneeName}`, margin + customerColWidth + 2, yPosition + 2, { fontSize: 8 });
+    addText(`Address: ${consigneeAddress}`, margin + customerColWidth + 2, yPosition + 6, { fontSize: 8, maxWidth: customerColWidth - 4 });
+    addText(`EXIM Code: ${consigneeExim}`, margin + customerColWidth + 2, yPosition + 10, { fontSize: 8 });
+    addText(`City: ${consigneeCity}`, margin + customerColWidth + 2, yPosition + 14, { fontSize: 8 });
+    addText(`Country: ${consigneeCountry}`, margin + customerColWidth + 2, yPosition + 18, { fontSize: 8 });
 
     yPosition += 25;
 
-    // Horizontal line
-    pdf.line(10, yPosition, pageWidth - 10, yPosition);
-    yPosition += 5;
+    // Items table - using autoTable for better reliability
+    drawLine(margin, yPosition, pageWidth - margin, yPosition);
+    yPosition += 0;
 
-    // Company name and details section
-    addText(autoCompanyData?.companyName || 'Company Name', pageWidth / 2, yPosition, {
-        fontSize: 18,
-        fontStyle: 'bold',
-        align: 'center'
-    });
-    yPosition += 8;
-
-    addText('Supplement for Export under Bond or Letter of Understanding without Payment of IGST', pageWidth / 2, yPosition, {
-        fontSize: 10,
-        align: 'center'
-    });
-    yPosition += 8;
-
-    addText(`${autoCompanyData?.address || ''}, ${autoCompanyData?.city || ''}, ${autoCompanyData?.state || ''} - ${autoCompanyData?.pincode || ''}`, pageWidth / 2, yPosition, {
-        fontSize: 10,
-        align: 'center',
-        maxWidth: 160
-    });
-    yPosition += 8;
-
-    addText(`Phone: ${autoCompanyData?.phone || ''} | Email: ${autoCompanyData?.email || ''}`, pageWidth / 2, yPosition, {
-        fontSize: 10,
-        align: 'center'
-    });
-    yPosition += 10;
-
-    // Horizontal line
-    pdf.line(10, yPosition, pageWidth - 10, yPosition);
-    yPosition += 5;
-
-    // Invoice details row (4 columns)
-    const colWidth = (pageWidth - 20) / 4;
-    let xPos = 10;
-
-    // Column 1: Invoice No
-    pdf.line(xPos + colWidth, yPosition - 5, xPos + colWidth, yPosition + 15);
-    addText('Invoice No.', xPos + 2, yPosition, { fontSize: 10, fontStyle: 'bold' });
-    addText(invoiceDetails?.invoiceNumber || '', xPos + 2, yPosition + 6, { fontSize: 10 });
-
-    // Column 2: Invoice Date
-    xPos += colWidth;
-    pdf.line(xPos + colWidth, yPosition - 5, xPos + colWidth, yPosition + 15);
-    addText('Invoice Date', xPos + 2, yPosition, { fontSize: 10, fontStyle: 'bold' });
-    const invoiceDate = invoiceDetails?.invoiceDate ? new Date(invoiceDetails.invoiceDate).toLocaleDateString('en-GB') : '';
-    addText(invoiceDate, xPos + 2, yPosition + 6, { fontSize: 10 });
-
-    // Column 3: MARKA
-    xPos += colWidth;
-    pdf.line(xPos + colWidth, yPosition - 5, xPos + colWidth, yPosition + 15);
-    addText('MARKA', xPos + 2, yPosition, { fontSize: 10, fontStyle: 'bold' });
-    addText(invoiceDetails?.marka || '', xPos + 2, yPosition + 6, { fontSize: 10 });
-
-    // Column 4: Date of Supply
-    xPos += colWidth;
-    addText('Date of Supply', xPos + 2, yPosition, { fontSize: 10, fontStyle: 'bold' });
-    const supplyDate = invoiceDetails?.supplyDate ? new Date(invoiceDetails.supplyDate).toLocaleDateString('en-GB') : '';
-    addText(supplyDate, xPos + 2, yPosition + 6, { fontSize: 10 });
-
-    yPosition += 20;
-    pdf.line(10, yPosition, pageWidth - 10, yPosition);
-
-    yPosition += 5;
-
-    // State and Transportation details row
-    xPos = 10;
-    const halfWidth = (pageWidth - 20) / 2;
-
-    // Left half - State details (2 sub-columns)
-    const quarterWidth = halfWidth / 2;
-
-    // State
-    pdf.line(xPos + quarterWidth, yPosition - 5, xPos + quarterWidth, yPosition + 15);
-    addText('State', xPos + 2, yPosition, { fontSize: 10, fontStyle: 'bold' });
-    addText(autoCompanyData?.state || '', xPos + 2, yPosition + 6, { fontSize: 10 });
-
-    // State Code
-    xPos += quarterWidth;
-    pdf.line(xPos + quarterWidth, yPosition - 5, xPos + quarterWidth, yPosition + 15);
-    addText('State Code', xPos + 2, yPosition, { fontSize: 10, fontStyle: 'bold' });
-    addText(autoCompanyData?.stateCode || '09', xPos + 2, yPosition + 6, { fontSize: 10 });
-
-    // Transportation
-    xPos += quarterWidth;
-    addText('Transportation', xPos + 2, yPosition, { fontSize: 10, fontStyle: 'bold' });
-    addText(invoiceDetails?.transport || '', xPos + 2, yPosition + 6, { fontSize: 10 });
-
-    yPosition += 20;
-    pdf.line(10, yPosition, pageWidth - 10, yPosition);
-    yPosition += 5;
-
-    // Customer details section (2 columns)
-    const customerColWidth = (pageWidth - 20) / 2;
-
-    // Left column - Receiver details
-    fillRect(10, yPosition, customerColWidth, 8);
-    addText('Details of Receiver | Billed to:', pageWidth / 4, yPosition + 5, {
-        fontSize: 10,
-        fontStyle: 'bold',
-        align: 'center'
-    });
-
-    // Right column - Consignee details
-    pdf.line(10 + customerColWidth, yPosition, 10 + customerColWidth, yPosition + 50);
-    fillRect(10 + customerColWidth, yPosition, customerColWidth, 8);
-    addText('Details of Consignee | Shipped to:', (pageWidth / 4) * 3, yPosition + 5, {
-        fontSize: 10,
-        fontStyle: 'bold',
-        align: 'center'
-    });
-
-    yPosition += 12;
-
-    // Receiver details (left)
-    addText(`Name: ${customerData?.billingAddress?.name || 'JEEVAN HARDWARE'}`, 12, yPosition, { fontSize: 9 });
-    addText(`Address: ${customerData?.billingAddress?.address || ''}`, 12, yPosition + 6, { fontSize: 9 });
-    addText(`EXIM Code: ${customerData?.billingAddress?.eximCode || '301806927014NP'}`, 12, yPosition + 12, { fontSize: 9 });
-    addText(`City: ${customerData?.billingAddress?.city || ''}`, 12, yPosition + 18, { fontSize: 9 });
-    addText(`Country: ${customerData?.billingAddress?.country || 'Nepal'}`, 12, yPosition + 24, { fontSize: 9 });
-
-    // Consignee details (right)
-    const rightX = 10 + customerColWidth + 2;
-    addText(`Name: ${customerData?.shippingAddress?.name || customerData?.billingAddress?.name || 'JEEVAN HARDWARE'}`, rightX, yPosition, { fontSize: 9 });
-    addText(`Address: ${customerData?.shippingAddress?.address || customerData?.billingAddress?.address || 'Kathmandu, kathmandu MC-11, Bhotebahali, 00'}`, rightX, yPosition + 6, { fontSize: 9, maxWidth: customerColWidth - 4 });
-    addText(`EXIM Code: ${customerData?.shippingAddress?.eximCode || customerData?.billingAddress?.eximCode || '301806927014NP'}`, rightX, yPosition + 12, { fontSize: 9 });
-    addText(`City: ${customerData?.shippingAddress?.city || customerData?.billingAddress?.city || ''}`, rightX, yPosition + 18, { fontSize: 9 });
-    addText(`Country: ${customerData?.shippingAddress?.country || customerData?.billingAddress?.country || 'Nepal'}`, rightX, yPosition + 24, { fontSize: 9 });
-
-    yPosition += 35;
-    pdf.line(10, yPosition, pageWidth - 10, yPosition);
-
-    yPosition += 5;
-
-    // Create the items table with exact template structure
+    // Table headers
     const tableHeaders = [
         'Sr. No.', 'Name of Product', 'HSN ACS', 'Units', 'Qty', 'Rate',
-        'Amount', 'Less: Disc.', 'CGST Rate', 'SGST Rate', 'IGST Rate (Amount)', 'Total'
+        'Amount', 'CGST Rate', 'SGST Rate', 'IGST Rate (Amount)', 'Total'
     ];
 
-    const tableData = [];
-
-    // Add actual items or default sample data
+    // Sample data or actual items
     const itemsToShow = items && items.length > 0 ? items : [
         {
-            description: 'Sample Product',
-            hsnCode: '8471',
-            unit: 'Nos',
-            quantity: 1,
-            rate: 42500,
-            totalAmount: 42500
+            description: 'Safty 1.5" (Door King Brand)',
+            hsnCode: '83024110',
+            unit: 'gz',
+            quantity: 5,
+            rate: 320.00,
+            totalAmount: 1600.00
+        },
+        {
+            description: 'Safty 2" (Door King Brand)',
+            hsnCode: '83024110',
+            unit: 'gz',
+            quantity: 10,
+            rate: 360.00,
+            totalAmount: 3600.00
+        },
+        {
+            description: 'Safty 4" (Door King Brand)',
+            hsnCode: '83024110',
+            unit: 'gz',
+            quantity: 5,
+            rate: 500.00,
+            totalAmount: 2500.00
+        },
+        {
+            description: 'Tower Bolt 4" (Anti Brand)',
+            hsnCode: '83024110',
+            unit: 'doz',
+            quantity: 200,
+            rate: 174.00,
+            totalAmount: 34800.00
         }
     ];
 
+    // Prepare table data
+    const tableData = [];
+
+    // Add items data
     itemsToShow.forEach((item, index) => {
         tableData.push([
             (index + 1).toString(),
@@ -394,161 +382,271 @@ export const generateInvoicePDF = (invoiceData) => {
             item.unit || '',
             item.quantity?.toString() || '0',
             formatIndianNumber(item.rate || 0),
-            formatIndianNumber(item.totalAmount?.toFixed(2) || '0.00'),
-            '0',
+            formatIndianNumber(item.totalAmount || 0),
             '(0.00)',
             '(0.00)',
             '(0.00)',
-            formatIndianNumber(item.totalAmount?.toFixed(2) || '0.00')
+            formatIndianNumber(item.totalAmount || 0)
         ]);
     });
 
-    // Add empty rows to fill space (minimum 3 total rows)
-    const minRows = 3;
-    for (let i = itemsToShow.length; i < minRows; i++) {
-        tableData.push(['', '', '', '', '', '', '', '', '', '', '', '']);
+    // Add empty rows to make total 8 rows
+    for (let i = itemsToShow.length; i < 8; i++) {
+        tableData.push([
+            (i + 1).toString(), '', '', '', '', '', '', '', '', '', ''
+        ]);
     }
 
-    // Total row
+    // Calculate totals
     const totalQty = itemsToShow.reduce((sum, item) => sum + (item.quantity || 0), 0);
-    tableData.push([
-        { content: 'Total :', colSpan: 5, styles: { fontStyle: 'bold', halign: 'center' } },
-        totalQty.toString(),
-        formatIndianNumber(totals.grandTotal.toFixed(2)),
-        '0.00',
-        '0.00',
-        '0.00',
-        '0.00',
-        formatIndianNumber(totals.grandTotal.toFixed(2))
-    ]);
+    const totalAmount = itemsToShow.reduce((sum, item) => sum + (item.totalAmount || 0), 0);
 
+    // Try to use autoTable if available
     try {
-        if (typeof pdf.autoTable === 'function') {
+        if (pdf.autoTable) {
             pdf.autoTable({
                 head: [tableHeaders],
                 body: tableData,
                 startY: yPosition,
+                margin: { left: margin, right: margin },
                 theme: 'grid',
                 styles: {
                     fontSize: 7,
-                    cellPadding: 1,
+                    cellPadding: 1.8,
                     lineColor: [0, 0, 0],
-                    lineWidth: 0.1,
-                    overflow: 'linebreak'
+                    lineWidth: 0.3,
+                    halign: 'center'
                 },
                 headStyles: {
                     fillColor: [240, 240, 240],
                     textColor: [0, 0, 0],
                     fontStyle: 'bold',
-                    halign: 'center',
-                    fontSize: 8
-                },
-                bodyStyles: {
-                    textColor: [0, 0, 0]
+                    halign: 'center'
                 },
                 columnStyles: {
-                    0: { halign: 'center', cellWidth: 12 },
-                    1: { halign: 'left', cellWidth: 45 },
-                    2: { halign: 'center', cellWidth: 15 },
-                    3: { halign: 'center', cellWidth: 12 },
-                    4: { halign: 'center', cellWidth: 12 },
-                    5: { halign: 'right', cellWidth: 20 },
-                    6: { halign: 'right', cellWidth: 20 },
-                    7: { halign: 'center', cellWidth: 12 },
-                    8: { halign: 'center', cellWidth: 15 },
-                    9: { halign: 'center', cellWidth: 15 },
-                    10: { halign: 'center', cellWidth: 20 },
-                    11: { halign: 'right', cellWidth: 20 }
-                },
-                margin: { left: 10, right: 10 },
-                tableWidth: 'auto'
+                    0: { cellWidth: 12, halign: 'center' },   // Sr. No.
+                    1: { cellWidth: 51, halign: 'left' },     // Name of Product
+                    2: { cellWidth: 15, halign: 'center' },   // HSN ACS
+                    3: { cellWidth: 10, halign: 'center' },   // Units
+                    4: { cellWidth: 12, halign: 'center' },   // Qty
+                    5: { cellWidth: 16, halign: 'right' },    // Rate
+                    6: { cellWidth: 18, halign: 'right' },    // Amount
+                    7: { cellWidth: 12, halign: 'center' },   // CGST Rate
+                    8: { cellWidth: 12, halign: 'center' },   // SGST Rate
+                    9: { cellWidth: 12, halign: 'center' },   // IGST Rate
+                    10: { cellWidth: 20, halign: 'right' }    // Total
+                }
             });
-            yPosition = pdf.lastAutoTable.finalY + 5;
+
+            // Add total row manually after autoTable
+            const finalY = pdf.lastAutoTable.finalY;
+
+            // Total row
+            pdf.setFillColor(240, 240, 240);
+            pdf.rect(margin, finalY, contentWidth, 8, 'F');
+
+            // Draw total row borders and content
+            drawLine(margin, finalY, pageWidth - margin, finalY);
+            drawLine(margin, finalY + 8, pageWidth - margin, finalY + 8);
+            drawLine(margin, finalY, margin, finalY + 8);
+            drawLine(pageWidth - margin, finalY, pageWidth - margin, finalY + 8);
+
+            // Add total text
+            addText('Total :', margin + 80, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
+            addText(totalQty.toString(), margin + 95, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
+            addText(formatIndianNumber(totalAmount), margin + 131, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'right' });
+            addText('0.00', margin + 166, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
+            addText('0.00', margin + 186, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
+            addText(formatIndianNumber(totalAmount), pageWidth - margin - 5, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'right' });
+
+            yPosition = finalY + 8;
         } else {
-            // Fallback if autoTable is not available
-            yPosition = createManualTable(pdf, tableHeaders, tableData, yPosition, pageWidth);
+            throw new Error('autoTable not available');
         }
     } catch (error) {
-        console.error('AutoTable failed:', error);
-        // Fallback to manual table creation
-        yPosition = createManualTable(pdf, tableHeaders, tableData, yPosition, pageWidth);
+        console.warn('autoTable failed, using simple table:', error);
     }
 
-    // Total Amount in Words section
-    addText('Total Invoice Amount In Words:', 15, yPosition, { fontSize: 9, fontStyle: 'bold' });
-    yPosition += 5;
-    const amountInWords = numberToWordsIndian(Math.floor(totals.grandTotal)) + ' Rupees Only';
-    addText(amountInWords, 15, yPosition, { fontSize: 9, maxWidth: 120 });
+    // Enhanced border structure with professional styling
+    drawLine(margin, yPosition, pageWidth - margin, yPosition, 0.5); // Thicker top border
+    yPosition += 0;
 
-    // Right side - Amount summary (aligned with amount in words)
-    const summaryX = pageWidth - 70;
-    let summaryY = yPosition - 5;
+    // Main bottom section - 3 rows structure with enhanced styling
+    const sectionHeight = 45;
+    const rightColumnX = pageWidth - 80; // Slightly wider right column
 
-    addText('Total Amount', summaryX, summaryY, { fontSize: 9 });
-    addText(formatIndianNumber(totals.grandTotal.toFixed(2)), pageWidth - 15, summaryY, { fontSize: 9, align: 'right' });
+    // Row 1: Amount in words and totals with enhanced borders
+    const row1Height = 20; // Increased height for better spacing
 
-    summaryY += 5;
-    addText('Rounded Amount:', summaryX, summaryY, { fontSize: 9 });
-    addText(formatIndianNumber(totals.grandTotal.toFixed(2)), pageWidth - 15, summaryY, { fontSize: 9, align: 'right' });
+    // Draw enhanced borders for row 1
+    drawLine(margin, yPosition, pageWidth - margin, yPosition, 0.4); // Top border
+    drawLine(margin, yPosition + row1Height, pageWidth - margin, yPosition + row1Height, 0.4); // Bottom border
+    drawLine(margin, yPosition, margin, yPosition + row1Height, 0.4); // Left border
+    drawLine(rightColumnX, yPosition, rightColumnX, yPosition + row1Height, 0.3); // Vertical separator
 
-    summaryY += 5;
-    addText('GST Payable on Reverse Charge', summaryX, summaryY, { fontSize: 8, fontStyle: 'bold' });
+    // Left side - Enhanced Amount in words section
+    // Header with professional background
+    pdf.setFillColor(245, 247, 250);
+    pdf.rect(margin + 0.55, yPosition + 0.5, rightColumnX - margin - 1.5, 6, 'F');
+    addText('Total Invoice Amount In Words:', margin + 2, yPosition + 4, { fontSize: 8, fontStyle: 'bold' });
 
-    yPosition += 15;
+    // Amount in words with better formatting
+    const amountInWords = numberToWordsIndian(Math.floor(totalAmount)) + ' Rupees Only';
 
-    // Bank Details and Signature section
-    pdf.line(10, yPosition, pageWidth - 10, yPosition);
-    yPosition += 5;
+    // Split long text for better readability
+    const maxLineLength = 45;
+    if (amountInWords.length > maxLineLength) {
+        const words = amountInWords.split(' ');
+        let line1 = '';
+        let line2 = '';
+        let currentLine = 1;
 
-    // Left side - Bank Details
-    addText('Bank Details :', 15, yPosition, { fontSize: 9, fontStyle: 'bold' });
-    const bankStartY = yPosition + 5;
+        for (const word of words) {
+            if (currentLine === 1 && (line1 + word).length <= maxLineLength) {
+                line1 += (line1 ? ' ' : '') + word;
+            } else {
+                currentLine = 2;
+                line2 += (line2 ? ' ' : '') + word;
+            }
+        }
 
-    addText(`Bank Name: ${autoBankDetails?.bankName || ''}`, 15, bankStartY, { fontSize: 8 });
-    addText(`Bank Account Number: ${autoBankDetails?.accountNumber || ''}`, 15, bankStartY + 4, { fontSize: 8 });
-    addText(`Bank Branch IFSC: ${autoBankDetails?.ifscCode || ''}`, 15, bankStartY + 8, { fontSize: 8 });
-    addText(`Account Name: ${autoBankDetails?.accountName || ''}`, 15, bankStartY + 12, { fontSize: 8 });
-    addText(`Account Type: ${autoBankDetails?.accountType || ''}`, 15, bankStartY + 16, { fontSize: 8 });
-    addText(`Branch: ${autoBankDetails?.branchName || ''}`, 15, bankStartY + 20, { fontSize: 8 });
-
-    // Right side - Certification and signature
-    const signX = pageWidth - 70;
-
-    addText('Certified that the particulars given above are true and correct.', signX, yPosition, {
-        fontSize: 8,
-        maxWidth: 60,
-        align: 'center'
-    });
-
-    addText(`For, ${autoCompanyData?.companyName || 'Company Name'}`, signX, yPosition + 15, {
-        fontSize: 9,
-        fontStyle: 'bold',
-        align: 'center'
-    });
-
-    addText('Authorised Signatory', signX, yPosition + 25, { fontSize: 8, align: 'center' });
-
-    yPosition += 30;
-
-    // Terms and Conditions (compact)
-    if (yPosition < pageHeight - 40) {
-        addText('Terms & Conditions :-', 15, yPosition, {
-            fontSize: 9,
-            fontStyle: 'bold'
-        });
-        yPosition += 5;
-
-        const terms = [
-            '1. Payment is due within 30 days of invoice date.',
-            '2. Interest @ 24% p.a. will be charged on overdue amounts.',
-            '3. All disputes subject to local jurisdiction only.'
-        ];
-
-        terms.forEach(term => {
-            addText(term, 15, yPosition, { fontSize: 7 });
-            yPosition += 3;
-        });
+        addText(line1, margin + 2, yPosition + 10, { fontSize: 8, fontStyle: 'bold' });
+        if (line2) {
+            addText(line2, margin + 2, yPosition + 14, { fontSize: 8, fontStyle: 'bold' });
+        }
+    } else {
+        addText(amountInWords, margin + 2, yPosition + 10, { fontSize: 8, fontStyle: 'bold' });
     }
+
+    // Right side - Enhanced Totals table with professional formatting
+    const totalRowHeight = 6;
+    let totalY = yPosition + 2;
+    const colonX = rightColumnX + 38; // Consistent colon position
+
+    // Total Amount row with light background
+    addText('Total Amount', rightColumnX + 2, totalY + 2, { fontSize: 8, fontStyle: 'bold' });
+    addText(':', colonX, totalY + 2, { fontSize: 8, fontStyle: 'bold' });
+    addText(formatIndianNumber(totalAmount), pageWidth - margin - 1, totalY + 2, { fontSize: 8, fontStyle: 'bold', align: 'right' });
+    drawLine(rightColumnX, totalY + totalRowHeight, pageWidth - margin, totalY + totalRowHeight, 0.2);
+
+    // Rounded Amount row
+    totalY += totalRowHeight;
+    addText('Rounded Amount', rightColumnX + 2, totalY + 4, { fontSize: 8, fontStyle: 'bold' });
+    addText(':', colonX, totalY + 4, { fontSize: 8, fontStyle: 'bold' });
+    addText(formatIndianNumber(totalAmount), pageWidth - margin - 2, totalY + 4, { fontSize: 8, fontStyle: 'bold', align: 'right' });
+    drawLine(rightColumnX, totalY + totalRowHeight, pageWidth - margin, totalY + totalRowHeight, 0.2);
+
+    // GST Payable row with emphasis
+    totalY += totalRowHeight + 0.5;
+    pdf.setFillColor(252, 248, 227); // Light yellow background for GST
+    pdf.rect(rightColumnX + 0.5, totalY - 0.5, pageWidth - margin - rightColumnX - 0.6, totalRowHeight - 0.5, 'F');
+    addText('GST Payable on Reverse Charge', rightColumnX + 2, totalY + 4, { fontSize: 7, fontStyle: 'bold' });
+    addText(':', colonX, totalY + 4, { fontSize: 7 });
+
+    yPosition += row1Height;
+
+    // Row 2: Bank Details and Company Info with enhanced styling
+    const row2Height = 25; // Increased height for better spacing
+
+    // Draw enhanced borders for row 2
+    // drawLine(margin, yPosition + row2Height, pageWidth - margin, yPosition + row2Height, 0.4); // Bottom border
+    drawLine(margin, yPosition, margin, yPosition + row2Height, 0.4); // Left border
+    drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + row2Height, 0.4); // Right border
+    drawLine(rightColumnX, yPosition, rightColumnX, yPosition + row2Height, 0.3); // Vertical separator
+
+    // Left side - Enhanced Bank details with better alignment
+    // Bank details header with background
+    pdf.setFillColor(240, 242, 247);
+    pdf.rect(margin + 0.5, yPosition + 0.5, rightColumnX - margin - 1.5, 6, 'F');
+    addText('Bank Details :', margin + 2, yPosition + 4, { fontSize: 8, fontStyle: 'bold' });
+
+    // Bank details with consistent formatting
+    const bankLabelX = margin + 5;
+    const bankValueX = margin + 50;
+    addText('Bank Name', bankLabelX, yPosition + 10, { fontSize: 8, fontStyle: 'bold' });
+    addText(':', bankValueX - 5, yPosition + 10, { fontSize: 8 });
+    addText(`${autoBankDetails.bankName} (Vikas Bhavan, Aligarh)`, bankValueX, yPosition + 10, { fontSize: 8 });
+
+    addText('Bank Account Number', bankLabelX, yPosition + 14, { fontSize: 8, fontStyle: 'bold' });
+    addText(':', bankValueX - 5, yPosition + 14, { fontSize: 8 });
+    addText(autoBankDetails.accountNumber, bankValueX, yPosition + 14, { fontSize: 8 });
+
+    addText('Bank Branch IFSC', bankLabelX, yPosition + 18, { fontSize: 8, fontStyle: 'bold' });
+    addText(':', bankValueX - 5, yPosition + 18, { fontSize: 8 });
+    addText(autoBankDetails.ifscCode, bankValueX, yPosition + 18, { fontSize: 8 });
+
+    // Right side - Enhanced Certification section
+    const certWidth = pageWidth - margin - rightColumnX;
+
+    // Certification text with better wrapping
+    addText('Certified that the particulars given above are', rightColumnX + 2, yPosition + 4, { fontSize: 7 });
+    addText('true and correct.', rightColumnX + 2, yPosition + 8, { fontSize: 7 });
+
+    // Company name with enhanced styling
+    addText(`For, ${autoCompanyData.companyName}`, rightColumnX + certWidth / 2, yPosition + 13, { fontSize: 8, fontStyle: 'bold', align: 'center' });
+
+    yPosition += row2Height;
+
+    // Row 3: Terms & Conditions and Signature with enhanced styling
+    const row3Height = 48; // Increased height for signature area
+
+    // Draw enhanced borders for row 3
+    drawLine(margin, yPosition + row3Height, pageWidth - margin, yPosition + row3Height, 0.5); // Thicker bottom border
+    drawLine(margin, yPosition, margin, yPosition + row3Height, 0.4); // Left border
+    drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + row3Height, 0.4); // Right border
+    drawLine(rightColumnX, yPosition, rightColumnX, yPosition + row3Height, 0.3); // Vertical separator
+
+    // Left side - Enhanced Terms & Conditions
+    // Terms header with background
+    pdf.setFillColor(240, 242, 247);
+    pdf.rect(margin + 1, yPosition, rightColumnX - margin - 1.5, 6, 'F');
+    addText('Terms & Conditions', margin + 2, yPosition + 4, { fontSize: 8, fontStyle: 'bold' });
+
+    // Enhanced terms with better formatting
+    const defaultTerms = [
+        { num: '1.', text: 'Country of Origin - India' },
+        { num: '2.', text: 'Custom Point - Bhairahwa' },
+        { num: '3.', text: 'Incoterms - EX-Works-Aligarh' },
+        { num: '4.', text: 'Payment Terms Credit 60 Days' }
+    ];
+
+    const termsToShow = termsAndConditions?.terms || defaultTerms;
+    termsToShow.slice(0, 4).forEach((term, index) => {
+        const termY = yPosition + 12 + (index * 4);
+        if (typeof term === 'object') {
+            addText(term.num, margin + 5, termY, { fontSize: 8, fontStyle: 'bold' });
+            addText(term.text, margin + 10, termY, { fontSize: 8 });
+        } else {
+            addText(term, margin + 5, termY, { fontSize: 8 });
+        }
+    });
+
+    // Right side - Enhanced Signature area
+    const signatureWidth = pageWidth - margin - rightColumnX;
+    const signatureX = rightColumnX + signatureWidth / 2;
+
+    // Signature box with border
+    pdf.setFillColor(250, 250, 250);
+    pdf.rect(rightColumnX + 5, yPosition, signatureWidth - 10, 50, 'F');
+    // Draw signature box with consistent coordinates
+    drawLine(rightColumnX + 5, yPosition + 35, rightColumnX + signatureWidth - 5, yPosition + 35, 0.3); // Top
+    drawLine(rightColumnX + 5, yPosition + 50, rightColumnX + signatureWidth - 5, yPosition + 50, 0.3); // Bottom
+    drawLine(rightColumnX + 5, yPosition + 35, rightColumnX + 5, yPosition + 50, 0.3); // Left
+    drawLine(rightColumnX + signatureWidth - 5, yPosition + 35, rightColumnX + signatureWidth - 5, yPosition + 50, 0.3); // Right
+
+    // Vertically center the label inside the signature box
+    const signatureBoxTop = yPosition + 38;
+    const signatureBoxHeight = 15;
+    const labelFontSize = 8;
+    const labelY = signatureBoxTop + (signatureBoxHeight / 2) + (labelFontSize / 2.5); // Adjust for font baseline
+    addText('Authorised Signatory', signatureX, labelY, { fontSize: 8, fontStyle: 'bold', align: 'center' });
+
+    // Enhanced Common Seal with styling
+    // pdf.setFillColor(248, 248, 248);
+    // pdf.rect(pageWidth - margin - 35, yPosition + row3Height - 8, 30, 6, 'F');
+    // drawLine(pageWidth - margin - 35, yPosition + row3Height - 8, pageWidth - margin - 5, yPosition + row3Height - 8, 0.2);
+    // drawLine(pageWidth - margin - 35, yPosition + row3Height - 2, pageWidth - margin - 5, yPosition + row3Height - 2, 0.2);
+    // addText('(Common Seal)', pageWidth - margin - 20, yPosition + row3Height - 5, { fontSize: 7, align: 'center', fontStyle: 'italic' });
 
     return pdf;
 };

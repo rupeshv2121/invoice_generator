@@ -18,7 +18,6 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
     const calculateItemTotals = (item) => {
         const quantity = parseFloat(item?.quantity) || 0;
         const rate = parseFloat(item?.rate) || 0;
-        const discountPercent = parseFloat(item?.discountPercent) || 0;
 
         const grossAmount = quantity * rate;
         const discountAmount = (grossAmount * discountPercent) / 100;
@@ -43,7 +42,6 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
 
         return {
             grossAmount,
-            discountAmount,
             taxableAmount,
             cgstAmount,
             sgstAmount,
@@ -71,10 +69,7 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
             unit: 'pcs',
             quantity: 1,
             rate: 0,
-            discountPercent: 0,
-            taxRate: 18,
             grossAmount: 0,
-            discountAmount: 0,
             taxableAmount: 0,
             cgstAmount: 0,
             sgstAmount: 0,
@@ -117,8 +112,6 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
                             <th className="border border-border p-2 text-left text-sm font-medium text-foreground">Unit</th>
                             <th className="border border-border p-2 text-left text-sm font-medium text-foreground">Qty</th>
                             <th className="border border-border p-2 text-left text-sm font-medium text-foreground">Rate (₹)</th>
-                            <th className="border border-border p-2 text-left text-sm font-medium text-foreground">Discount (%)</th>
-                            <th className="border border-border p-2 text-left text-sm font-medium text-foreground">Tax (%)</th>
                             {isInterState ? (
                                 <th className="border border-border p-2 text-left text-sm font-medium text-foreground">IGST (₹)</th>
                             ) : (
@@ -183,27 +176,8 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
                                         className="border-0 p-0 text-sm w-20"
                                     />
                                 </td>
-                                <td className="border border-border p-2">
-                                    <Input
-                                        type="number"
-                                        value={item?.discountPercent}
-                                        onChange={(e) => updateItem(index, 'discountPercent', e?.target?.value)}
-                                        min="0"
-                                        max="100"
-                                        step="0.01"
-                                        className="border-0 p-0 text-sm w-16"
-                                    />
-                                </td>
-                                <td className="border border-border p-2">
-                                    <Input
-                                        type="number"
-                                        value={item?.taxRate}
-                                        onChange={(e) => updateItem(index, 'taxRate', e?.target?.value)}
-                                        min="0"
-                                        step="0.01"
-                                        className="border-0 p-0 text-sm w-16"
-                                    />
-                                </td>
+
+
                                 {isInterState ? (
                                     <td className="border border-border p-2 text-right text-sm">
                                         ₹{item?.igstAmount?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

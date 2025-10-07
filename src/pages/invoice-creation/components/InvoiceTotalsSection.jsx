@@ -3,7 +3,6 @@ import Input from '../../../components/ui/Input';
 const InvoiceTotalsSection = ({ items, additionalCharges, onAdditionalChargesChange }) => {
     const calculateTotals = () => {
         const subtotal = items?.reduce((sum, item) => sum + (item?.taxableAmount || 0), 0);
-        const totalDiscount = items?.reduce((sum, item) => sum + (item?.discountAmount || 0), 0);
         const totalCGST = items?.reduce((sum, item) => sum + (item?.cgstAmount || 0), 0);
         const totalSGST = items?.reduce((sum, item) => sum + (item?.sgstAmount || 0), 0);
         const totalIGST = items?.reduce((sum, item) => sum + (item?.igstAmount || 0), 0);
@@ -14,7 +13,6 @@ const InvoiceTotalsSection = ({ items, additionalCharges, onAdditionalChargesCha
 
         return {
             subtotal,
-            totalDiscount,
             totalCGST,
             totalSGST,
             totalIGST,
@@ -130,12 +128,7 @@ const InvoiceTotalsSection = ({ items, additionalCharges, onAdditionalChargesCha
                             <span className="text-text-secondary">Subtotal:</span>
                             <span className="font-medium">₹{totals?.subtotal?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
-                        {totals?.totalDiscount > 0 && (
-                            <div className="flex justify-between">
-                                <span className="text-text-secondary">Total Discount:</span>
-                                <span className="font-medium text-success">-₹{totals?.totalDiscount?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                            </div>
-                        )}
+
                         {totals?.totalCGST > 0 && (
                             <div className="flex justify-between">
                                 <span className="text-text-secondary">CGST:</span>

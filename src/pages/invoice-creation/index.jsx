@@ -8,7 +8,7 @@ import { getMyCompanyProfile } from '../../services/companyProfileService';
 import { getAllCustomers } from '../../services/customerService';
 import { downloadInvoicePDF } from '../../services/pdfService';
 import { getDefaultInvoiceValues, getNextInvoiceNumber } from '../../services/settingsService';
-import { downloadSimpleInvoicePDF } from '../../services/simplePdfService';
+// import { downloadSimpleInvoicePDF } from '../../services/simplePdfService';
 import CompanyCustomerSelector from './components/CompanyCustomerSelector';
 import InvoiceDetailsSection from './components/InvoiceDetailsSection';
 import InvoiceItemsTable from './components/InvoiceItemsTable';
@@ -164,11 +164,7 @@ const InvoiceCreation = () => {
             unit: 'gz',
             quantity: 5,
             rate: 320,
-            discountPercent: 0,
-            taxRate: 0, // Export items typically have 0% tax
             grossAmount: 1600,
-            discountAmount: 0,
-            taxableAmount: 1600,
             cgstAmount: 0,
             sgstAmount: 0,
             igstAmount: 0,
@@ -181,11 +177,7 @@ const InvoiceCreation = () => {
             unit: 'gz',
             quantity: 10,
             rate: 360,
-            discountPercent: 0,
-            taxRate: 0,
             grossAmount: 3600,
-            discountAmount: 0,
-            taxableAmount: 3600,
             cgstAmount: 0,
             sgstAmount: 0,
             igstAmount: 0,
@@ -198,10 +190,7 @@ const InvoiceCreation = () => {
             unit: 'gz',
             quantity: 5,
             rate: 500,
-            discountPercent: 0,
-            taxRate: 0,
             grossAmount: 2500,
-            discountAmount: 0,
             taxableAmount: 2500,
             cgstAmount: 0,
             sgstAmount: 0,
@@ -215,10 +204,7 @@ const InvoiceCreation = () => {
             unit: 'doz',
             quantity: 200,
             rate: 174,
-            discountPercent: 0,
-            taxRate: 0,
             grossAmount: 34800,
-            discountAmount: 0,
             taxableAmount: 34800,
             cgstAmount: 0,
             sgstAmount: 0,
