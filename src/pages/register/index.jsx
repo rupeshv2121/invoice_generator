@@ -192,13 +192,13 @@ const Register = () => {
             <div className="flex items-center justify-between mb-4">
                 {[1, 2, 3]?.map((step) => (
                     <div key={step} className="flex items-center">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step === currentStep ? 'bg-indigo-600 text-white' :
-                                step < currentStep ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                        <div className={`w-8 h-8 p-4 rounded-full flex items-center justify-center text-sm font-medium ${step === currentStep ? 'bg-indigo-600 text-white' :
+                            step < currentStep ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
                             }`}>
-                            {step < currentStep ? <CheckCircle className="h-4 w-4" /> : step}
+                            {step < currentStep ? <CheckCircle className="h-4 w-4 text-white" /> : step}
                         </div>
                         {step < 3 && (
-                            <div className={`w-full h-1 mx-4 ${step < currentStep ? 'bg-green-500' : 'bg-gray-200'
+                            <div className={`w-full h-1 mx-4 ${step < currentStep ? 'bg-green-500 text-white' : 'bg-gray-200'
                                 }`} />
                         )}
                     </div>
@@ -406,7 +406,7 @@ const Register = () => {
                         <div className="flex items-center justify-between text-xs mb-1">
                             <span className="text-gray-600">Password strength</span>
                             <span className={`font-medium ${passwordStrength < 40 ? 'text-red-500' :
-                                    passwordStrength < 70 ? 'text-yellow-500' : 'text-green-500'
+                                passwordStrength < 70 ? 'text-yellow-500' : 'text-green-500'
                                 }`}>
                                 {getPasswordStrengthText()}
                             </span>

@@ -8,6 +8,7 @@ import Dashboard from "./pages/dashboard";
 import InvoiceCreation from "./pages/invoice-creation";
 import InvoiceList from "./pages/invoice-list";
 import ItemsManagement from "./pages/items-management";
+import LandingPage from "./pages/landing-page";
 import Login from "./pages/login/index";
 import PDFPreview from "./pages/pdf-preview";
 import Register from "./pages/register";
@@ -21,7 +22,7 @@ const Routes = () => {
                 <ScrollToTop />
                 <RouterRoutes>
                     {/* Define your route here */}
-                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/invoice-list" element={<InvoiceList />} />
