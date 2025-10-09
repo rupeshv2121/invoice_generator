@@ -59,7 +59,183 @@ const PDFPreview = () => {
                 quantity: 200,
                 rate: 174.00,
                 totalAmount: 34800.00
-            }
+            },
+            {
+                description: 'Tower Bolt 6" (Anti Brand)',
+                hsnCode: '83024110',
+                unit: 'doz',
+                quantity: 150,
+                rate: 194.00,
+                totalAmount: 29100.00
+            },
+            {
+                description: 'Tower Bolt 8" (Anti Brand)',
+                hsnCode: '83024110',
+                unit: 'doz',
+                quantity: 100,
+                rate: 214.00,
+                totalAmount: 21400.00
+            },
+            {
+                description: 'Door Handle Set (Premium)',
+                hsnCode: '83024110',
+                unit: 'set',
+                quantity: 50,
+                rate: 450.00,
+                totalAmount: 22500.00
+            },
+            {
+                description: 'Window Lock (Standard)',
+                hsnCode: '83024110',
+                unit: 'pcs',
+                quantity: 75,
+                rate: 125.00,
+                totalAmount: 9375.00
+            },
+            {
+                description: 'Door Hinges 4" Heavy Duty',
+                hsnCode: '83024110',
+                unit: 'pair',
+                quantity: 200,
+                rate: 95.00,
+                totalAmount: 19000.00
+            },
+            {
+                description: 'Mortise Lock Set with Keys',
+                hsnCode: '83024110',
+                unit: 'set',
+                quantity: 25,
+                rate: 850.00,
+                totalAmount: 21250.00
+            },
+            {
+                description: 'Cabinet Handle (Aluminum)',
+                hsnCode: '83024110',
+                unit: 'pcs',
+                quantity: 300,
+                rate: 45.00,
+                totalAmount: 13500.00
+            },
+            {
+                description: 'Sliding Door Track System',
+                hsnCode: '83024110',
+                unit: 'set',
+                quantity: 20,
+                rate: 1200.00,
+                totalAmount: 24000.00
+            },
+            // {
+            //     description: 'Door Handle Set (Premium)',
+            //     hsnCode: '83024110',
+            //     unit: 'set',
+            //     quantity: 50,
+            //     rate: 450.00,
+            //     totalAmount: 22500.00
+            // },
+            // {
+            //     description: 'Window Lock (Standard)',
+            //     hsnCode: '83024110',
+            //     unit: 'pcs',
+            //     quantity: 75,
+            //     rate: 125.00,
+            //     totalAmount: 9375.00
+            // },
+            // {
+            //     description: 'Door Hinges 4" Heavy Duty',
+            //     hsnCode: '83024110',
+            //     unit: 'pair',
+            //     quantity: 200,
+            //     rate: 95.00,
+            //     totalAmount: 19000.00
+            // },
+            // {
+            //     description: 'Mortise Lock Set with Keys',
+            //     hsnCode: '83024110',
+            //     unit: 'set',
+            //     quantity: 25,
+            //     rate: 850.00,
+            //     totalAmount: 21250.00
+            // },
+            // {
+            //     description: 'Cabinet Handle (Aluminum)',
+            //     hsnCode: '83024110',
+            //     unit: 'pcs',
+            //     quantity: 300,
+            //     rate: 45.00,
+            //     totalAmount: 13500.00
+            // },
+            // {
+            //     description: 'Sliding Door Track System',
+            //     hsnCode: '83024110',
+            //     unit: 'set',
+            //     quantity: 20,
+            //     rate: 1200.00,
+            //     totalAmount: 24000.00
+            // },
+            // {
+            //     description: 'Security Chain Lock',
+            //     hsnCode: '83024110',
+            //     unit: 'pcs',
+            //     quantity: 100,
+            //     rate: 75.00,
+            //     totalAmount: 7500.00
+            // },
+            // {
+            //     description: 'Door Stopper (Rubber)',
+            //     hsnCode: '83024110',
+            //     unit: 'pcs',
+            //     quantity: 150,
+            //     rate: 25.00,
+            //     totalAmount: 3750.00
+            // },
+            // {
+            //     description: 'Concealed Hinges (Soft Close)',
+            //     hsnCode: '83024110',
+            //     unit: 'pair',
+            //     quantity: 80,
+            //     rate: 165.00,
+            //     totalAmount: 13200.00
+            // },
+            // {
+            //     description: 'Magnetic Door Catch',
+            //     hsnCode: '83024110',
+            //     unit: 'pcs',
+            //     quantity: 120,
+            //     rate: 35.00,
+            //     totalAmount: 4200.00
+            // },
+            // {
+            //     description: 'Pull Handle for Glass Door',
+            //     hsnCode: '83024110',
+            //     unit: 'pcs',
+            //     quantity: 60,
+            //     rate: 275.00,
+            //     totalAmount: 16500.00
+            // },
+            // {
+            //     description: 'Flush Bolt for French Doors',
+            //     hsnCode: '83024110',
+            //     unit: 'set',
+            //     quantity: 40,
+            //     rate: 385.00,
+            //     totalAmount: 15400.00
+            // },
+            // {
+            //     description: 'Door Viewer (Peephole)',
+            //     hsnCode: '83024110',
+            //     unit: 'pcs',
+            //     quantity: 90,
+            //     rate: 55.00,
+            //     totalAmount: 4950.00
+            // },
+            // {
+            //     description: 'Automatic Door Closer',
+            //     hsnCode: '83024110',
+            //     unit: 'pcs',
+            //     quantity: 15,
+            //     rate: 950.00,
+            //     totalAmount: 14250.00
+            // }
         ]
     };
 

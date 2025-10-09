@@ -324,7 +324,7 @@ export const generateInvoicePDF = (invoiceData) => {
 
     yPosition += 25;
 
-    // Items table - using autoTable for better reliability
+    // Items table - using autoTable for better reliability with page break support
     drawLine(margin, yPosition, pageWidth - margin, yPosition);
     yPosition += 0;
 
@@ -373,7 +373,7 @@ export const generateInvoicePDF = (invoiceData) => {
     // Prepare table data
     const tableData = [];
 
-    // Add items data
+    // Add items data - no more empty rows padding
     itemsToShow.forEach((item, index) => {
         tableData.push([
             (index + 1).toString(),
@@ -390,29 +390,26 @@ export const generateInvoicePDF = (invoiceData) => {
         ]);
     });
 
-    // Add empty rows to make total 8 rows
-    for (let i = itemsToShow.length; i < 8; i++) {
-        tableData.push([
-            (i + 1).toString(), '', '', '', '', '', '', '', '', '', ''
-        ]);
-    }
-
     // Calculate totals
     const totalQty = itemsToShow.reduce((sum, item) => sum + (item.quantity || 0), 0);
     const totalAmount = itemsToShow.reduce((sum, item) => sum + (item.totalAmount || 0), 0);
 
-    // Try to use autoTable if available
+    // Reserve space for footer (amount in words, bank details, terms)
+    const footerHeight = 55; // Reduced to minimum to allow 12+ items per page
+    const availableTableHeight = pageHeight - yPosition - footerHeight - margin;
+
+    // Try to use autoTable if available with page break support
     try {
         if (pdf.autoTable) {
             pdf.autoTable({
                 head: [tableHeaders],
                 body: tableData,
                 startY: yPosition,
-                margin: { left: margin, right: margin },
+                margin: { left: margin, right: margin, bottom: margin + footerHeight },
                 theme: 'grid',
                 styles: {
-                    fontSize: 7,
-                    cellPadding: 1.8,
+                    fontSize: 6.5,  // Slightly smaller font
+                    cellPadding: 1.5,  // Reduced padding
                     lineColor: [0, 0, 0],
                     lineWidth: 0.3,
                     halign: 'center'
@@ -435,36 +432,69 @@ export const generateInvoicePDF = (invoiceData) => {
                     8: { cellWidth: 12, halign: 'center' },   // SGST Rate
                     9: { cellWidth: 12, halign: 'center' },   // IGST Rate
                     10: { cellWidth: 20, halign: 'right' }    // Total
+                },
+                // Handle page breaks
+                didDrawPage: function (data) {
+                    // If we're on a new page (not the first), add page border
+                    if (data.pageNumber > 1) {
+                        const currentPageWidth = pdf.internal.pageSize.width;
+                        const currentPageHeight = pdf.internal.pageSize.height;
+                        pdf.setDrawColor(0, 0, 0);
+                        pdf.setLineWidth(0.5);
+                        pdf.rect(margin, margin, currentPageWidth - (2 * margin), currentPageHeight - (2 * margin));
+
+                        // Add page header info on continuation pages
+                        pdf.setFontSize(10);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text(`Invoice ${invoiceDetails?.invoiceNumber || 'EXP-1001'} (Continued...)`,
+                            currentPageWidth / 2, margin + 15, { align: 'center' });
+                    }
+                },
+                // Ensure table doesn't go into footer area
+                pageBreak: 'auto',
+                pageBreakBefore: function (hookData) {
+                    return hookData.cursor.y >= pageHeight - footerHeight - margin;
                 }
             });
 
             // Add total row manually after autoTable
             const finalY = pdf.lastAutoTable.finalY;
 
+            // Check if we need a new page for the total row
+            if (finalY + 20 > pageHeight - footerHeight - margin) {
+                pdf.addPage();
+                // Add border to new page
+                drawBorder(margin, margin, contentWidth, pageHeight - (2 * margin));
+                yPosition = margin + 20;
+            } else {
+                yPosition = finalY;
+            }
+
             // Total row
             pdf.setFillColor(240, 240, 240);
-            pdf.rect(margin, finalY, contentWidth, 8, 'F');
+            pdf.rect(margin, yPosition, contentWidth, 8, 'F');
 
             // Draw total row borders and content
-            drawLine(margin, finalY, pageWidth - margin, finalY);
-            drawLine(margin, finalY + 8, pageWidth - margin, finalY + 8);
-            drawLine(margin, finalY, margin, finalY + 8);
-            drawLine(pageWidth - margin, finalY, pageWidth - margin, finalY + 8);
+            drawLine(margin, yPosition, pageWidth - margin, yPosition);
+            drawLine(margin, yPosition + 8, pageWidth - margin, yPosition + 8);
+            drawLine(margin, yPosition, margin, yPosition + 8);
+            drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + 8);
 
             // Add total text
-            addText('Total :', margin + 80, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
-            addText(totalQty.toString(), margin + 95, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
-            addText(formatIndianNumber(totalAmount), margin + 131, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'right' });
-            addText('0.00', margin + 166, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
-            addText('0.00', margin + 186, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
-            addText(formatIndianNumber(totalAmount), pageWidth - margin - 5, finalY + 5, { fontSize: 7, fontStyle: 'bold', align: 'right' });
+            addText('Total :', margin + 80, yPosition + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
+            addText(totalQty.toString(), margin + 95, yPosition + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
+            addText(formatIndianNumber(totalAmount), margin + 131, yPosition + 5, { fontSize: 7, fontStyle: 'bold', align: 'right' });
+            addText('0.00', margin + 166, yPosition + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
+            addText('0.00', margin + 186, yPosition + 5, { fontSize: 7, fontStyle: 'bold', align: 'center' });
+            addText(formatIndianNumber(totalAmount), pageWidth - margin - 5, yPosition + 5, { fontSize: 7, fontStyle: 'bold', align: 'right' });
 
-            yPosition = finalY + 8;
+            yPosition = yPosition + 8;
         } else {
             throw new Error('autoTable not available');
         }
     } catch (error) {
         console.warn('autoTable failed, using simple table:', error);
+        // Fallback to simple table implementation would go here
     }
 
     // Enhanced border structure with professional styling
@@ -591,10 +621,10 @@ export const generateInvoicePDF = (invoiceData) => {
     const row3Height = 48; // Increased height for signature area
 
     // Draw enhanced borders for row 3
-    drawLine(margin, yPosition + row3Height, pageWidth - margin, yPosition + row3Height, 0.5); // Thicker bottom border
-    drawLine(margin, yPosition, margin, yPosition + row3Height, 0.4); // Left border
-    drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + row3Height, 0.4); // Right border
-    drawLine(rightColumnX, yPosition, rightColumnX, yPosition + row3Height, 0.3); // Vertical separator
+    // drawLine(margin, yPosition + row3Height, pageWidth - margin, yPosition + row3Height, 0.5); // Thicker bottom border
+    // drawLine(margin, yPosition, margin, yPosition + row3Height, 0.4); // Left border
+    // drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + row3Height, 0.4); // Right border
+    drawLine(rightColumnX, yPosition + 33, rightColumnX, yPosition, 0.3); // Vertical separator
 
     // Left side - Enhanced Terms & Conditions
     // Terms header with background
@@ -627,26 +657,14 @@ export const generateInvoicePDF = (invoiceData) => {
 
     // Signature box with border
     pdf.setFillColor(250, 250, 250);
-    pdf.rect(rightColumnX + 5, yPosition, signatureWidth - 10, 50, 'F');
-    // Draw signature box with consistent coordinates
-    drawLine(rightColumnX + 5, yPosition + 35, rightColumnX + signatureWidth - 5, yPosition + 35, 0.3); // Top
-    drawLine(rightColumnX + 5, yPosition + 50, rightColumnX + signatureWidth - 5, yPosition + 50, 0.3); // Bottom
-    drawLine(rightColumnX + 5, yPosition + 35, rightColumnX + 5, yPosition + 50, 0.3); // Left
-    drawLine(rightColumnX + signatureWidth - 5, yPosition + 35, rightColumnX + signatureWidth - 5, yPosition + 50, 0.3); // Right
+    pdf.rect(rightColumnX + 5, yPosition + 12.5, signatureWidth - 10, 20, 'F');
 
     // Vertically center the label inside the signature box
-    const signatureBoxTop = yPosition + 38;
-    const signatureBoxHeight = 15;
+    const signatureBoxTop = yPosition + 16;
+    const signatureBoxHeight = 20;
     const labelFontSize = 8;
     const labelY = signatureBoxTop + (signatureBoxHeight / 2) + (labelFontSize / 2.5); // Adjust for font baseline
     addText('Authorised Signatory', signatureX, labelY, { fontSize: 8, fontStyle: 'bold', align: 'center' });
-
-    // Enhanced Common Seal with styling
-    // pdf.setFillColor(248, 248, 248);
-    // pdf.rect(pageWidth - margin - 35, yPosition + row3Height - 8, 30, 6, 'F');
-    // drawLine(pageWidth - margin - 35, yPosition + row3Height - 8, pageWidth - margin - 5, yPosition + row3Height - 8, 0.2);
-    // drawLine(pageWidth - margin - 35, yPosition + row3Height - 2, pageWidth - margin - 5, yPosition + row3Height - 2, 0.2);
-    // addText('(Common Seal)', pageWidth - margin - 20, yPosition + row3Height - 5, { fontSize: 7, align: 'center', fontStyle: 'italic' });
 
     return pdf;
 };

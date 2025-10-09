@@ -1,6 +1,7 @@
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
+import ItemSelector from './ItemSelector';
 
 
 const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }) => {
@@ -18,6 +19,7 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
     const calculateItemTotals = (item) => {
         const quantity = parseFloat(item?.quantity) || 0;
         const rate = parseFloat(item?.rate) || 0;
+        const discountPercent = parseFloat(item?.discountPercent) || 0;
 
         const grossAmount = quantity * rate;
         const discountAmount = (grossAmount * discountPercent) / 100;
@@ -131,12 +133,17 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
                                     {index + 1}
                                 </td>
                                 <td className="border border-border p-2">
-                                    <Input
-                                        type="text"
+                                    <ItemSelector
                                         value={item?.description}
-                                        onChange={(e) => updateItem(index, 'description', e?.target?.value)}
-                                        placeholder="Product/Service description"
-                                        className="border-0 p-0 text-sm"
+                                        onChange={(itemData) => {
+                                            // Update multiple fields when an item is selected
+                                            const updatedItem = { ...item, ...itemData };
+                                            const totals = calculateItemTotals(updatedItem);
+                                            const updatedItems = [...items];
+                                            updatedItems[index] = { ...updatedItem, ...totals };
+                                            onItemsChange(updatedItems);
+                                        }}
+                                        placeholder="Search and select item..."
                                     />
                                 </td>
                                 <td className="border border-border p-2">

@@ -44,13 +44,13 @@ const Navigation = () => {
                         >
                             Sign In
                         </Link>
-                        <Button
+                        <Link
                             as={Link}
-                            to="/register"
+                            to="/dashboard"
                             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-200"
                         >
                             Start Free Trial
-                        </Button>
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Button */}

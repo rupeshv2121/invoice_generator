@@ -1,6 +1,5 @@
 import { ArrowRight, CheckCircle, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import Button from '../../../components/ui/Button';
 
 const HeroSection = () => {
     const keyBenefits = [
@@ -47,14 +46,14 @@ const HeroSection = () => {
 
                         {/* CTA Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <Button
+                            <Link
                                 as={Link}
                                 to="/dashboard"
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold text-lg flex items-center justify-center group transition-all duration-200"
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-1 rounded-lg font-semibold text-lg flex items-center justify-center group transition-all duration-200"
                             >
                                 Start Free Trial
                                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                            </Button>
+                            </Link>
 
                             <button className="border-2 border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg flex items-center justify-center group transition-all duration-200">
                                 <Play className="mr-2 h-5 w-5" />
