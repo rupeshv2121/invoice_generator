@@ -1,6 +1,4 @@
-// import Icon from './components/AppIcon';
-// import Button from './components/ui/Button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {
     const navigate = useNavigate();
@@ -24,23 +22,23 @@ const NotFound = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button
+                    <button
                         variant="primary"
-                        icon={<Icon name="ArrowLeft" />}
+                        // icon={<Icon name="ArrowLeft" />}
                         iconPosition="left"
                         onClick={() => window.history?.back()}
                     >
                         Go Back
-                    </Button>
+                    </button>
 
-                    <Button
+                    <button
                         variant="outline"
-                        icon={<Icon name="Home" />}
+                        // icon={<Icon name="Home" />}
                         iconPosition="left"
                         onClick={handleGoHome}
                     >
                         Back to Home
-                    </Button>
+                    </button>
                 </div>
             </div>
         </div>

@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../supabaseClient';
 import Icon from '../AppIcon';
 import Button from './Button';
 
@@ -7,6 +9,8 @@ const Header = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
+    const { setSession } = useAuth();
 
     const navigationItems = [
         { label: 'Dashboard', path: '/dashboard', icon: 'LayoutDashboard' },
@@ -38,6 +42,11 @@ const Header = () => {
         setIsUserMenuOpen(false);
     };
 
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        setSession(null);
+        navigate("/login", { replace: true });
+    }
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-border">
             <div className="flex items-center justify-between h-16 px-4 lg:px-6">
@@ -110,10 +119,7 @@ const Header = () => {
                                         <div className="border-t border-border my-1" />
                                         <button
                                             className="flex items-center w-full px-4 py-2 text-sm text-popover-foreground hover:bg-muted transition-colors duration-150"
-                                            onClick={() => {
-                                                closeUserMenu();
-                                                // Handle logout
-                                            }}
+                                            onClick={handleLogout}
                                         >
                                             <Icon name="LogOut" size={16} className="mr-3" />
                                             Logout

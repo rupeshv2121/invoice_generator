@@ -4,29 +4,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button';
 import { Checkbox } from '../../components/ui/Checkbox';
 import Input from '../../components/ui/Input';
-import Select from '../../components/ui/Select';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../supabaseClient';
 
 const Register = () => {
     const navigate = useNavigate();
+    const { setSession } = useAuth();
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
         // Personal Details
-        fullName: '',
-        email: '',
-        phone: '',
+        fullName: 'Rupesh Varshney',
+        email: 'rupeshvarshney7@gmail.com',
+        phone: '1234567890',
 
         // Business Information
-        companyName: '',
-        businessType: '',
-        industry: '',
+        companyName: 'Rupesh Traders',
+        // businessType: '',
+        // industry: '',
 
         // Account Credentials
-        password: '',
-        confirmPassword: '',
+        password: 'Rupesh@1234',
+        confirmPassword: 'Rupesh@1234',
 
         // GST Information
-        gstRegistered: false,
-        gstin: '',
+        gstRegistered: true,
+        gstin: '29AAAPL1234C1Z5',
 
         // Legal
         termsAccepted: false,
@@ -39,29 +41,29 @@ const Register = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
 
-    const businessTypes = [
-        { value: '', label: 'Select Business Type' },
-        { value: 'sole_proprietorship', label: 'Sole Proprietorship' },
-        { value: 'partnership', label: 'Partnership' },
-        { value: 'private_limited', label: 'Private Limited Company' },
-        { value: 'public_limited', label: 'Public Limited Company' },
-        { value: 'llp', label: 'Limited Liability Partnership' },
-        { value: 'freelancer', label: 'Freelancer/Consultant' }
-    ];
+    // const businessTypes = [
+    //     { value: '', label: 'Select Business Type' },
+    //     { value: 'sole_proprietorship', label: 'Sole Proprietorship' },
+    //     { value: 'partnership', label: 'Partnership' },
+    //     { value: 'private_limited', label: 'Private Limited Company' },
+    //     { value: 'public_limited', label: 'Public Limited Company' },
+    //     { value: 'llp', label: 'Limited Liability Partnership' },
+    //     { value: 'freelancer', label: 'Freelancer/Consultant' }
+    // ];
 
-    const industries = [
-        { value: '', label: 'Select Industry' },
-        { value: 'technology', label: 'Technology' },
-        { value: 'manufacturing', label: 'Manufacturing' },
-        { value: 'retail', label: 'Retail' },
-        { value: 'services', label: 'Professional Services' },
-        { value: 'healthcare', label: 'Healthcare' },
-        { value: 'education', label: 'Education' },
-        { value: 'finance', label: 'Finance' },
-        { value: 'real_estate', label: 'Real Estate' },
-        { value: 'hospitality', label: 'Hospitality' },
-        { value: 'other', label: 'Other' }
-    ];
+    // const industries = [
+    //     { value: '', label: 'Select Industry' },
+    //     { value: 'technology', label: 'Technology' },
+    //     { value: 'manufacturing', label: 'Manufacturing' },
+    //     { value: 'retail', label: 'Retail' },
+    //     { value: 'services', label: 'Professional Services' },
+    //     { value: 'healthcare', label: 'Healthcare' },
+    //     { value: 'education', label: 'Education' },
+    //     { value: 'finance', label: 'Finance' },
+    //     { value: 'real_estate', label: 'Real Estate' },
+    //     { value: 'hospitality', label: 'Hospitality' },
+    //     { value: 'other', label: 'Other' }
+    // ];
 
     const calculatePasswordStrength = (password) => {
         let strength = 0;
@@ -112,8 +114,8 @@ const Register = () => {
 
         if (step === 2) {
             if (!formData?.companyName?.trim()) newErrors.companyName = 'Company name is required';
-            if (!formData?.businessType) newErrors.businessType = 'Business type is required';
-            if (!formData?.industry) newErrors.industry = 'Industry is required';
+            // if (!formData?.businessType) newErrors.businessType = 'Business type is required';
+            // if (!formData?.industry) newErrors.industry = 'Industry is required';
 
             if (formData?.gstRegistered && !formData?.gstin?.trim()) {
                 newErrors.gstin = 'GSTIN is required for GST registered businesses';
@@ -163,11 +165,29 @@ const Register = () => {
 
         setIsLoading(true);
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            const { data, error } = await supabase.auth.signUp({
+                email: formData?.email,
+                password: formData?.password,
+                options: {
+                    data: {
+                        fullName: formData?.fullName,
+                        phone: formData?.phone,
+                        companyName: formData?.companyName,
+                        gstRegistered: formData?.gstRegistered,
+                        gstin: formData?.gstin
+                    }
+                }
+            })
 
-            // On successful registration, redirect to dashboard
-            navigate('/dashboard');
+            console.log(data, error)
+            if (data.session) {
+                setSession(data.session);
+                navigate("/dashboard", { replace: true });
+            }
+            else {
+                // If email confirmation is ON, session will be null
+                alert("Please check your email to confirm your account.");
+            }
         } catch (error) {
             setErrors({ general: 'Registration failed. Please try again.' });
         } finally {
@@ -301,7 +321,7 @@ const Register = () => {
                 {errors?.companyName && <p className="text-red-500 text-xs mt-1">{errors?.companyName}</p>}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <label htmlFor="businessType" className="block text-sm font-medium text-gray-700">
                         Business Type *
@@ -331,7 +351,7 @@ const Register = () => {
                     />
                     {errors?.industry && <p className="text-red-500 text-xs mt-1">{errors?.industry}</p>}
                 </div>
-            </div>
+            </div> */}
 
             {/* GST Section */}
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
@@ -365,7 +385,7 @@ const Register = () => {
                             maxLength={15}
                         />
                         <p className="text-xs text-gray-500">
-                            Format: 15 characters (2 digits + 10 characters + 1 digit + 1 character + 1 character)
+                            Format: 15 characters (2 digits + 10 characters + 1 digit + 1 character + 1 character) - e.g. 29AAAPL1234C1Z5
                         </p>
                         {errors?.gstin && <p className="text-red-500 text-xs mt-1">{errors?.gstin}</p>}
                     </div>

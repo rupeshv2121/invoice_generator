@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
+import {
+    createItem,
+    deleteItem,
+    getItems,
+    updateItem
+} from '../../api/items';
+
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import Input from '../../components/ui/Input';
 import {
-    addItem,
-    deleteItem,
     exportItems,
-    getAllItems,
-    getItemsStats,
     importItems,
     searchItems,
-    updateItem,
     validateItemData
 } from '../../services/itemService';
 import ItemFormModal from './components/ItemFormModal';
@@ -27,6 +29,7 @@ const ItemsManagement = () => {
     const [showFormModal, setShowFormModal] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [stats, setStats] = useState({});
+
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -45,9 +48,10 @@ const ItemsManagement = () => {
     const loadItems = async () => {
         setLoading(true);
         try {
-            const itemsList = getAllItems();
+            const itemsList = await getItems();
             setItems(itemsList);
-            setStats(getItemsStats());
+            setFilteredItems(itemsList.data.items);
+            // setStats(getItemsStats());
         } catch (error) {
             console.error('Error loading items:', error);
         } finally {
@@ -92,9 +96,9 @@ const ItemsManagement = () => {
 
         let result;
         if (editingItem) {
-            result = await updateItem(editingItem.id, itemData);
+            result = await updateItem({ ...editingItem, ...itemData });
         } else {
-            result = await addItem(itemData);
+            result = await createItem(itemData);
         }
 
         if (result.success) {

@@ -1,12 +1,15 @@
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button';
 import { Checkbox } from '../../components/ui/Checkbox';
 import Input from '../../components/ui/Input';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../supabaseClient';
 
 const Login = () => {
     const navigate = useNavigate();
+    const { session, setSession, loading } = useAuth();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -55,22 +58,60 @@ const Login = () => {
 
         setIsLoading(true);
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // Sign in with Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: formData.email,
+                password: formData.password,
+            });
 
-            // On successful login, redirect to dashboard
-            navigate('/dashboard');
-        } catch {
-            setErrors({ general: 'Invalid credentials. Please try again.' });
+            if (error) {
+                setErrors({ general: error.message });
+                return;
+            }
+
+            setSession(data.session);
+
+            if (data?.user) {
+                console.log('Login success:', data.user);
+
+                // Optional: store session in localStorage
+                localStorage.setItem('supabaseSession', JSON.stringify(data.session));
+
+                // Navigate to dashboard
+                navigate('/dashboard', { replace: true });
+            } else {
+                setErrors({ general: 'Login failed. Please check your credentials.' });
+            }
+        } catch (err) {
+            console.error(err);
+            setErrors({ general: 'Something went wrong. Please try again.' });
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleSocialLogin = (provider) => {
-        // Placeholder for social login integration
-        console.log(`Login with ${provider}`);
+    const handleSocialLogin = async (provider) => {
+        setIsLoading(true);
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+                redirectTo: window.location.origin + '/dashboard', // your frontend page
+            },
+        });
+        if (error) console.error('Google login error:', error);
     };
+
+    useEffect(() => {
+        if (session) navigate("/dashboard", { replace: true });
+    }, [session]);
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
