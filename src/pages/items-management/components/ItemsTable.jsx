@@ -107,6 +107,7 @@ const ItemsTable = ({
                             </th>
                         </tr>
                     </thead>
+
                     <tbody className="bg-white divide-y divide-gray-200">
                         {items.length === 0 ? (
                             <tr>

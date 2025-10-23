@@ -7,7 +7,7 @@ export const login = async (email, password) => {
         // Check if access_token exists
         const token = response?.data?.access_token;
         if (token) {
-            console.log("Access token received:", token);
+            // console.log("Access token received:", token);
             // Optionally store in localStorage/sessionStorage
             localStorage.setItem("access_token", token);
         } else {
@@ -32,7 +32,7 @@ export const register = async (name, email, password) => {
         // Check if access_token exists
         const token = response?.data?.access_token;
         if (token) {
-            console.log("✅ Access token received:", token);
+            // console.log("✅ Access token received:", token);
             localStorage.setItem("access_token", token);
         } else {
             console.warn("⚠️ No access_token in response:", response.data);

@@ -1,32 +1,23 @@
 import { useEffect, useState } from 'react';
-import {
-    createItem,
-    deleteItem,
-    getItems,
-    updateItem
-} from '../../api/items';
+import { useItemService } from '../../api/items.js';
 
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import Input from '../../components/ui/Input';
-import {
-    exportItems,
-    importItems,
-    searchItems,
-    validateItemData
-} from '../../services/itemService';
+
 import ItemFormModal from './components/ItemFormModal';
 import ItemsStats from './components/ItemsStats';
 import ItemsTable from './components/ItemsTable';
 
 const ItemsManagement = () => {
+    const { getItems, createItem, updateItem, deleteItem } = useItemService();
     const [items, setItems] = useState([]);
     const [filteredItems, setFilteredItems] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchItems, setSearchItems] = useState('');
     const [loading, setLoading] = useState(true);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [showFormModal, setShowFormModal] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [stats, setStats] = useState({});
 
@@ -38,19 +29,30 @@ const ItemsManagement = () => {
     // Load items on component mount
     useEffect(() => {
         loadItems();
+        // loadStats();
     }, []);
 
+    // const loadStats = async () => {
+    //     try {
+    //         const data = await itemsStats(); // Call your API
+    //         console.log("📊 Stats data:", data);
+    //         setStats(data);
+    //     } catch (error) {
+    //         console.error("Error loading stats:", error);
+    //     }
+    // };
     // Filter items when search term changes
     useEffect(() => {
         handleSearch();
-    }, [searchTerm, items]);
+    }, [searchItems, items]);
 
     const loadItems = async () => {
         setLoading(true);
         try {
             const itemsList = await getItems();
+            console.log("Item List : ", itemsList)
             setItems(itemsList);
-            setFilteredItems(itemsList.data.items);
+            setFilteredItems(Array.isArray(itemsList) ? itemsList : []);
             // setStats(getItemsStats());
         } catch (error) {
             console.error('Error loading items:', error);
@@ -60,55 +62,79 @@ const ItemsManagement = () => {
     };
 
     const handleSearch = () => {
-        const filtered = searchItems(searchTerm);
-        setFilteredItems(filtered);
-        setCurrentPage(1); // Reset to first page on search
+        const filtered = items.filter(item =>
+            item.name.toLowerCase().includes(searchItems.toLowerCase()) ||
+            item.hsnCode?.toLowerCase().includes(searchItems.toLowerCase())
+        );
+        setFilteredItems(Array.isArray(filtered) ? filtered : []);
+        setCurrentPage(1);
     };
+
 
     const handleAddItem = () => {
         setEditingItem(null);
-        setShowFormModal(true);
+        setModalOpen(true);
     };
 
     const handleEditItem = (item) => {
         setEditingItem(item);
-        setShowFormModal(true);
+        setModalOpen(true);
     };
 
     const handleDeleteItem = async (itemId) => {
-        if (window.confirm('Are you sure you want to delete this item?')) {
+        if (!window.confirm('Are you sure you want to delete this item?')) return;
+
+        try {
             const result = await deleteItem(itemId);
-            if (result.success) {
-                loadItems();
-                // Remove from selected items if it was selected
-                setSelectedItems(selectedItems.filter(id => id !== itemId));
+
+            if (result?.success) {
+                // optional: show toast or soft message instead of alert
+                console.log('✅ Item deleted successfully');
+                setSelectedItems(prev => prev.filter(id => id !== itemId));
+                await loadItems();
             } else {
-                alert('Error deleting item: ' + result.error);
+                console.error('❌ Delete failed:', result?.error || 'Unknown error');
+                alert('Error deleting item: ' + (result?.error || 'Something went wrong'));
             }
+        } catch (error) {
+            console.error('Error deleting item:', error);
+            alert('Failed to delete item.');
         }
     };
 
-    const handleSaveItem = async (itemData) => {
-        const validation = validateItemData(itemData);
-        if (!validation.isValid) {
-            return { success: false, errors: validation.errors };
-        }
+    const handleSave = async (item) => {
+        try {
+            const payload = {
+                ...item,
+                purchasePrice: parseFloat(item.purchasePrice),
+                sellingPrice: parseFloat(item.sellingPrice),
+                cgstRate: item.cgstRate,
+                sgstRate: item.sgstRate,
+                igstRate: item.igstRate
+            };
 
-        let result;
-        if (editingItem) {
-            result = await updateItem({ ...editingItem, ...itemData });
-        } else {
-            result = await createItem(itemData);
-        }
+            let response;
+            if (editingItem) {
+                response = await updateItem({ ...editingItem, ...payload });
+                console.log("Response HandleSave : ", response)
+            } else {
+                console.log("Response : ", payload)
+                response = await createItem(payload);
+            }
 
-        if (result.success) {
-            setShowFormModal(false);
-            setEditingItem(null);
-            loadItems();
+            if (response?.success !== false) {
+                alert(editingItem ? 'Item updated!' : 'Item added!');
+                await loadItems();
+                return { success: true };
+            } else {
+                return { success: false, error: response.error };
+            }
+        } catch (error) {
+            console.error('Error creating/updating item:', error);
+            return { success: false, error: error.message };
         }
-
-        return result;
     };
+
 
     const handleBulkDelete = async () => {
         if (selectedItems.length === 0) {
@@ -183,6 +209,7 @@ const ItemsManagement = () => {
     };
 
     const getCurrentPageItems = () => {
+        if (!Array.isArray(filteredItems)) return [];
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         return filteredItems.slice(startIndex, endIndex);
@@ -308,8 +335,8 @@ const ItemsManagement = () => {
                             <Input
                                 type="text"
                                 placeholder="Search by item name or HSN code..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                value={searchItems}
+                                onChange={(e) => setSearchItems(e.target.value)}
                                 className="w-full"
                             />
                         </div>
@@ -340,12 +367,9 @@ const ItemsManagement = () => {
 
                 {/* Item Form Modal */}
                 <ItemFormModal
-                    isOpen={showFormModal}
-                    onClose={() => {
-                        setShowFormModal(false);
-                        setEditingItem(null);
-                    }}
-                    onSave={handleSaveItem}
+                    isOpen={modalOpen}
+                    onClose={() => setModalOpen(false)}
+                    onSave={handleSave}
                     editingItem={editingItem}
                 />
             </main>

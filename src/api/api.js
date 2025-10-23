@@ -1,22 +1,22 @@
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
-const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001", // Adjust your backend URL
-    headers: {
-        "Content-Type": "application/json",
-    },
-});
+export const useApi = () => {
+    const { token } = useAuth();
 
-// Attach token on every request
-apiClient.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem("access_token");
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+    const apiClient = axios.create({
+        baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001",
+        headers: { "Content-Type": "application/json", ...(token && { Authorization: `Bearer ${token}` }), },
+    });
 
-export default apiClient;
+    // Dynamically attach token
+    apiClient.interceptors.request.use(
+        (config) => {
+            if (token) config.headers.Authorization = `Bearer ${token}`;
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
+
+    return apiClient;
+};

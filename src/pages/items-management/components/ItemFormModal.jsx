@@ -15,10 +15,10 @@ const ItemFormModal = ({ isOpen, onClose, onSave, editingItem }) => {
     useEffect(() => {
         if (editingItem) {
             setFormData({
-                name: editingItem.name || '',
-                hsnCode: editingItem.hsnCode || '',
-                purchasePrice: editingItem.purchasePrice || '',
-                sellingPrice: editingItem.sellingPrice || ''
+                name: editingItem.name,
+                hsnCode: editingItem.hsnCode,
+                purchasePrice: editingItem.purchasePrice,
+                sellingPrice: editingItem.sellingPrice
             });
         } else {
             setFormData({
@@ -50,8 +50,16 @@ const ItemFormModal = ({ isOpen, onClose, onSave, editingItem }) => {
         e.preventDefault();
         setSaving(true);
 
+        const normalizedData = {
+            name: formData.name.trim(),
+            hsnCode: Number(formData.hsnCode),
+            purchasePrice: parseFloat(formData.purchasePrice),
+            sellingPrice: parseFloat(formData.sellingPrice)
+        };
+
         try {
-            const result = await onSave(formData);
+            const result = await onSave(normalizedData);
+            console.log("Edit Result : ", result)
 
             if (result.success) {
                 handleClose();
@@ -232,6 +240,7 @@ const ItemFormModal = ({ isOpen, onClose, onSave, editingItem }) => {
                             disabled={saving}
                             loading={saving}
                             className="w-full sm:w-auto order-1 sm:order-2"
+                            onClick={handleSubmit}
                         >
                             {saving ? 'Saving...' : (editingItem ? 'Update Item' : 'Add Item')}
                         </Button>

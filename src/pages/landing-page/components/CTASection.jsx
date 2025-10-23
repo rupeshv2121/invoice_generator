@@ -1,6 +1,5 @@
 import { ArrowRight, CheckCircle, Users, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import Button from '../../../components/ui/Button';
 
 const CTASection = () => {
     const urgencyPoints = [
@@ -61,22 +60,22 @@ const CTASection = () => {
 
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <Button
+                        <Link
                             as={Link}
                             to="/register"
-                            className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-8 py-4 rounded-xl font-bold text-lg flex items-center group transition-all duration-200 shadow-2xl"
+                            className="bg-yellow-400 hover:bg-yellow-500 text-white px-8 py-2 rounded-xl font-bold text-lg flex items-center group transition-all duration-200 shadow-2xl"
                         >
                             Start Your Free Trial
                             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                        </Button>
+                        </Link>
 
-                        <Button
+                        <Link
                             as={Link}
                             to="/login"
-                            className="border-2 border-white/30 hover:border-white hover:bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200"
+                            className="border-2 border-white/30 hover:border-white hover:bg-white/10 text-white px-8 py-2 rounded-xl font-semibold text-lg transition-all duration-200"
                         >
                             Sign In to Your Account
-                        </Button>
+                        </Link>
                     </div>
 
                     {/* Trust Indicators */}

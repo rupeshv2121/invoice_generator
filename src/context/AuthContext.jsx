@@ -6,23 +6,33 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [session, setSession] = useState(null);
-    const [loading, setLoading] = useState(true); // ✅ track loading
+    const [token, setToken] = useState(null);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchSession = async () => {
             const { data } = await supabase.auth.getSession();
             setSession(data?.session ?? null);
-            setLoading(false); // ✅ done checking
+            setToken(data?.session?.access_token ?? null);
+            setLoading(false);
         };
 
         fetchSession();
 
-        // Listen to login/logout changes
+        // Listen for login/logout events
         const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
+            setToken(session?.access_token ?? null);
             setLoading(false);
-            if (session) navigate('/dashboard', { replace: true }); // auto redirect if logged in
+            if (event === 'SIGNED_IN') {
+                navigate('/dashboard', { replace: true });
+            }
+
+            // On logout, optionally redirect to login
+            if (event === 'SIGNED_OUT') {
+                navigate('/login', { replace: true });
+            }
         });
 
         return () => listener?.subscription?.unsubscribe();
@@ -32,6 +42,7 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         setSession(data.session);
+        setToken(data.session?.access_token ?? null);
         return data;
     };
 
@@ -39,27 +50,37 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
         setSession(data.session);
+        setToken(data.session?.access_token ?? null);
         return data;
     };
 
     const loginWithProvider = async (provider) => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider,
-            options: {
-                redirectTo: window.location.origin + '/dashboard'
-            }
+            options: { redirectTo: window.location.origin + '/dashboard' }
         });
         if (error) throw error;
-        return data; // user will be redirected
+        return data;
     };
 
     const logout = async () => {
         await supabase.auth.signOut();
         setSession(null);
+        setToken(null);
     };
 
+    useEffect(() => {
+        if (session?.access_token) {
+            localStorage.setItem("access_token", session.access_token);
+        } else {
+            localStorage.removeItem("access_token");
+        }
+    }, [session]);
+
     return (
-        <AuthContext.Provider value={{ session, loading, setSession, login, register, loginWithProvider, logout }}>
+        <AuthContext.Provider
+            value={{ session, token, loading, setSession, login, register, loginWithProvider, logout }}
+        >
             {children}
         </AuthContext.Provider>
     );
