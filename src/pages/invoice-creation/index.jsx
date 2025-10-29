@@ -5,7 +5,7 @@ import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
 import { getMyCompanyProfile } from '../../services/companyProfileService';
-import { getAllCustomers } from '../../services/customerService';
+// import { getAllCustomers } from '../../services/customerService';
 import { downloadInvoicePDF } from '../../services/pdfService';
 import { getDefaultInvoiceValues, getNextInvoiceNumber } from '../../services/settingsService';
 // import { downloadSimpleInvoicePDF } from '../../services/simplePdfService';

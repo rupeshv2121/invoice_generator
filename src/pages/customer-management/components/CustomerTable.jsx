@@ -29,23 +29,23 @@ const CustomerTable = ({
                         <tr>
                             <th className="text-left p-4 font-medium text-foreground">
                                 <button
-                                    onClick={() => handleSort('businessName')}
+                                    onClick={() => handleSort('companyName')}
                                     className="flex items-center space-x-1 hover:text-primary transition-colors"
                                 >
-                                    <span>Business Name</span>
-                                    <Icon name={getSortIcon('businessName')} size={16} />
+                                    <span>Company Name</span>
+                                    <Icon name={getSortIcon('companyName')} size={16} />
                                 </button>
                             </th>
                             <th className="text-left p-4 font-medium text-foreground">
                                 <button
-                                    onClick={() => handleSort('contactPerson')}
+                                    onClick={() => handleSort('name')}
                                     className="flex items-center space-x-1 hover:text-primary transition-colors"
                                 >
                                     <span>Contact Person</span>
-                                    <Icon name={getSortIcon('contactPerson')} size={16} />
+                                    <Icon name={getSortIcon('name')} size={16} />
                                 </button>
                             </th>
-                            <th className="text-left p-4 font-medium text-foreground">
+                            {/* <th className="text-left p-4 font-medium text-foreground">
                                 <button
                                     onClick={() => handleSort('email')}
                                     className="flex items-center space-x-1 hover:text-primary transition-colors"
@@ -53,23 +53,24 @@ const CustomerTable = ({
                                     <span>Email</span>
                                     <Icon name={getSortIcon('email')} size={16} />
                                 </button>
-                            </th>
-                            <th className="text-left p-4 font-medium text-foreground">Phone</th>
+                            </th> */}
+                            {/* <th className="text-left p-4 font-medium text-foreground">Phone</th> */}
                             <th className="text-left p-4 font-medium text-foreground">
                                 <button
-                                    onClick={() => handleSort('location')}
+                                    onClick={() => handleSort('city')}
                                     className="flex items-center space-x-1 hover:text-primary transition-colors"
                                 >
-                                    <span>Location</span>
-                                    <Icon name={getSortIcon('location')} size={16} />
+                                    <span>City</span>
+                                    <Icon name={getSortIcon('city')} size={16} />
                                 </button>
                             </th>
                             <th className="text-left p-4 font-medium text-foreground">EXIM Code</th>
-                            <th className="text-left p-4 font-medium text-foreground">GST Status</th>
-                            <th className="text-right p-4 font-medium text-foreground">Actions</th>
+                            {/* <th className="text-left p-4 font-medium text-foreground">GST Status</th> */}
+                            <th className="text-right py-4 pr-20 font-medium text-foreground">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {console.log("Rendering customers:", customers)}
                         {customers?.map((customer, index) => (
                             <tr
                                 key={customer?.id}
@@ -77,32 +78,32 @@ const CustomerTable = ({
                                     }`}
                             >
                                 <td className="p-4">
-                                    <div className="font-medium text-foreground">{customer?.businessName}</div>
-                                    <div className="text-sm text-text-secondary">{customer?.customerType}</div>
+                                    <div className="font-medium text-foreground">{customer?.companyName}</div>
+                                    <div className="text-sm text-text-secondary">{customer?.email}</div>
                                 </td>
                                 <td className="p-4">
-                                    <div className="text-foreground">{customer?.contactPerson}</div>
+                                    <div className="text-foreground">{customer?.name}</div>
                                 </td>
-                                <td className="p-4">
+                                {/* <td className="p-4">
                                     <div className="text-foreground">{customer?.email}</div>
-                                </td>
-                                <td className="p-4">
+                                </td> */}
+                                {/* <td className="p-4">
                                     <div className="text-foreground">{customer?.phone}</div>
+                                </td> */}
+                                <td className="p-4">
+                                    <div className="text-foreground">{customer?.city || 'N/A'}</div>
                                 </td>
                                 <td className="p-4">
-                                    <div className="text-foreground">{customer?.location}</div>
-                                </td>
-                                <td className="p-4">
-                                    <div className="font-mono text-sm text-foreground bg-muted px-2 py-1 rounded">
-                                        {customer?.eximCode || 'N/A'}
+                                    <div className="font-mono text-md text-foreground bg-muted px-2 py-1 rounded">
+                                        {customer?.EximCode || 'N/A'}
                                     </div>
                                 </td>
-                                <td className="p-4">
+                                {/* <td className="p-4">
                                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${customer?.gstStatus === 'Registered' ? 'bg-green-600 text-white font-bold' : 'bg-yellow-500 text-white font-bold'
                                         }`}>
                                         {customer?.gstStatus}
                                     </span>
-                                </td>
+                                </td> */}
                                 <td className="p-4">
                                     <div className="flex items-center  justify-center space-x-2">
                                         <Button
@@ -146,31 +147,27 @@ const CustomerTable = ({
                     <div key={customer?.id} className="bg-surface border border-border rounded-lg p-4">
                         <div className="flex items-start justify-between mb-3">
                             <div>
-                                <h3 className="font-medium text-foreground">{customer?.businessName}</h3>
-                                <p className="text-sm text-text-secondary">{customer?.customerType}</p>
+                                <h3 className="font-medium text-foreground">{customer?.companyName}</h3>
+                                <p className="text-sm text-text-secondary">{customer?.email || 'No email'}</p>
                             </div>
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${customer?.gstStatus === 'Registered' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${customer?.gstin ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
                                 }`}>
-                                {customer?.gstStatus}
+                                {customer?.gstin ? 'GST Registered' : 'No GST'}
                             </span>
                         </div>
 
                         <div className="space-y-2 mb-4">
                             <div className="flex items-center space-x-2">
                                 <Icon name="User" size={16} className="text-text-secondary" />
-                                <span className="text-sm text-foreground">{customer?.contactPerson}</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Icon name="Mail" size={16} className="text-text-secondary" />
-                                <span className="text-sm text-foreground">{customer?.email}</span>
+                                <span className="text-sm text-foreground">{customer?.name}</span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Icon name="Phone" size={16} className="text-text-secondary" />
-                                <span className="text-sm text-foreground">{customer?.phone}</span>
+                                <span className="text-sm text-foreground">{customer?.phone || 'No phone'}</span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Icon name="MapPin" size={16} className="text-text-secondary" />
-                                <span className="text-sm text-foreground">{customer?.location}</span>
+                                <span className="text-sm text-foreground">{customer?.city || 'No city'}</span>
                             </div>
                         </div>
 

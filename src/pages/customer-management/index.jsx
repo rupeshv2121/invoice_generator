@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useCustomersService } from '../../api/customers';
 import Icon from '../../components/AppIcon';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
-import { addCustomer, deleteCustomer, getAllCustomers, searchCustomers, updateCustomer } from '../../services/customerService';
 import CustomerFilters from './components/CustomerFilters';
 import CustomerHistoryModal from './components/CustomerHistoryModal';
 import CustomerModal from './components/CustomerModal';
@@ -12,13 +12,14 @@ import CustomerStats from './components/CustomerStats';
 import CustomerTable from './components/CustomerTable';
 
 const CustomerManagement = () => {
+    const { getCustomers, addCustomer, updateCustomer, deleteCustomer, getCustomerById } = useCustomersService();
     const [customers, setCustomers] = useState([]);
     const [filteredCustomers, setFilteredCustomers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [locationFilter, setLocationFilter] = useState('');
     const [customerTypeFilter, setCustomerTypeFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
-    const [sortBy, setSortBy] = useState('businessName');
+    const [sortBy, setSortBy] = useState('companyName');
     const [sortOrder, setSortOrder] = useState('asc');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
@@ -30,11 +31,12 @@ const CustomerManagement = () => {
         loadCustomers();
     }, []);
 
-    const loadCustomers = () => {
+    const loadCustomers = async () => {
         try {
-            const customersList = getAllCustomers();
-            setCustomers(customersList);
-            setFilteredCustomers(customersList);
+            const response = await getCustomers();
+            console.log("Response Get Customer:", response);
+            setCustomers(response?.customers || []);
+            setFilteredCustomers(response?.customers || []);
         } catch (error) {
             console.error('Error loading customers:', error);
             setCustomers([]);
@@ -42,275 +44,6 @@ const CustomerManagement = () => {
         }
     };
 
-    // Original mock customers for reference (will be removed)
-    const originalMockCustomers = [
-        {
-            id: 1,
-            businessName: "TechCorp Solutions Pvt Ltd",
-            contactPerson: "Rajesh Kumar",
-            email: "rajesh@techcorp.com",
-            phone: "+91 98765 43210",
-            location: "Mumbai",
-            customerType: "Business",
-            gstNumber: "27AAAAA0000A1Z5",
-            gstStatus: "Registered",
-            status: "Active",
-            billingAddress: {
-                street: "123 Business Park, Andheri East",
-                city: "Mumbai",
-                state: "Maharashtra",
-                pincode: "400069",
-                country: "India"
-            },
-            shippingAddress: {
-                street: "123 Business Park, Andheri East",
-                city: "Mumbai",
-                state: "Maharashtra",
-                pincode: "400069",
-                country: "India",
-                sameAsBilling: true
-            },
-            bankDetails: {
-                accountName: "TechCorp Solutions Pvt Ltd",
-                accountNumber: "1234567890",
-                ifscCode: "HDFC0001234",
-                bankName: "HDFC Bank"
-            }
-        },
-        {
-            id: 2,
-            businessName: "Digital Marketing Hub",
-            contactPerson: "Priya Sharma",
-            email: "priya@digitalmarketing.com",
-            phone: "+91 87654 32109",
-            location: "Delhi",
-            customerType: "Business",
-            gstNumber: "07BBBBB1111B2Z6",
-            gstStatus: "Registered",
-            status: "Active",
-            billingAddress: {
-                street: "456 Connaught Place",
-                city: "New Delhi",
-                state: "Delhi",
-                pincode: "110001",
-                country: "India"
-            },
-            shippingAddress: {
-                street: "456 Connaught Place",
-                city: "New Delhi",
-                state: "Delhi",
-                pincode: "110001",
-                country: "India",
-                sameAsBilling: true
-            },
-            bankDetails: {
-                accountName: "Digital Marketing Hub",
-                accountNumber: "9876543210",
-                ifscCode: "ICIC0001234",
-                bankName: "ICICI Bank"
-            }
-        },
-        {
-            id: 3,
-            businessName: "Creative Designs Studio",
-            contactPerson: "Amit Patel",
-            email: "amit@creativedesigns.com",
-            phone: "+91 76543 21098",
-            location: "Bangalore",
-            customerType: "Freelancer",
-            gstNumber: "",
-            gstStatus: "Unregistered",
-            status: "Active",
-            billingAddress: {
-                street: "789 MG Road",
-                city: "Bangalore",
-                state: "Karnataka",
-                pincode: "560001",
-                country: "India"
-            },
-            shippingAddress: {
-                street: "789 MG Road",
-                city: "Bangalore",
-                state: "Karnataka",
-                pincode: "560001",
-                country: "India",
-                sameAsBilling: true
-            },
-            bankDetails: {
-                accountName: "Amit Patel",
-                accountNumber: "5432109876",
-                ifscCode: "SBIN0001234",
-                bankName: "State Bank of India"
-            }
-        },
-        {
-            id: 4,
-            businessName: "Global Exports Ltd",
-            contactPerson: "Sunita Reddy",
-            email: "sunita@globalexports.com",
-            phone: "+91 65432 10987",
-            location: "Chennai",
-            customerType: "Business",
-            gstNumber: "33CCCCC2222C3Z7",
-            gstStatus: "Registered",
-            status: "Inactive",
-            billingAddress: {
-                street: "321 Anna Salai",
-                city: "Chennai",
-                state: "Tamil Nadu",
-                pincode: "600002",
-                country: "India"
-            },
-            shippingAddress: {
-                street: "321 Anna Salai",
-                city: "Chennai",
-                state: "Tamil Nadu",
-                pincode: "600002",
-                country: "India",
-                sameAsBilling: true
-            },
-            bankDetails: {
-                accountName: "Global Exports Ltd",
-                accountNumber: "2109876543",
-                ifscCode: "AXIS0001234",
-                bankName: "Axis Bank"
-            }
-        },
-        {
-            id: 5,
-            businessName: "Innovative Solutions",
-            contactPerson: "Vikram Singh",
-            email: "vikram@innovative.com",
-            phone: "+91 54321 09876",
-            location: "Hyderabad",
-            customerType: "Business",
-            gstNumber: "36DDDDD3333D4Z8",
-            gstStatus: "Registered",
-            status: "Active",
-            billingAddress: {
-                street: "654 HITEC City",
-                city: "Hyderabad",
-                state: "Telangana",
-                pincode: "500081",
-                country: "India"
-            },
-            shippingAddress: {
-                street: "654 HITEC City",
-                city: "Hyderabad",
-                state: "Telangana",
-                pincode: "500081",
-                country: "India",
-                sameAsBilling: true
-            },
-            bankDetails: {
-                accountName: "Innovative Solutions",
-                accountNumber: "6789012345",
-                ifscCode: "KOTAK001234",
-                bankName: "Kotak Mahindra Bank"
-            }
-        },
-        {
-            id: 6,
-            businessName: "Retail Chain Stores",
-            contactPerson: "Meera Joshi",
-            email: "meera@retailchain.com",
-            phone: "+91 43210 98765",
-            location: "Pune",
-            customerType: "Business",
-            gstNumber: "27EEEEE4444E5Z9",
-            gstStatus: "Registered",
-            status: "Active",
-            billingAddress: {
-                street: "987 FC Road",
-                city: "Pune",
-                state: "Maharashtra",
-                pincode: "411005",
-                country: "India"
-            },
-            shippingAddress: {
-                street: "987 FC Road",
-                city: "Pune",
-                state: "Maharashtra",
-                pincode: "411005",
-                country: "India",
-                sameAsBilling: true
-            },
-            bankDetails: {
-                accountName: "Retail Chain Stores",
-                accountNumber: "3456789012",
-                ifscCode: "PUNB0001234",
-                bankName: "Punjab National Bank"
-            }
-        },
-        {
-            id: 7,
-            businessName: "Consulting Services Inc",
-            contactPerson: "Arjun Gupta",
-            email: "arjun@consulting.com",
-            phone: "+91 32109 87654",
-            location: "Kolkata",
-            customerType: "Individual",
-            gstNumber: "",
-            gstStatus: "Unregistered",
-            status: "Active",
-            billingAddress: {
-                street: "147 Park Street",
-                city: "Kolkata",
-                state: "West Bengal",
-                pincode: "700016",
-                country: "India"
-            },
-            shippingAddress: {
-                street: "147 Park Street",
-                city: "Kolkata",
-                state: "West Bengal",
-                pincode: "700016",
-                country: "India",
-                sameAsBilling: true
-            },
-            bankDetails: {
-                accountName: "Arjun Gupta",
-                accountNumber: "7890123456",
-                ifscCode: "IDIB0001234",
-                bankName: "Indian Bank"
-            }
-        },
-        {
-            id: 8,
-            businessName: "Manufacturing Co Ltd",
-            contactPerson: "Kavya Nair",
-            email: "kavya@manufacturing.com",
-            phone: "+91 21098 76543",
-            location: "Ahmedabad",
-            customerType: "Business",
-            gstNumber: "24FFFFF5555F6Z0",
-            gstStatus: "Registered",
-            status: "Active",
-            billingAddress: {
-                street: "258 Industrial Area",
-                city: "Ahmedabad",
-                state: "Gujarat",
-                pincode: "380015",
-                country: "India"
-            },
-            shippingAddress: {
-                street: "258 Industrial Area",
-                city: "Ahmedabad",
-                state: "Gujarat",
-                pincode: "380015",
-                country: "India",
-                sameAsBilling: true
-            },
-            bankDetails: {
-                accountName: "Manufacturing Co Ltd",
-                accountNumber: "4567890123",
-                ifscCode: "VIJB0001234",
-                bankName: "Vijaya Bank"
-            }
-        }
-    ];
-
-    // This useEffect is now replaced by the loadCustomers function called in the first useEffect
 
     // Filter and search customers
     useEffect(() => {
@@ -337,31 +70,31 @@ const CustomerManagement = () => {
         }
 
         // Sort customers
-        filtered?.sort((a, b) => {
-            let aValue = a?.[sortBy];
-            let bValue = b?.[sortBy];
+        // filtered?.sort((a, b) => {
+        //     let aValue = a?.[sortBy];
+        //     let bValue = b?.[sortBy];
 
-            if (typeof aValue === 'string') {
-                aValue = aValue?.toLowerCase();
-                bValue = bValue?.toLowerCase();
-            }
+        //     if (typeof aValue === 'string') {
+        //         aValue = aValue?.toLowerCase();
+        //         bValue = bValue?.toLowerCase();
+        //     }
 
-            if (sortOrder === 'asc') {
-                return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-            } else {
-                return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-            }
-        });
+        //     if (sortOrder === 'asc') {
+        //         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+        //     } else {
+        //         return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+        //     }
+        // });
 
         setFilteredCustomers(filtered);
     }, [customers, searchTerm, locationFilter, customerTypeFilter, statusFilter, sortBy, sortOrder]);
 
     // Calculate statistics
     const stats = {
-        totalCustomers: customers?.length,
-        activeCustomers: customers?.filter(c => c?.status === 'Active')?.length,
-        gstRegistered: customers?.filter(c => c?.gstStatus === 'Registered')?.length,
-        outstandingAmount: 485000 // Mock outstanding amount
+        // totalCustomers: customers?.length,
+        // activeCustomers: customers?.filter(c => c?.status === 'Active')?.length,
+        // gstRegistered: customers?.filter(c => c?.gstStatus === 'Registered')?.length,
+        // outstandingAmount: 485000 // Mock outstanding amount
     };
 
     const handleAddCustomer = () => {
@@ -381,14 +114,14 @@ const CustomerManagement = () => {
         setIsHistoryModalOpen(true);
     };
 
-    const handleDeleteCustomer = (customer) => {
-        if (window.confirm(`Are you sure you want to delete ${customer?.businessName}?`)) {
+    const handleDeleteCustomer = async (customer) => {
+        if (window.confirm(`Are you sure you want to delete ${customer?.companyName}?`)) {
             try {
-                const success = deleteCustomer(customer.id);
-                if (success) {
+                const result = await deleteCustomer(customer.id);
+                if (result.success) {
                     loadCustomers(); // Reload customers after deletion
                 } else {
-                    alert('Error deleting customer. Customer not found.');
+                    alert(result.error || 'Error deleting customer. Customer not found.');
                 }
             } catch (error) {
                 console.error('Error deleting customer:', error);
@@ -397,23 +130,17 @@ const CustomerManagement = () => {
         }
     };
 
-    const handleSaveCustomer = (customerData) => {
+    const handleSaveCustomer = async (customerData) => {
         try {
-            // Prepare customer data with additional fields
-            const processedData = {
-                ...customerData,
-                status: customerData.status || 'Active',
-                gstStatus: customerData?.gstNumber ? 'Registered' : 'Unregistered',
-                location: customerData?.billingAddress?.city
-            };
+            console.log("Saving customer data:", customerData);
 
             if (modalMode === 'add') {
-                addCustomer(processedData);
+                await addCustomer(customerData);
             } else {
-                updateCustomer(selectedCustomer.id, processedData);
+                await updateCustomer(selectedCustomer.id, customerData);
             }
 
-            loadCustomers(); // Reload customers after save
+            await loadCustomers(); // Reload customers after save
             setIsModalOpen(false);
             setSelectedCustomer(null);
         } catch (error) {
