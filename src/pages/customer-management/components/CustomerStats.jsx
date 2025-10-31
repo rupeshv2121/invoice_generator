@@ -1,45 +1,49 @@
 import Icon from '../../../components/AppIcon';
 
 const CustomerStats = ({ stats }) => {
+
     const statItems = [
         {
             label: 'Total Customers',
-            value: stats?.totalCustomers,
+            value: stats?.totalCustomers || 0,
             icon: 'Users',
-            color: 'text-blue-600',
-
+            bgColor: 'bg-blue-50',
+            color: 'text-blue-600'
         },
         {
             label: 'Active Customers',
-            value: stats?.activeCustomers,
+            value: stats?.customersWithInvoices || 0,
             icon: 'UserCheck',
-            color: 'text-green-600',
+            bgColor: 'bg-green-50',
+            color: 'text-green-600'
         },
         {
             label: 'GST Registered',
-            value: stats?.gstRegistered,
+            value: stats?.gstRegisteredCount || 0,
             icon: 'FileText',
-            color: 'text-blue-600',
+            bgColor: 'bg-indigo-50',
+            color: 'text-indigo-600'
         },
         {
             label: 'Outstanding Amount',
-            value: `₹${stats?.outstandingAmount?.toLocaleString('en-IN')}`,
+            value: `₹${stats?.outstandingAmount?.toFixed(2) || 0}`,
             icon: 'IndianRupee',
-            color: 'text-yellow-500',
+            bgColor: 'bg-yellow-50',
+            color: 'text-yellow-600'
         }
     ];
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {statItems?.map((item, index) => (
+            {statItems.map((item, index) => (
                 <div key={index} className="bg-card rounded-lg border border-border p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-text-secondary mb-1">{item?.label}</p>
-                            <p className="text-2xl font-bold text-foreground">{item?.value}</p>
+                            <p className="text-sm font-medium text-text-secondary mb-1">{item.label}</p>
+                            <p className="text-2xl font-bold text-foreground">{item.value}</p>
                         </div>
-                        <div className={`p-3 rounded-lg ${item?.bgColor}`}>
-                            <Icon name={item?.icon} size={24} className={item?.color} />
+                        <div className={`p-3 rounded-lg ${item.bgColor}`}>
+                            <Icon name={item.icon} size={24} className={item.color} />
                         </div>
                     </div>
                 </div>

@@ -59,5 +59,16 @@ export const useCustomersService = () => {
         }
     }
 
-    return { getCustomers, getCustomerById, addCustomer, updateCustomer, deleteCustomer };
+    const getCustomerStatistics = async () => {
+        try {
+            const response = await api.get('/api/customer/stats');
+            console.log("Customer Statistics Response:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching customer statistics:', error);
+            return null;
+        }
+    };
+
+    return { getCustomers, getCustomerById, addCustomer, updateCustomer, deleteCustomer, getCustomerStatistics };
 }

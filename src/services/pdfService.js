@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { getMyCompanyProfile } from './companyProfileService';
+// import { getMyCompanyProfile } from './companyProfileService';
 import { getTermsAndConditions } from './settingsService';
 
 // Helper function to format Indian numbers
@@ -86,7 +86,7 @@ export const generateInvoicePDF = (invoiceData) => {
     const { companyData, customerData, invoiceDetails, items, additionalCharges } = invoiceData;
 
     // Get company profile and terms from services
-    const myCompanyProfile = getMyCompanyProfile();
+    // const myCompanyProfile = getMyCompanyProfile();
     const termsAndConditions = getTermsAndConditions();
 
     // Create new PDF document

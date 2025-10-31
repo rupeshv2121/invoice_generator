@@ -9,15 +9,13 @@ const CompanyCustomerSelector = ({
     myCompanyProfile,
     loading = false
 }) => {
-    console.log('CompanyCustomerSelector props:', { customers, selectedCustomerId, loading });
+    // console.log('CompanyCustomerSelector props:', { customers, selectedCustomerId, loading });
 
-    const customerOptions = customers?.map(customer => ({
-        value: customer.id,
-        label: customer.businessName,
-        description: `${customer.email} - ${customer.location} ${customer.eximCode ? `(EXIM: ${customer.eximCode})` : ''}`
+    const customerOptions = customers?.map(c => ({
+        value: c.id,
+        label: c.name || c.companyName || c.email,
+        description: `${c.email} - ${c.location} ${c.eximCode ? `(EXIM: ${c.eximCode})` : ''}`
     }));
-
-    console.log('Customer options:', customerOptions);
 
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -33,7 +31,7 @@ const CompanyCustomerSelector = ({
                     </label>
                     <Select
                         value={selectedCustomerId || ''}
-                        onChange={(value) => onCustomerChange(value ? parseInt(value) : null)}
+                        onChange={(value) => onCustomerChange(value || null)}
                         options={customerOptions}
                         placeholder={loading ? 'Loading customers...' : 'Choose a customer...'}
                         className="w-full"
@@ -81,7 +79,8 @@ const CompanyCustomerSelector = ({
                             <div className="space-y-1 text-gray-600">
                                 <div><strong>EXIM Code:</strong> {customers?.find(c => c.id === selectedCustomerId)?.eximCode || 'N/A'}</div>
                                 <div><strong>GST:</strong> {customers?.find(c => c.id === selectedCustomerId)?.gstNumber || 'Unregistered'}</div>
-                                <div><strong>Country:</strong> {customers?.find(c => c.id === selectedCustomerId)?.billingAddress?.country}</div>
+                                <div><strong>Country:</strong> {customers?.find(c => c.id === selectedCustomerId)?.country || 'N/A'}</div>
+
                             </div>
                         </div>
                     </div>

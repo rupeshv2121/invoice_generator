@@ -68,15 +68,17 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
             id: Date.now(),
             description: '',
             hsnCode: '',
-            unit: 'pcs',
-            quantity: 1,
-            rate: 0,
-            grossAmount: 0,
-            taxableAmount: 0,
-            cgstAmount: 0,
-            sgstAmount: 0,
-            igstAmount: 0,
-            totalAmount: 0
+            unit: '',
+            quantity: '',
+            rate: '',
+            discountPercent: '',
+            taxRate: '',
+            grossAmount: '',
+            taxableAmount: '',
+            cgstAmount: '',
+            sgstAmount: '',
+            igstAmount: '',
+            totalAmount: ''
         };
         onItemsChange([...items, newItem]);
     };
@@ -89,7 +91,6 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
     };
 
     const isInterState = companyState !== customerState;
-
     return (
         <div className="bg-card rounded-lg border border-border p-6 mb-6">
             <div className="flex items-center justify-between mb-4">

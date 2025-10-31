@@ -6,6 +6,7 @@ import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
 import { downloadInvoicePDF } from '../../services/pdfService';
 
+import { useInvoiceService } from '../../api/invoice';
 import InvoicePreviewModal from '../invoice-creation/components/InvoicePreviewModal';
 import BulkActions from './components/BulkActions';
 import InvoiceFilters from './components/InvoiceFilters';
@@ -14,95 +15,33 @@ import InvoiceTable from './components/InvoiceTable';
 
 const InvoiceList = () => {
     const navigate = useNavigate();
+    const { getInvoices } = useInvoiceService();
     const [previewModalOpen, setPreviewModalOpen] = useState(false);
     const [selectedInvoiceForPreview, setSelectedInvoiceForPreview] = useState(null);
 
-    // Mock invoice data
-    const mockInvoices = [
-        {
-            id: 'INV-001',
-            invoiceNumber: 'INV-2024-001',
-            customerName: 'Acme Corporation',
-            customerEmail: 'contact@acmecorp.com',
-            date: '2024-09-25',
-            dueDate: '2024-10-25',
-            amount: 125000.00,
-            status: 'sent'
-        },
-        {
-            id: 'INV-002',
-            invoiceNumber: 'INV-2024-002',
-            customerName: 'Tech Solutions Ltd',
-            customerEmail: 'billing@techsolutions.com',
-            date: '2024-09-28',
-            dueDate: '2024-10-28',
-            amount: 87500.50,
-            status: 'paid'
-        },
-        {
-            id: 'INV-003',
-            invoiceNumber: 'INV-2024-003',
-            customerName: 'Global Imports Inc',
-            customerEmail: 'accounts@globalimports.com',
-            date: '2024-09-20',
-            dueDate: '2024-10-20',
-            amount: 245000.75,
-            status: 'overdue'
-        },
-        {
-            id: 'INV-004',
-            invoiceNumber: 'INV-2024-004',
-            customerName: 'Retail Chain Co',
-            customerEmail: 'finance@retailchain.com',
-            date: '2024-09-30',
-            dueDate: '2024-10-30',
-            amount: 156000.00,
-            status: 'draft'
-        },
-        {
-            id: 'INV-005',
-            invoiceNumber: 'INV-2024-005',
-            customerName: 'Manufacturing Hub',
-            customerEmail: 'payments@mfghub.com',
-            date: '2024-09-22',
-            dueDate: '2024-10-22',
-            amount: 98750.25,
-            status: 'sent'
-        },
-        {
-            id: 'INV-006',
-            invoiceNumber: 'INV-2024-006',
-            customerName: 'Digital Services Pro',
-            customerEmail: 'billing@digitalservices.com',
-            date: '2024-09-26',
-            dueDate: '2024-10-26',
-            amount: 67500.00,
-            status: 'paid'
-        },
-        {
-            id: 'INV-007',
-            invoiceNumber: 'INV-2024-007',
-            customerName: 'Construction Partners',
-            customerEmail: 'accounts@constructionpartners.com',
-            date: '2024-09-18',
-            dueDate: '2024-10-18',
-            amount: 312000.50,
-            status: 'overdue'
-        },
-        {
-            id: 'INV-008',
-            invoiceNumber: 'INV-2024-008',
-            customerName: 'Healthcare Systems',
-            customerEmail: 'finance@healthcaresys.com',
-            date: '2024-09-29',
-            dueDate: '2024-10-29',
-            amount: 189000.75,
-            status: 'sent'
-        }
-    ];
-
     // State management
-    const [invoices] = useState(mockInvoices);
+    const [invoices, setInvoices] = useState([]);
+
+    useEffect(() => {
+        const fetchInvoices = async () => {
+            const invoicesData = await getInvoices();
+            // Map backend invoices to flat structure for table
+            const mapped = (invoicesData || []).map(inv => ({
+                id: inv.id,
+                invoiceNumber: inv.invoiceNumber,
+                customerName: inv.customer?.name || '',
+                customerEmail: inv.customer?.email || '',
+                date: inv.invoiceDate || inv.date || '',
+                dueDate: inv.dueDate || '',
+                amount: inv.totalAmount || inv.amount || 0,
+                status: inv.status || 'sent',
+                // ...add more fields as needed
+                raw: inv // keep original for preview, etc.
+            }));
+            setInvoices(mapped);
+        };
+        fetchInvoices();
+    }, [getInvoices]);
     const [selectedInvoices, setSelectedInvoices] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);

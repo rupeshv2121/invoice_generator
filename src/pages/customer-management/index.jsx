@@ -12,7 +12,7 @@ import CustomerStats from './components/CustomerStats';
 import CustomerTable from './components/CustomerTable';
 
 const CustomerManagement = () => {
-    const { getCustomers, addCustomer, updateCustomer, deleteCustomer, getCustomerById } = useCustomersService();
+    const { getCustomers, addCustomer, updateCustomer, deleteCustomer, getCustomerById, getCustomerStatistics } = useCustomersService();
     const [customers, setCustomers] = useState([]);
     const [filteredCustomers, setFilteredCustomers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -25,16 +25,18 @@ const CustomerManagement = () => {
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [modalMode, setModalMode] = useState('add');
+    const [customerStats, setCustomerStats] = useState(null);
 
     // Load customers from service on component mount
     useEffect(() => {
         loadCustomers();
+        loadCustomerStatistics();
     }, []);
 
     const loadCustomers = async () => {
         try {
             const response = await getCustomers();
-            console.log("Response Get Customer:", response);
+            // console.log("Response Get Customer:", response);
             setCustomers(response?.customers || []);
             setFilteredCustomers(response?.customers || []);
         } catch (error) {
@@ -43,6 +45,16 @@ const CustomerManagement = () => {
             setFilteredCustomers([]);
         }
     };
+
+    const loadCustomerStatistics = async () => {
+        try {
+            const stats = await getCustomerStatistics();
+            setCustomerStats(stats);
+        } catch (error) {
+            console.error('Error loading customer statistics:', error);
+            setCustomerStats(null);
+        }
+    }
 
 
     // Filter and search customers

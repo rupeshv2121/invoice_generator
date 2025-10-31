@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getMyCompanyProfile } from '../../../services/companyProfileService';
+// import { getMyCompanyProfile } from '../../../services/companyProfileService';
 import { getInvoiceSettings, getTermsAndConditions } from '../../../services/settingsService';
 import { formatIndianNumber, numberToWordsIndian } from '../../../utils/numberUtils';
 
@@ -17,7 +17,7 @@ const ExportInvoiceTemplate = ({
     // Load data from services
     useEffect(() => {
         try {
-            const profile = getMyCompanyProfile();
+            // const profile = getMyCompanyProfile();
             const terms = getTermsAndConditions();
             const settings = getInvoiceSettings();
 

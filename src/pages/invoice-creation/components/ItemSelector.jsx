@@ -1,6 +1,6 @@
 import { ChevronDown, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { getAllItems, searchItems } from '../../../services/itemService';
+import { useItemService } from '../../../api/items';
 
 const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -9,12 +9,17 @@ const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
     const [filteredItems, setFilteredItems] = useState([]);
     const dropdownRef = useRef(null);
     const inputRef = useRef(null);
+    const { getItems, searchItems } = useItemService();
 
     // Load all items on component mount
     useEffect(() => {
-        const allItems = getAllItems();
-        setItems(allItems);
-        setFilteredItems(allItems);
+        const fetchData = async () => {
+            const allItems = await getItems();
+            console.log("Fetched Items: ", allItems);
+            setItems(allItems);
+            setFilteredItems(allItems);
+        };
+        fetchData();
     }, []);
 
     // Filter items based on search term

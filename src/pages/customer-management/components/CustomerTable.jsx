@@ -70,7 +70,6 @@ const CustomerTable = ({
                         </tr>
                     </thead>
                     <tbody>
-                        {console.log("Rendering customers:", customers)}
                         {customers?.map((customer, index) => (
                             <tr
                                 key={customer?.id}

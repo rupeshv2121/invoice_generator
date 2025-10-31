@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Icon from '../../components/AppIcon';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
-import { getMyCompanyProfile } from '../../services/companyProfileService';
 // import BankDetailsSection from './components/BankDetailsSection';
 // import CompanyDetailsForm from './components/CompanyDetailsForm';
 // import GSTComplianceSection from './components/GSTComplianceSection';
@@ -17,11 +16,14 @@ const CompanyProfile = () => {
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-    useEffect(() => {
-        // Load company profile data from service
-        const profile = getMyCompanyProfile();
-        setProfileData(profile);
-    }, []);
+    // useEffect(() => {
+    //     // Load company profile data from service (async)
+    //     async function fetchProfile() {
+    //         const profile = await getMyCompanyProfile();
+    //         setProfileData(profile);
+    //     }
+    //     fetchProfile();
+    // }, []);
 
     const tabs = [
         { id: 'company', label: 'Company Details', icon: 'Building' },

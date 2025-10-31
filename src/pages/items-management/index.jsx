@@ -11,7 +11,7 @@ import ItemsStats from './components/ItemsStats';
 import ItemsTable from './components/ItemsTable';
 
 const ItemsManagement = () => {
-    const { getItems, createItem, updateItem, deleteItem } = useItemService();
+    const { getItems, createItem, updateItem, deleteItem, itemsStats } = useItemService();
     const [items, setItems] = useState([]);
     const [filteredItems, setFilteredItems] = useState([]);
     const [searchItems, setSearchItems] = useState('');
@@ -26,21 +26,21 @@ const ItemsManagement = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+
     // Load items on component mount
     useEffect(() => {
         loadItems();
-        // loadStats();
+        loadStats();
     }, []);
-
-    // const loadStats = async () => {
-    //     try {
-    //         const data = await itemsStats(); // Call your API
-    //         console.log("📊 Stats data:", data);
-    //         setStats(data);
-    //     } catch (error) {
-    //         console.error("Error loading stats:", error);
-    //     }
-    // };
+    const loadStats = async () => {
+        try {
+            const data = await itemsStats(); // Call your API
+            console.log("📊 Stats data:", data);
+            setStats(data);
+        } catch (error) {
+            console.error("Error loading stats:", error);
+        }
+    };
     // Filter items when search term changes
     useEffect(() => {
         handleSearch();

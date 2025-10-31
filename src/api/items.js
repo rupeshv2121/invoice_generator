@@ -4,7 +4,7 @@ export const useItemService = () => {
     const getItems = async () => {
         try {
             const response = await api.get('/api/item');
-            console.log("Response data : ", response.data)
+            // console.log("Response data : ", response.data)
             return response.data.items;
         } catch (error) {
             console.error('Error fetching items : ', error);
@@ -77,15 +77,16 @@ export const useItemService = () => {
         }
     }
 
-    // const itemsStats = async () => {
-    //     try {
-    //         const response = await api.get('/api/item/stats');
-    //         return response.data;
-    //     }
-    //     catch (error) {
-    //         console.error('Error fetching items stats : ', error)
-    //     }
-    // }
+    const itemsStats = async () => {
+        try {
+            const response = await api.get('/api/item/stats');
+            console.log("Items stats response : ", response.data)
+            return response.data;
+        }
+        catch (error) {
+            console.error('Error fetching items stats : ', error)
+        }
+    }
 
-    return { getItems, getItemById, createItem, updateItem, deleteItem };
+    return { getItems, getItemById, createItem, updateItem, deleteItem, itemsStats };
 }

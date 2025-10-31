@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCustomersService } from '../../api/customers';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
-import { getMyCompanyProfile } from '../../services/companyProfileService';
-// import { getAllCustomers } from '../../services/customerService';
 import { downloadInvoicePDF } from '../../services/pdfService';
 import { getDefaultInvoiceValues, getNextInvoiceNumber } from '../../services/settingsService';
 // import { downloadSimpleInvoicePDF } from '../../services/simplePdfService';
+import { useInvoiceService } from '../../api/invoice';
+import { useItemService } from '../../api/items';
 import CompanyCustomerSelector from './components/CompanyCustomerSelector';
 import InvoiceDetailsSection from './components/InvoiceDetailsSection';
 import InvoiceItemsTable from './components/InvoiceItemsTable';
@@ -17,10 +18,32 @@ import InvoiceTotalsSection from './components/InvoiceTotalsSection';
 
 const InvoiceCreation = () => {
     const navigate = useNavigate();
+    const { getItems } = useItemService();
+    const { getCustomers } = useCustomersService();
+    const { createInvoice } = useInvoiceService();
+    // Master list of all items (from backend)
+    const [allItems, setAllItems] = useState([]);
+    // Invoice line items (rows in the invoice)
+    const [invoiceItems, setInvoiceItems] = useState([
+        {
+            id: Date.now(),
+            description: '',
+            hsnCode: '',
+            unit: '',
+            quantity: '',
+            rate: '',
+            discountPercent: '',
+            taxRate: '',
+            grossAmount: '',
+            taxableAmount: '',
+            cgstAmount: '',
+            sgstAmount: '',
+            igstAmount: '',
+            totalAmount: ''
+        }
+    ]);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [sameAsShipping, setSameAsShipping] = useState(true);
-
-    // Mock data - in real app, these would come from API calls
 
     // Your business profile (logged-in user's company) - fetched from service
     const [myCompanyProfile, setMyCompanyProfile] = useState(null);
@@ -35,23 +58,51 @@ const InvoiceCreation = () => {
     // Derived data based on selections
     const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
 
+    useEffect(() => {
+        const loadItems = async () => {
+            try {
+                const itemsData = await getItems();
+                setAllItems(itemsData || []);
+            } catch (error) {
+                console.error('Error loading items:', error);
+                setAllItems([]);
+            }
+        };
+        loadItems();
+    }, [getItems]);
+
+    // Load company profile on mount (async)
+    // useEffect(() => {
+    //     async function fetchProfile() {
+    //         const profile = await getMyCompanyProfile();
+    //         setMyCompanyProfile(profile);
+    //     }
+    //     fetchProfile();
+    // }, []);
+
     // Load company profile and customers on component mount
     useEffect(() => {
-        const profile = getMyCompanyProfile();
-        setMyCompanyProfile(profile);
+        async function fetchData() {
+            // const profile = getMyCompanyProfile();
+            // setMyCompanyProfile(profile);
 
-        // Load customers from service
-        try {
-            const customersList = getAllCustomers();
-            console.log('Loaded customers:', customersList);
-            setCustomers(customersList);
-        } catch (error) {
-            console.error('Error loading customers:', error);
-            setCustomers([]);
-        } finally {
-            setCustomersLoading(false);
+            try {
+                const customersResponse = await getCustomers();
+                console.log('Loaded customers:', customersResponse);
+
+                // Your API returns { customers, pagination }, so extract the array
+                setCustomers(customersResponse.customers || []);
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                setCustomers([]);
+            } finally {
+                setCustomersLoading(false);
+            }
         }
+
+        fetchData();
     }, []);
+
 
     // Company data state - auto-populated from selected company
     const [companyData, setCompanyData] = useState({});
@@ -135,83 +186,25 @@ const InvoiceCreation = () => {
                 selectedCustomer: selectedCustomer,
                 billingAddress: {
                     name: selectedCustomer.businessName,
-                    address: selectedCustomer.billingAddress.street,
-                    city: selectedCustomer.billingAddress.city,
-                    state: selectedCustomer.billingAddress.state,
-                    pincode: selectedCustomer.billingAddress.pincode,
+                    address: selectedCustomer.address,
+                    city: selectedCustomer.city,
+                    state: selectedCustomer.state,
+                    pincode: selectedCustomer.pincode,
                     gstin: selectedCustomer.gstNumber,
                     eximCode: selectedCustomer.eximCode,
-                    country: selectedCustomer.billingAddress.country
+                    country: selectedCustomer.country
                 },
                 shippingAddress: {
                     name: selectedCustomer.businessName,
-                    address: selectedCustomer.shippingAddress.street,
-                    city: selectedCustomer.shippingAddress.city,
-                    state: selectedCustomer.shippingAddress.state,
-                    pincode: selectedCustomer.shippingAddress.pincode,
-                    country: selectedCustomer.shippingAddress.country
+                    address: selectedCustomer.street,
+                    city: selectedCustomer.city,
+                    state: selectedCustomer.state,
+                    pincode: selectedCustomer.pincode,
+                    country: selectedCustomer.country
                 }
             });
         }
     }, [selectedCustomer]);
-
-    // Invoice items state
-    const [items, setItems] = useState([
-        {
-            id: Date.now(),
-            description: 'Safty 1.5" (Door King Brand)',
-            hsnCode: '83024110',
-            unit: 'gz',
-            quantity: 5,
-            rate: 320,
-            grossAmount: 1600,
-            cgstAmount: 0,
-            sgstAmount: 0,
-            igstAmount: 0,
-            totalAmount: 1600
-        },
-        {
-            id: Date.now() + 1,
-            description: 'Safty 2" (Door King Brand)',
-            hsnCode: '83024110',
-            unit: 'gz',
-            quantity: 10,
-            rate: 360,
-            grossAmount: 3600,
-            cgstAmount: 0,
-            sgstAmount: 0,
-            igstAmount: 0,
-            totalAmount: 3600
-        },
-        {
-            id: Date.now() + 2,
-            description: 'Safty 4" (Door King Brand)',
-            hsnCode: '83024110',
-            unit: 'gz',
-            quantity: 5,
-            rate: 500,
-            grossAmount: 2500,
-            taxableAmount: 2500,
-            cgstAmount: 0,
-            sgstAmount: 0,
-            igstAmount: 0,
-            totalAmount: 2500
-        },
-        {
-            id: Date.now() + 3,
-            description: 'Tower Bolt 4" (Anti Brand)',
-            hsnCode: '83024110',
-            unit: 'doz',
-            quantity: 200,
-            rate: 174,
-            grossAmount: 34800,
-            taxableAmount: 34800,
-            cgstAmount: 0,
-            sgstAmount: 0,
-            igstAmount: 0,
-            totalAmount: 34800
-        }
-    ]);
 
     // Additional charges state
     const [additionalCharges, setAdditionalCharges] = useState({
@@ -281,7 +274,7 @@ const InvoiceCreation = () => {
             companyData,
             customerData,
             invoiceDetails,
-            items,
+            items: invoiceItems,
             additionalCharges
         };
 
@@ -314,9 +307,50 @@ const InvoiceCreation = () => {
         navigate('/invoice-list');
     };
 
-    const handleGenerateInvoice = () => {
-        alert('Invoice generated successfully!');
-        navigate('/invoice-list');
+    const handleGenerateInvoice = async () => {
+        if (!validateForm()) {
+            return;
+        }
+
+        // Build payload for backend
+        const payload = {
+            companyId: myCompanyProfile?.id || "00000000-0000-0000-0000-000000000000", // TEST UUID if no company profile
+            customerId: selectedCustomerId,
+            invoiceNumber: invoiceDetails.invoiceNumber,
+            invoiceDate: invoiceDetails.invoiceDate ? new Date(invoiceDetails.invoiceDate).toISOString() : null,
+            dueDate: invoiceDetails.dueDate ? new Date(invoiceDetails.dueDate).toISOString() : null,
+            marka: invoiceDetails.marka,
+            dateOfSupply: invoiceDetails.supplyDate ? new Date(invoiceDetails.supplyDate).toISOString() : null,
+            stateCode: companyData?.stateCode,
+            transportation: invoiceDetails.transport,
+            notes: '',
+            status: 'SENT',
+            invoiceItems: invoiceItems.map(item => ({
+                description: item.description,
+                hsnCode: String(item.hsnCode),
+                unit: item.unit || 'pcs',
+                quantity: Number(item.quantity) || 1,
+                rate: Number(item.rate) || 0,
+                cgstRate: Number(item.cgstRate) || 0,
+                sgstRate: Number(item.sgstRate) || 0,
+                igstRate: Number(item.igstRate) || 0
+            }))
+        };
+
+        console.log("Invoice Payload to be sent : ", payload);
+
+        try {
+            const result = await createInvoice(payload);
+            console.log("Create Invoice Result : ", result);
+            if (result && !result.error) {
+                alert('Invoice generated successfully!');
+                navigate('/invoice-list');
+            } else {
+                throw new Error(result.error || 'Unknown error');
+            }
+        } catch (error) {
+            alert('Error generating invoice: ' + error.message);
+        }
     };
 
     const validateForm = () => {
@@ -324,7 +358,7 @@ const InvoiceCreation = () => {
             alert('Please select a customer');
             return false;
         }
-        if (items?.some(item => !item?.description || item?.quantity <= 0 || item?.rate <= 0)) {
+        if (invoiceItems?.some(item => !item?.description || item?.quantity <= 0 || item?.rate <= 0)) {
             alert('Please fill all item details correctly');
             return false;
         }
@@ -411,14 +445,15 @@ const InvoiceCreation = () => {
                         />
 
                         <InvoiceItemsTable
-                            items={items}
-                            onItemsChange={setItems}
+                            items={invoiceItems}
+                            onItemsChange={setInvoiceItems}
                             companyState={companyData?.state}
                             customerState={customerData?.billingAddress?.state}
+                            allItems={allItems}
                         />
 
                         <InvoiceTotalsSection
-                            items={items}
+                            items={invoiceItems}
                             additionalCharges={additionalCharges}
                             onAdditionalChargesChange={handleAdditionalChargesChange}
                         />
@@ -454,11 +489,7 @@ const InvoiceCreation = () => {
                             </Button>
                             <Button
                                 variant="default"
-                                onClick={() => {
-                                    if (validateForm()) {
-                                        handleGenerateInvoice();
-                                    }
-                                }}
+                                onClick={handleGenerateInvoice}
                                 iconName="FileText"
                                 iconPosition="left"
                                 fullWidth
@@ -476,10 +507,10 @@ const InvoiceCreation = () => {
                 companyData={companyData}
                 customerData={customerData}
                 invoiceDetails={invoiceDetails}
-                items={items}
+                items={invoiceItems}
                 additionalCharges={additionalCharges}
             />
-        </div>
+        </div >
     );
 };
 
