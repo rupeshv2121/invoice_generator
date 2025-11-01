@@ -62,10 +62,14 @@ const ItemsManagement = () => {
     };
 
     const handleSearch = () => {
-        const filtered = items.filter(item =>
-            item.name.toLowerCase().includes(searchItems.toLowerCase()) ||
-            item.hsnCode?.toLowerCase().includes(searchItems.toLowerCase())
-        );
+        const filtered = items.filter(item => {
+            const searchLower = searchItems.toLowerCase();
+            return (
+                item.name?.toLowerCase().includes(searchLower) ||
+                item.description?.toLowerCase().includes(searchLower) ||
+                item.hsnCode?.toString().includes(searchItems)
+            );
+        });
         setFilteredItems(Array.isArray(filtered) ? filtered : []);
         setCurrentPage(1);
     };
