@@ -15,6 +15,7 @@ const CustomerManagement = () => {
     const { getCustomers, addCustomer, updateCustomer, deleteCustomer, getCustomerById, getCustomerStatistics } = useCustomersService();
     const [customers, setCustomers] = useState([]);
     const [filteredCustomers, setFilteredCustomers] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [locationFilter, setLocationFilter] = useState('');
     const [customerTypeFilter, setCustomerTypeFilter] = useState('');
@@ -34,6 +35,7 @@ const CustomerManagement = () => {
     }, []);
 
     const loadCustomers = async () => {
+        setLoading(true);
         try {
             const response = await getCustomers();
             // console.log("Response Get Customer:", response);
@@ -43,6 +45,8 @@ const CustomerManagement = () => {
             console.error('Error loading customers:', error);
             setCustomers([]);
             setFilteredCustomers([]);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -217,29 +221,41 @@ const CustomerManagement = () => {
                         onClearFilters={handleClearFilters}
                     />
 
-                    {/* Results Summary */}
-                    <div className="flex items-center justify-between mb-4">
-                        <p className="text-sm text-text-secondary">
-                            Showing {filteredCustomers?.length} of {customers?.length} customers
-                        </p>
-                        <div className="flex items-center space-x-2">
-                            <Icon name="Filter" size={16} className="text-text-secondary" />
-                            <span className="text-sm text-text-secondary">
-                                Sorted by {sortBy} ({sortOrder})
-                            </span>
+                    {/* Loading State */}
+                    {loading ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="flex flex-col items-center space-y-4">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                                <p className="text-text-secondary">Loading customers...</p>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <>
+                            {/* Results Summary */}
+                            <div className="flex items-center justify-between mb-4">
+                                <p className="text-sm text-text-secondary">
+                                    Showing {filteredCustomers?.length} of {customers?.length} customers
+                                </p>
+                                <div className="flex items-center space-x-2">
+                                    <Icon name="Filter" size={16} className="text-text-secondary" />
+                                    <span className="text-sm text-text-secondary">
+                                        Sorted by {sortBy} ({sortOrder})
+                                    </span>
+                                </div>
+                            </div>
 
-                    {/* Customer Table */}
-                    <CustomerTable
-                        customers={filteredCustomers}
-                        onEditCustomer={handleEditCustomer}
-                        onViewHistory={handleViewHistory}
-                        onDeleteCustomer={handleDeleteCustomer}
-                        sortBy={sortBy}
-                        sortOrder={sortOrder}
-                        onSort={handleSort}
-                    />
+                            {/* Customer Table */}
+                            <CustomerTable
+                                customers={filteredCustomers}
+                                onEditCustomer={handleEditCustomer}
+                                onViewHistory={handleViewHistory}
+                                onDeleteCustomer={handleDeleteCustomer}
+                                sortBy={sortBy}
+                                sortOrder={sortOrder}
+                                onSort={handleSort}
+                            />
+                        </>
+                    )}
 
                     {/* Modals */}
                     <CustomerModal

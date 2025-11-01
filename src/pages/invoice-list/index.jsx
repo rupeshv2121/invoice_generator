@@ -21,27 +21,39 @@ const InvoiceList = () => {
 
     // State management
     const [invoices, setInvoices] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchInvoices = async () => {
-            const invoicesData = await getInvoices();
-            // Map backend invoices to flat structure for table
-            const mapped = (invoicesData || []).map(inv => ({
-                id: inv.id,
-                invoiceNumber: inv.invoiceNumber,
-                customerName: inv.customer?.name || '',
-                customerEmail: inv.customer?.email || '',
-                date: inv.invoiceDate || inv.date || '',
-                dueDate: inv.dueDate || '',
-                amount: inv.totalAmount || inv.amount || 0,
-                status: inv.status || 'sent',
-                // ...add more fields as needed
-                raw: inv // keep original for preview, etc.
-            }));
-            setInvoices(mapped);
+            setLoading(true);
+            try {
+                const invoicesData = await getInvoices();
+                console.log('Fetched invoices data:', invoicesData);
+                console.log('Number of invoices:', invoicesData?.length);
+                // Map backend invoices to flat structure for table
+                const mapped = (invoicesData || []).map(inv => ({
+                    id: inv.id,
+                    invoiceNumber: inv.invoiceNumber,
+                    customerName: inv.customer?.name || '',
+                    customerEmail: inv.customer?.email || '',
+                    date: inv.invoiceDate || inv.date || '',
+                    dueDate: inv.dueDate || '',
+                    amount: inv.totalAmount || inv.amount || 0,
+                    status: inv.status || 'sent',
+                    // ...add more fields as needed
+                    raw: inv // keep original for preview, etc.
+                }));
+                console.log('Mapped invoices:', mapped);
+                setInvoices(mapped);
+            } catch (error) {
+                console.error('Error fetching invoices:', error);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchInvoices();
-    }, [getInvoices]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const [selectedInvoices, setSelectedInvoices] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -325,23 +337,35 @@ const InvoiceList = () => {
                         onClearSelection={handleClearSelection}
                     />
 
-                    {/* Invoice Table */}
-                    <InvoiceTable
-                        invoices={paginatedInvoices}
-                        selectedInvoices={selectedInvoices}
-                        onSelectionChange={handleSelectionChange}
-                        onInvoiceAction={handleInvoiceAction}
-                    />
+                    {/* Loading State */}
+                    {loading ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="flex flex-col items-center space-y-4">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                                <p className="text-text-secondary">Loading invoices...</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {/* Invoice Table */}
+                            <InvoiceTable
+                                invoices={paginatedInvoices}
+                                selectedInvoices={selectedInvoices}
+                                onSelectionChange={handleSelectionChange}
+                                onInvoiceAction={handleInvoiceAction}
+                            />
 
-                    {/* Pagination */}
-                    <InvoicePagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        totalItems={filteredInvoices?.length}
-                        itemsPerPage={itemsPerPage}
-                        onPageChange={handlePageChange}
-                        onItemsPerPageChange={handleItemsPerPageChange}
-                    />
+                            {/* Pagination */}
+                            <InvoicePagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                totalItems={filteredInvoices?.length}
+                                itemsPerPage={itemsPerPage}
+                                onPageChange={handlePageChange}
+                                onItemsPerPageChange={handleItemsPerPageChange}
+                            />
+                        </>
+                    )}
                 </div>
             </main>
             <QuickActionButton />

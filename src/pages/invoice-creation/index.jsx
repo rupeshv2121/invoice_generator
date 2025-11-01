@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCustomersService } from '../../api/customers';
+import { useMyCompanyService } from '../../api/myCompany';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
@@ -21,6 +22,7 @@ const InvoiceCreation = () => {
     const { getItems } = useItemService();
     const { getCustomers } = useCustomersService();
     const { createInvoice } = useInvoiceService();
+    const { getMyCompany } = useMyCompanyService();
     // Master list of all items (from backend)
     const [allItems, setAllItems] = useState([]);
     // Invoice line items (rows in the invoice)
@@ -47,10 +49,17 @@ const InvoiceCreation = () => {
 
     // Your business profile (logged-in user's company) - fetched from service
     const [myCompanyProfile, setMyCompanyProfile] = useState(null);
+    const [loadingCompany, setLoadingCompany] = useState(true);
 
     // Customers state - loaded from customer service
     const [customers, setCustomers] = useState([]);
     const [customersLoading, setCustomersLoading] = useState(true);
+
+    // Items state
+    const [itemsLoading, setItemsLoading] = useState(true);
+
+    // Invoice submission state
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Selected customer ID
     const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -60,16 +69,20 @@ const InvoiceCreation = () => {
 
     useEffect(() => {
         const loadItems = async () => {
+            setItemsLoading(true);
             try {
                 const itemsData = await getItems();
                 setAllItems(itemsData || []);
             } catch (error) {
                 console.error('Error loading items:', error);
                 setAllItems([]);
+            } finally {
+                setItemsLoading(false);
             }
         };
         loadItems();
-    }, [getItems]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Load company profile on mount (async)
     // useEffect(() => {
@@ -83,24 +96,31 @@ const InvoiceCreation = () => {
     // Load company profile and customers on component mount
     useEffect(() => {
         async function fetchData() {
-            // const profile = getMyCompanyProfile();
-            // setMyCompanyProfile(profile);
-
             try {
+                setLoadingCompany(true);
+                // Load company profile
+                const profile = await getMyCompany();
+                console.log('Loaded company profile:', profile);
+                setMyCompanyProfile(profile);
+                setLoadingCompany(false);
+
+                // Load customers
                 const customersResponse = await getCustomers();
                 console.log('Loaded customers:', customersResponse);
 
                 // Your API returns { customers, pagination }, so extract the array
                 setCustomers(customersResponse.customers || []);
             } catch (error) {
-                console.error('Error loading customers:', error);
+                console.error('Error loading data:', error);
                 setCustomers([]);
+                setLoadingCompany(false);
             } finally {
                 setCustomersLoading(false);
             }
         }
 
         fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
@@ -169,12 +189,10 @@ const InvoiceCreation = () => {
             });
 
             setAutoPopulatedBankDetails({
-                bankName: myCompanyProfile.bankDetails.bankName,
-                accountNumber: myCompanyProfile.bankDetails.accountNumber,
-                ifscCode: myCompanyProfile.bankDetails.ifscCode,
-                accountName: myCompanyProfile.bankDetails.accountName,
-                accountType: myCompanyProfile.bankDetails.accountType,
-                branchName: myCompanyProfile.bankDetails.branchName
+                bankName: myCompanyProfile.bankName,
+                accountNumber: myCompanyProfile.bankAccountNumber,
+                ifscCode: myCompanyProfile.bankIfscCode,
+                branchName: myCompanyProfile.bankBranch
             });
         }
     }, [myCompanyProfile]); // Run when company profile is loaded
@@ -312,9 +330,17 @@ const InvoiceCreation = () => {
             return;
         }
 
+        // Check if company profile exists
+        if (!myCompanyProfile?.id) {
+            alert('Please create a company profile first before creating an invoice.');
+            return;
+        }
+
+        setIsSubmitting(true);
+
         // Build payload for backend
         const payload = {
-            companyId: myCompanyProfile?.id || "00000000-0000-0000-0000-000000000000", // TEST UUID if no company profile
+            companyProfileId: myCompanyProfile.id,
             customerId: selectedCustomerId,
             invoiceNumber: invoiceDetails.invoiceNumber,
             invoiceDate: invoiceDetails.invoiceDate ? new Date(invoiceDetails.invoiceDate).toISOString() : null,
@@ -350,6 +376,8 @@ const InvoiceCreation = () => {
             }
         } catch (error) {
             alert('Error generating invoice: ' + error.message);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -372,65 +400,75 @@ const InvoiceCreation = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <Breadcrumb />
 
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h1 className="text-2xl font-bold text-foreground">Create Invoice</h1>
-                            <p className="text-text-secondary mt-1">Generate professional GST-compliant invoices</p>
+                    {/* Loading State */}
+                    {(loadingCompany || customersLoading || itemsLoading) ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="flex flex-col items-center space-y-4">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                                <p className="text-text-secondary">Loading invoice form...</p>
+                            </div>
                         </div>
-                        <div className="hidden lg:flex items-center space-x-3">
-                            <Button
-                                variant="outline"
-                                onClick={handleSaveDraft}
-                                iconName="Save"
-                                iconPosition="left"
-                            >
-                                Save Draft
-                            </Button>
-                            <Button
-                                variant="outline"
-                                onClick={handleDownloadPDF}
-                                iconName="Download"
-                                iconPosition="left"
-                            >
-                                Download PDF
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                onClick={handlePreview}
-                                iconName="Eye"
-                                iconPosition="left"
-                            >
-                                Preview
-                            </Button>
-                            <Button
-                                variant="default"
-                                onClick={() => {
-                                    if (validateForm()) {
-                                        handleGenerateInvoice();
-                                    }
-                                }}
-                                iconName="FileText"
-                                iconPosition="left"
-                            >
-                                Generate Invoice
-                            </Button>
-                        </div>
-                    </div>
+                    ) : (
+                        <>
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h1 className="text-2xl font-bold text-foreground">Create Invoice</h1>
+                                    <p className="text-text-secondary mt-1">Generate professional GST-compliant invoices</p>
+                                </div>
+                                <div className="hidden lg:flex items-center space-x-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleSaveDraft}
+                                        iconName="Save"
+                                        iconPosition="left"
+                                    >
+                                        Save Draft
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleDownloadPDF}
+                                        iconName="Download"
+                                        iconPosition="left"
+                                    >
+                                        Download PDF
+                                    </Button>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={handlePreview}
+                                        iconName="Eye"
+                                        iconPosition="left"
+                                    >
+                                        Preview
+                                    </Button>
+                                    <Button
+                                        variant="default"
+                                        onClick={() => {
+                                            if (validateForm()) {
+                                                handleGenerateInvoice();
+                                            }
+                                        }}
+                                        iconName="FileText"
+                                        iconPosition="left"
+                                    >
+                                        Generate Invoice
+                                    </Button>
+                                </div>
+                            </div>
 
-                    <div className="space-y-6">
-                        <CompanyCustomerSelector
-                            customers={customers}
-                            selectedCustomerId={selectedCustomerId}
-                            onCustomerChange={setSelectedCustomerId}
-                            myCompanyProfile={myCompanyProfile}
-                            loading={customersLoading}
-                        />
+                            <div className="space-y-6">
+                                <CompanyCustomerSelector
+                                    customers={customers}
+                                    selectedCustomerId={selectedCustomerId}
+                                    onCustomerChange={setSelectedCustomerId}
+                                    myCompanyProfile={myCompanyProfile}
+                                    loading={customersLoading}
+                                />
 
-                        {/* <CompanyDetailsSection
+                                {/* <CompanyDetailsSection
                             companyData={companyData}
                             onCompanyDataChange={handleCompanyDataChange}
                         /> */}
-                        {/* 
+                                {/* 
                         <CustomerDetailsSection
                             customerData={customerData}
                             onCustomerDataChange={handleCustomerDataChange}
@@ -439,65 +477,68 @@ const InvoiceCreation = () => {
                             onSameAsShippingChange={handleSameAsShippingChange}
                         /> */}
 
-                        <InvoiceDetailsSection
-                            invoiceDetails={invoiceDetails}
-                            onInvoiceDetailsChange={handleInvoiceDetailsChange}
-                        />
+                                <InvoiceDetailsSection
+                                    invoiceDetails={invoiceDetails}
+                                    onInvoiceDetailsChange={handleInvoiceDetailsChange}
+                                />
 
-                        <InvoiceItemsTable
-                            items={invoiceItems}
-                            onItemsChange={setInvoiceItems}
-                            companyState={companyData?.state}
-                            customerState={customerData?.billingAddress?.state}
-                            allItems={allItems}
-                        />
+                                <InvoiceItemsTable
+                                    items={invoiceItems}
+                                    onItemsChange={setInvoiceItems}
+                                    companyState={companyData?.state}
+                                    customerState={customerData?.billingAddress?.state}
+                                    allItems={allItems}
+                                />
 
-                        <InvoiceTotalsSection
-                            items={invoiceItems}
-                            additionalCharges={additionalCharges}
-                            onAdditionalChargesChange={handleAdditionalChargesChange}
-                        />
+                                <InvoiceTotalsSection
+                                    items={invoiceItems}
+                                    additionalCharges={additionalCharges}
+                                    onAdditionalChargesChange={handleAdditionalChargesChange}
+                                />
 
-                        {/* Mobile Action Buttons */}
-                        <div className="lg:hidden flex flex-col space-y-3">
-                            <Button
-                                variant="outline"
-                                onClick={handleSaveDraft}
-                                iconName="Save"
-                                iconPosition="left"
-                                fullWidth
-                            >
-                                Save Draft
-                            </Button>
-                            <Button
-                                variant="outline"
-                                onClick={handleDownloadPDF}
-                                iconName="Download"
-                                iconPosition="left"
-                                fullWidth
-                            >
-                                Download PDF
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                onClick={handlePreview}
-                                iconName="Eye"
-                                iconPosition="left"
-                                fullWidth
-                            >
-                                Preview Invoice
-                            </Button>
-                            <Button
-                                variant="default"
-                                onClick={handleGenerateInvoice}
-                                iconName="FileText"
-                                iconPosition="left"
-                                fullWidth
-                            >
-                                Generate Invoice
-                            </Button>
-                        </div>
-                    </div>
+                                {/* Mobile Action Buttons */}
+                                <div className="lg:hidden flex flex-col space-y-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleSaveDraft}
+                                        iconName="Save"
+                                        iconPosition="left"
+                                        fullWidth
+                                    >
+                                        Save Draft
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleDownloadPDF}
+                                        iconName="Download"
+                                        iconPosition="left"
+                                        fullWidth
+                                    >
+                                        Download PDF
+                                    </Button>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={handlePreview}
+                                        iconName="Eye"
+                                        iconPosition="left"
+                                        fullWidth
+                                    >
+                                        Preview Invoice
+                                    </Button>
+                                    <Button
+                                        variant="default"
+                                        onClick={handleGenerateInvoice}
+                                        iconName="FileText"
+                                        iconPosition="left"
+                                        fullWidth
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Generating...' : 'Generate Invoice'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
             <QuickActionButton />
