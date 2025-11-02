@@ -1,66 +1,75 @@
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const CustomerAnalysis = () => {
-    const topCustomers = [
-        {
-            id: 1,
-            name: "Rajesh Enterprises Pvt Ltd",
-            totalInvoices: 45,
-            totalAmount: 1245000,
-            paidAmount: 1100000,
-            pendingAmount: 145000,
-            lastPayment: "15/10/2024",
-            status: "good"
-        },
-        {
-            id: 2,
-            name: "Mumbai Trading Company",
-            totalInvoices: 32,
-            totalAmount: 890000,
-            paidAmount: 890000,
-            pendingAmount: 0,
-            lastPayment: "28/10/2024",
-            status: "excellent"
-        },
-        {
-            id: 3,
-            name: "Delhi Manufacturing Ltd",
-            totalInvoices: 28,
-            totalAmount: 756000,
-            paidAmount: 600000,
-            pendingAmount: 156000,
-            lastPayment: "05/10/2024",
-            status: "average"
-        },
-        {
-            id: 4,
-            name: "Chennai Exports Inc",
-            totalInvoices: 23,
-            totalAmount: 645000,
-            paidAmount: 445000,
-            pendingAmount: 200000,
-            lastPayment: "20/09/2024",
-            status: "poor"
-        },
-        {
-            id: 5,
-            name: "Bangalore Tech Solutions",
-            totalInvoices: 19,
-            totalAmount: 534000,
-            paidAmount: 534000,
-            pendingAmount: 0,
-            lastPayment: "30/10/2024",
-            status: "excellent"
-        }
-    ];
+const CustomerAnalysis = ({ topCustomers = [], invoices = [] }) => {
+    // Use provided data or fallback to empty array
+    const defaultTopCustomers = topCustomers.length > 0 ? topCustomers : [];
 
-    const agingAnalysis = [
-        { range: "0-30 days", amount: 245000, count: 12, percentage: 35 },
-        { range: "31-60 days", amount: 189000, count: 8, percentage: 27 },
-        { range: "61-90 days", amount: 156000, count: 6, percentage: 22 },
-        { range: "90+ days", amount: 110000, count: 4, percentage: 16 }
-    ];
+    // Calculate aging analysis from invoices
+    const calculateAgingAnalysis = () => {
+        const now = new Date();
+        const ranges = {
+            '0-30': { amount: 0, count: 0 },
+            '31-60': { amount: 0, count: 0 },
+            '61-90': { amount: 0, count: 0 },
+            '90+': { amount: 0, count: 0 }
+        };
+
+        const pendingInvoices = invoices.filter(inv =>
+            inv.status?.toLowerCase() === 'pending' || inv.status?.toLowerCase() === 'overdue'
+        );
+
+        pendingInvoices.forEach(inv => {
+            const dueDate = new Date(inv.dueDate || inv.invoiceDate);
+            const daysPending = Math.floor((now - dueDate) / (1000 * 60 * 60 * 24));
+            const amount = inv.grandTotal || 0;
+
+            if (daysPending <= 30) {
+                ranges['0-30'].amount += amount;
+                ranges['0-30'].count++;
+            } else if (daysPending <= 60) {
+                ranges['31-60'].amount += amount;
+                ranges['31-60'].count++;
+            } else if (daysPending <= 90) {
+                ranges['61-90'].amount += amount;
+                ranges['61-90'].count++;
+            } else {
+                ranges['90+'].amount += amount;
+                ranges['90+'].count++;
+            }
+        });
+
+        const totalAmount = Object.values(ranges).reduce((sum, range) => sum + range.amount, 0);
+
+        return [
+            {
+                range: "0-30 days",
+                amount: ranges['0-30'].amount,
+                count: ranges['0-30'].count,
+                percentage: totalAmount > 0 ? ((ranges['0-30'].amount / totalAmount) * 100).toFixed(0) : 0
+            },
+            {
+                range: "31-60 days",
+                amount: ranges['31-60'].amount,
+                count: ranges['31-60'].count,
+                percentage: totalAmount > 0 ? ((ranges['31-60'].amount / totalAmount) * 100).toFixed(0) : 0
+            },
+            {
+                range: "61-90 days",
+                amount: ranges['61-90'].amount,
+                count: ranges['61-90'].count,
+                percentage: totalAmount > 0 ? ((ranges['61-90'].amount / totalAmount) * 100).toFixed(0) : 0
+            },
+            {
+                range: "90+ days",
+                amount: ranges['90+'].amount,
+                count: ranges['90+'].count,
+                percentage: totalAmount > 0 ? ((ranges['90+'].amount / totalAmount) * 100).toFixed(0) : 0
+            }
+        ];
+    };
+
+    const agingAnalysis = calculateAgingAnalysis();
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
@@ -117,7 +126,7 @@ const CustomerAnalysis = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {topCustomers?.map((customer) => (
+                            {defaultTopCustomers?.map((customer) => (
                                 <tr key={customer?.id} className="border-b border-border hover:bg-muted/50">
                                     <td className="py-4 px-4">
                                         <div>
@@ -148,13 +157,20 @@ const CustomerAnalysis = () => {
                                     </td>
                                 </tr>
                             ))}
+                            {defaultTopCustomers.length === 0 && (
+                                <tr>
+                                    <td colSpan="7" className="px-6 py-12 text-center text-text-secondary">
+                                        No customer data available
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
 
                 {/* Mobile Card View */}
                 <div className="lg:hidden space-y-4">
-                    {topCustomers?.map((customer) => (
+                    {defaultTopCustomers?.map((customer) => (
                         <div key={customer?.id} className="border border-gray-200 rounded-lg p-4">
                             <div className="flex items-start justify-between mb-3">
                                 <div className="min-w-0 flex-1">
@@ -193,6 +209,11 @@ const CustomerAnalysis = () => {
                             </div>
                         </div>
                     ))}
+                    {defaultTopCustomers.length === 0 && (
+                        <div className="text-center py-12 text-text-secondary">
+                            No customer data available
+                        </div>
+                    )}
                 </div>
             </div>
             {/* Aging Analysis */}

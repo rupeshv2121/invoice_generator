@@ -7,7 +7,7 @@ import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
 import { downloadInvoicePDF } from '../../services/pdfService';
-import { getDefaultInvoiceValues, getNextInvoiceNumber } from '../../services/settingsService';
+import { getDefaultInvoiceValues, getNextInvoiceNumber, incrementInvoiceNumber } from '../../services/settingsService';
 // import { downloadSimpleInvoicePDF } from '../../services/simplePdfService';
 import { useInvoiceService } from '../../api/invoice';
 import { useItemService } from '../../api/items';
@@ -369,6 +369,8 @@ const InvoiceCreation = () => {
             const result = await createInvoice(payload);
             console.log("Create Invoice Result : ", result);
             if (result && !result.error) {
+                // Increment invoice number after successful creation
+                incrementInvoiceNumber();
                 alert('Invoice generated successfully!');
                 navigate('/invoice-list');
             } else {

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useCustomersService } from '../../api/customers';
+import { useInvoiceService } from '../../api/invoice';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
@@ -15,6 +17,25 @@ const Reports = () => {
     const [endDate, setEndDate] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [lastUpdated, setLastUpdated] = useState(new Date());
+    const [loading, setLoading] = useState(true);
+    const [reportData, setReportData] = useState({
+        totalRevenue: 0,
+        totalTax: 0,
+        outstanding: 0,
+        activeCustomers: 0,
+        revenueGrowth: 0,
+        outstandingPercentage: 0,
+        newCustomers: 0,
+        monthlyRevenue: [],
+        paymentStatus: [],
+        gstBreakdown: {},
+        topCustomers: [],
+        invoices: [],
+        customers: []
+    });
+
+    const { getInvoices } = useInvoiceService();
+    const { getCustomers } = useCustomersService();
 
     useEffect(() => {
         // Set default date range to current month
@@ -28,10 +49,184 @@ const Reports = () => {
         // Auto-refresh data every 5 minutes
         const interval = setInterval(() => {
             setLastUpdated(new Date());
+            fetchReportData();
         }, 300000);
 
         return () => clearInterval(interval);
     }, []);
+
+    // Fetch data when date range changes
+    useEffect(() => {
+        if (startDate && endDate) {
+            fetchReportData();
+        }
+    }, [startDate, endDate]);
+
+    const fetchReportData = async () => {
+        try {
+            setLoading(true);
+
+            // Fetch all invoices and customers
+            const invoices = await getInvoices();
+            const customers = await getCustomers();
+
+            // Filter invoices by date range
+            const filteredInvoices = invoices.filter(inv => {
+                const invDate = new Date(inv.invoiceDate);
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                return invDate >= start && invDate <= end;
+            });
+
+            // Calculate total revenue (all paid invoices in date range)
+            const totalRevenue = filteredInvoices
+                .filter(inv => inv.status === 'Paid' || inv.status === 'paid')
+                .reduce((sum, inv) => sum + (inv.grandTotal || 0), 0);
+
+            // Calculate total tax (CGST + SGST + IGST)
+            const totalTax = filteredInvoices.reduce((sum, inv) => {
+                const cgst = inv.totalCgst || 0;
+                const sgst = inv.totalSgst || 0;
+                const igst = inv.totalIgst || 0;
+                return sum + cgst + sgst + igst;
+            }, 0);
+
+            // Calculate outstanding amount (pending + overdue)
+            const outstanding = filteredInvoices
+                .filter(inv => {
+                    const status = inv.status?.toLowerCase();
+                    return status === 'pending' || status === 'overdue';
+                })
+                .reduce((sum, inv) => sum + (inv.grandTotal || 0), 0);
+
+            // Calculate outstanding percentage
+            const totalAmount = filteredInvoices.reduce((sum, inv) => sum + (inv.grandTotal || 0), 0);
+            const outstandingPercentage = totalAmount > 0 ? ((outstanding / totalAmount) * 100).toFixed(1) : 0;
+
+            // Calculate revenue growth (compare with previous period)
+            const periodLength = new Date(endDate) - new Date(startDate);
+            const prevStartDate = new Date(new Date(startDate).getTime() - periodLength);
+            const prevEndDate = new Date(startDate);
+
+            const prevPeriodInvoices = invoices.filter(inv => {
+                const invDate = new Date(inv.invoiceDate);
+                return invDate >= prevStartDate && invDate < prevEndDate && (inv.status === 'Paid' || inv.status === 'paid');
+            });
+
+            const prevRevenue = prevPeriodInvoices.reduce((sum, inv) => sum + (inv.grandTotal || 0), 0);
+            const revenueGrowth = prevRevenue > 0 ? (((totalRevenue - prevRevenue) / prevRevenue) * 100).toFixed(1) : 0;
+
+            // Count active customers (customers with invoices in date range)
+            const activeCustomerIds = new Set(filteredInvoices.map(inv => inv.customerId));
+            const activeCustomers = activeCustomerIds.size;
+
+            // Count new customers (created in date range)
+            const newCustomers = customers.filter(cust => {
+                const custDate = new Date(cust.createdAt);
+                return custDate >= new Date(startDate) && custDate <= new Date(endDate);
+            }).length;
+
+            // Calculate monthly revenue for last 12 months
+            const monthlyRevenue = [];
+            for (let i = 11; i >= 0; i--) {
+                const monthDate = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
+                const monthName = monthDate.toLocaleString('default', { month: 'short' });
+                const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+                const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+
+                const monthInvoices = invoices.filter(inv => {
+                    const invDate = new Date(inv.invoiceDate);
+                    return invDate >= monthStart && invDate <= monthEnd && (inv.status === 'Paid' || inv.status === 'paid');
+                });
+
+                const revenue = monthInvoices.reduce((sum, inv) => sum + (inv.grandTotal || 0), 0);
+                monthlyRevenue.push({ month: monthName, revenue, invoices: monthInvoices.length });
+            }
+
+            // Calculate payment status distribution
+            const totalInvoices = filteredInvoices.length;
+            const paidCount = filteredInvoices.filter(inv => inv.status?.toLowerCase() === 'paid').length;
+            const pendingCount = filteredInvoices.filter(inv => inv.status?.toLowerCase() === 'pending').length;
+            const overdueCount = filteredInvoices.filter(inv => inv.status?.toLowerCase() === 'overdue').length;
+
+            const paymentStatus = [
+                { name: 'Paid', value: totalInvoices > 0 ? ((paidCount / totalInvoices) * 100).toFixed(0) : 0, color: '#10B981' },
+                { name: 'Pending', value: totalInvoices > 0 ? ((pendingCount / totalInvoices) * 100).toFixed(0) : 0, color: '#F59E0B' },
+                { name: 'Overdue', value: totalInvoices > 0 ? ((overdueCount / totalInvoices) * 100).toFixed(0) : 0, color: '#EF4444' }
+            ];
+
+            // Calculate GST breakdown
+            const cgstTotal = filteredInvoices.reduce((sum, inv) => sum + (inv.totalCgst || 0), 0);
+            const sgstTotal = filteredInvoices.reduce((sum, inv) => sum + (inv.totalSgst || 0), 0);
+            const igstTotal = filteredInvoices.reduce((sum, inv) => sum + (inv.totalIgst || 0), 0);
+
+            // Calculate top customers by revenue
+            const customerRevenue = new Map();
+            filteredInvoices.forEach(inv => {
+                const custId = inv.customerId;
+                const custName = inv.customerName || 'Unknown';
+                if (!customerRevenue.has(custId)) {
+                    customerRevenue.set(custId, {
+                        id: custId,
+                        name: custName,
+                        totalInvoices: 0,
+                        totalAmount: 0,
+                        paidAmount: 0,
+                        pendingAmount: 0,
+                        lastPayment: null
+                    });
+                }
+                const custData = customerRevenue.get(custId);
+                custData.totalInvoices++;
+                custData.totalAmount += inv.grandTotal || 0;
+
+                if (inv.status?.toLowerCase() === 'paid') {
+                    custData.paidAmount += inv.grandTotal || 0;
+                    if (!custData.lastPayment || new Date(inv.invoiceDate) > new Date(custData.lastPayment)) {
+                        custData.lastPayment = inv.invoiceDate;
+                    }
+                } else {
+                    custData.pendingAmount += inv.grandTotal || 0;
+                }
+            });
+
+            const topCustomers = Array.from(customerRevenue.values())
+                .sort((a, b) => b.totalAmount - a.totalAmount)
+                .slice(0, 5)
+                .map(cust => ({
+                    ...cust,
+                    status: cust.pendingAmount === 0 ? 'excellent' :
+                        cust.pendingAmount < cust.totalAmount * 0.2 ? 'good' :
+                            cust.pendingAmount < cust.totalAmount * 0.5 ? 'average' : 'poor'
+                }));
+
+            setReportData({
+                totalRevenue,
+                totalTax,
+                outstanding,
+                activeCustomers,
+                revenueGrowth,
+                outstandingPercentage,
+                newCustomers,
+                monthlyRevenue,
+                paymentStatus,
+                gstBreakdown: {
+                    cgst: cgstTotal,
+                    sgst: sgstTotal,
+                    igst: igstTotal,
+                    total: cgstTotal + sgstTotal + igstTotal
+                },
+                topCustomers,
+                invoices: filteredInvoices,
+                customers
+            });
+
+        } catch (error) {
+            console.error('Error fetching report data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleQuickDateSelect = (range) => {
         const now = new Date();
@@ -74,10 +269,7 @@ const Reports = () => {
 
     const handleGenerateReport = async () => {
         setIsGenerating(true);
-
-        // Simulate report generation
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
+        await fetchReportData();
         setIsGenerating(false);
         setLastUpdated(new Date());
     };
@@ -137,17 +329,27 @@ const Reports = () => {
 
                     {/* Charts and Visualizations */}
                     <div className="mb-8">
-                        <RevenueChart />
+                        <RevenueChart
+                            monthlyRevenue={reportData.monthlyRevenue}
+                            paymentStatus={reportData.paymentStatus}
+                        />
                     </div>
 
                     {/* GST Compliance Section */}
                     <div className="mb-8">
-                        <GSTComplianceSection />
+                        <GSTComplianceSection
+                            gstData={reportData.gstBreakdown}
+                            invoices={reportData.invoices}
+                            dateRange={{ start: startDate, end: endDate }}
+                        />
                     </div>
 
                     {/* Customer Analysis */}
                     <div className="mb-8">
-                        <CustomerAnalysis />
+                        <CustomerAnalysis
+                            topCustomers={reportData.topCustomers}
+                            invoices={reportData.invoices}
+                        />
                     </div>
 
                     {/* Export Controls */}
@@ -159,59 +361,79 @@ const Reports = () => {
                     </div>
 
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-                        <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
-                            <div className="flex items-center justify-between">
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Total Revenue</p>
-                                    <p className="text-xl lg:text-2xl font-bold text-foreground truncate">₹45,67,890</p>
-                                </div>
-                                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
-                                    <div className="w-5 h-5 lg:w-6 lg:h-6 bg-primary rounded" />
-                                </div>
-                            </div>
-                            <p className="text-xs lg:text-sm text-success mt-2 truncate">+12.5% from last month</p>
+                    {loading ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                         </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+                            <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Total Revenue</p>
+                                        <p className="text-xl lg:text-2xl font-bold text-foreground truncate">
+                                            ₹{reportData.totalRevenue.toLocaleString('en-IN')}
+                                        </p>
+                                    </div>
+                                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+                                        <div className="w-5 h-5 lg:w-6 lg:h-6 bg-primary rounded" />
+                                    </div>
+                                </div>
+                                <p className={`text-xs lg:text-sm mt-2 truncate ${reportData.revenueGrowth >= 0 ? 'text-success' : 'text-error'}`}>
+                                    {reportData.revenueGrowth >= 0 ? '+' : ''}{reportData.revenueGrowth}% from last period
+                                </p>
+                            </div>
 
-                        <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
-                            <div className="flex items-center justify-between">
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Total Tax Collected</p>
-                                    <p className="text-xl lg:text-2xl font-bold text-foreground truncate">₹8,22,221</p>
+                            <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Total Tax Collected</p>
+                                        <p className="text-xl lg:text-2xl font-bold text-foreground truncate">
+                                            ₹{reportData.totalTax.toLocaleString('en-IN')}
+                                        </p>
+                                    </div>
+                                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-success/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+                                        <div className="w-5 h-5 lg:w-6 lg:h-6 bg-success rounded" />
+                                    </div>
                                 </div>
-                                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-success/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
-                                    <div className="w-5 h-5 lg:w-6 lg:h-6 bg-success rounded" />
-                                </div>
+                                <p className="text-xs lg:text-sm text-success mt-2 truncate">GST compliant</p>
                             </div>
-                            <p className="text-xs lg:text-sm text-success mt-2 truncate">GST compliant</p>
-                        </div>
 
-                        <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
-                            <div className="flex items-center justify-between">
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Outstanding Amount</p>
-                                    <p className="text-xl lg:text-2xl font-bold text-foreground truncate">₹7,00,000</p>
+                            <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Outstanding Amount</p>
+                                        <p className="text-xl lg:text-2xl font-bold text-foreground truncate">
+                                            ₹{reportData.outstanding.toLocaleString('en-IN')}
+                                        </p>
+                                    </div>
+                                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-warning/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+                                        <div className="w-5 h-5 lg:w-6 lg:h-6 bg-warning rounded" />
+                                    </div>
                                 </div>
-                                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-warning/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
-                                    <div className="w-5 h-5 lg:w-6 lg:h-6 bg-warning rounded" />
-                                </div>
+                                <p className="text-xs lg:text-sm text-warning mt-2 truncate">
+                                    {reportData.outstandingPercentage}% of total sales
+                                </p>
                             </div>
-                            <p className="text-xs lg:text-sm text-warning mt-2 truncate">15% of total sales</p>
-                        </div>
 
-                        <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
-                            <div className="flex items-center justify-between">
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Active Customers</p>
-                                    <p className="text-xl lg:text-2xl font-bold text-foreground truncate">147</p>
+                            <div className="bg-card rounded-lg border border-border p-4 lg:p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-xs lg:text-sm text-text-secondary mb-1 truncate">Active Customers</p>
+                                        <p className="text-xl lg:text-2xl font-bold text-foreground truncate">
+                                            {reportData.activeCustomers}
+                                        </p>
+                                    </div>
+                                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+                                        <div className="w-5 h-5 lg:w-6 lg:h-6 bg-secondary rounded" />
+                                    </div>
                                 </div>
-                                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
-                                    <div className="w-5 h-5 lg:w-6 lg:h-6 bg-secondary rounded" />
-                                </div>
+                                <p className="text-xs lg:text-sm text-success mt-2 truncate">
+                                    +{reportData.newCustomers} new this period
+                                </p>
                             </div>
-                            <p className="text-xs lg:text-sm text-success mt-2 truncate">+8 new this month</p>
                         </div>
-                    </div>
+                    )}
                 </div>
             </main>
 

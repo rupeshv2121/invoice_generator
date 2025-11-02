@@ -74,28 +74,48 @@ const CompanyProfile = () => {
         setHasUnsavedChanges(true);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         // Save profile to backend
-        async function saveProfile() {
-            try {
-                if (!profileData.id) {
-                    // Create new company profile
-                    await createCompany(profileData);
-                } else {
-                    // Update existing company profile
-                    await updateCompany(profileData.id, profileData);
-                }
-                setIsEditing(false);
-                setHasUnsavedChanges(false);
-                alert('Company profile updated successfully!');
-            } catch (err) {
-                alert('Error saving company profile.');
+        try {
+            console.log('Saving profile data:', profileData);
+            setLoading(true);
+            let savedData;
+            if (!profileData.id) {
+                // Create new company profile
+                console.log('Creating new company...');
+                savedData = await createCompany(profileData);
+                console.log('Created company response:', savedData);
+            } else {
+                // Update existing company profile
+                console.log('Updating company with ID:', profileData.id);
+                savedData = await updateCompany(profileData.id, profileData);
+                console.log('Updated company response:', savedData);
             }
-        }
-        saveProfile();
-    };
 
-    const renderTabContent = () => {
+            // Update local state with saved data
+            if (savedData) {
+                console.log('Setting profile data to saved data:', savedData);
+                setProfileData(savedData);
+            }
+
+            setIsEditing(false);
+            setHasUnsavedChanges(false);
+            alert('Company profile updated successfully!');
+
+            // Reload data from server to ensure sync
+            const freshData = await getMyCompany();
+            console.log('Fresh data after save:', freshData);
+            if (freshData) {
+                setProfileData(freshData);
+            }
+        } catch (err) {
+            console.error('Error saving company profile:', err);
+            console.error('Error response:', err.response?.data);
+            alert('Error saving company profile: ' + (err.response?.data?.message || err.message || 'Unknown error'));
+        } finally {
+            setLoading(false);
+        }
+    }; const renderTabContent = () => {
         if (!profileData) return (
             <div>
                 <div>No company profile found. Please create one.</div>
@@ -115,7 +135,13 @@ const CompanyProfile = () => {
                             <h3 className="text-lg font-medium text-foreground">Company Information</h3>
                             <Button
                                 variant={isEditing ? "default" : "outline"}
-                                onClick={() => setIsEditing(!isEditing)}
+                                onClick={() => {
+                                    if (isEditing) {
+                                        handleSave();
+                                    } else {
+                                        setIsEditing(true);
+                                    }
+                                }}
                                 iconName={isEditing ? "Save" : "Edit"}
                             >
                                 {isEditing ? "Save Changes" : "Edit"}
@@ -193,23 +219,14 @@ const CompanyProfile = () => {
                             <h4 className="text-md font-medium text-foreground">Address</h4>
                             <div className="grid grid-cols-1 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-foreground">Address Line 1</label>
-                                    <input
-                                        type="text"
-                                        value={profileData.addressLine1}
-                                        onChange={(e) => handleInputChange('addressLine1', e.target.value)}
+                                    <label className="text-sm font-medium text-foreground">Street Address</label>
+                                    <textarea
+                                        value={profileData.address || ''}
+                                        onChange={(e) => handleInputChange('address', e.target.value)}
                                         disabled={!isEditing}
+                                        rows={3}
                                         className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-foreground">Address Line 2</label>
-                                    <input
-                                        type="text"
-                                        value={profileData.addressLine2}
-                                        onChange={(e) => handleInputChange('addressLine2', e.target.value)}
-                                        disabled={!isEditing}
-                                        className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary"
+                                        placeholder="Enter complete street address"
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -217,7 +234,7 @@ const CompanyProfile = () => {
                                         <label className="text-sm font-medium text-foreground">City</label>
                                         <input
                                             type="text"
-                                            value={profileData.city}
+                                            value={profileData.city || ''}
                                             onChange={(e) => handleInputChange('city', e.target.value)}
                                             disabled={!isEditing}
                                             className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary"
@@ -227,18 +244,18 @@ const CompanyProfile = () => {
                                         <label className="text-sm font-medium text-foreground">State</label>
                                         <input
                                             type="text"
-                                            value={profileData.state}
+                                            value={profileData.state || ''}
                                             onChange={(e) => handleInputChange('state', e.target.value)}
                                             disabled={!isEditing}
                                             className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-foreground">Postal Code</label>
+                                        <label className="text-sm font-medium text-foreground">Pincode</label>
                                         <input
                                             type="text"
-                                            value={profileData.postalCode}
-                                            onChange={(e) => handleInputChange('postalCode', e.target.value)}
+                                            value={profileData.pincode || ''}
+                                            onChange={(e) => handleInputChange('pincode', e.target.value)}
                                             disabled={!isEditing}
                                             className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary"
                                         />
@@ -247,7 +264,7 @@ const CompanyProfile = () => {
                                         <label className="text-sm font-medium text-foreground">Country</label>
                                         <input
                                             type="text"
-                                            value={profileData.country}
+                                            value={profileData.country || ''}
                                             onChange={(e) => handleInputChange('country', e.target.value)}
                                             disabled={!isEditing}
                                             className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary"
@@ -265,7 +282,13 @@ const CompanyProfile = () => {
                             <h3 className="text-lg font-medium text-foreground">Compliance Information</h3>
                             <Button
                                 variant={isEditing ? "default" : "outline"}
-                                onClick={() => setIsEditing(!isEditing)}
+                                onClick={() => {
+                                    if (isEditing) {
+                                        handleSave();
+                                    } else {
+                                        setIsEditing(true);
+                                    }
+                                }}
                                 iconName={isEditing ? "Save" : "Edit"}
                             >
                                 {isEditing ? "Save Changes" : "Edit"}
@@ -273,20 +296,21 @@ const CompanyProfile = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground">GST Number</label>
+                                <label className="text-sm font-medium text-foreground">GST Number (GSTIN)</label>
                                 <input
                                     type="text"
-                                    value={profileData.gstNumber}
-                                    onChange={(e) => handleInputChange('gstNumber', e.target.value)}
+                                    value={profileData.gstin || ''}
+                                    onChange={(e) => handleInputChange('gstin', e.target.value)}
                                     disabled={!isEditing}
                                     className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary font-mono"
+                                    placeholder="22AAAAA0000A1Z5"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-foreground">IEC Code</label>
                                 <input
                                     type="text"
-                                    value={profileData.iecCode}
+                                    value={profileData.iecCode || ''}
                                     onChange={(e) => handleInputChange('iecCode', e.target.value)}
                                     disabled={!isEditing}
                                     className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary font-mono"
@@ -296,32 +320,23 @@ const CompanyProfile = () => {
                                 <label className="text-sm font-medium text-foreground">PAN Number</label>
                                 <input
                                     type="text"
-                                    value={profileData.panNumber}
-                                    onChange={(e) => handleInputChange('panNumber', e.target.value)}
+                                    value={profileData.pan || ''}
+                                    onChange={(e) => handleInputChange('pan', e.target.value)}
                                     disabled={!isEditing}
                                     className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary font-mono"
+                                    placeholder="AAAAA0000A"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-foreground">CIN Number</label>
+                                <label className="text-sm font-medium text-foreground">ARN Number</label>
                                 <input
                                     type="text"
-                                    value={profileData.cinNumber}
-                                    onChange={(e) => handleInputChange('cinNumber', e.target.value)}
+                                    value={profileData.arn || ''}
+                                    onChange={(e) => handleInputChange('arn', e.target.value)}
                                     disabled={!isEditing}
                                     className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary font-mono"
                                 />
                             </div>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-foreground">BOND Number</label>
-                            <input
-                                type="text"
-                                value={profileData.bondNumber}
-                                onChange={(e) => handleInputChange('bondNumber', e.target.value)}
-                                disabled={!isEditing}
-                                className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary font-mono"
-                            />
                         </div>
                     </div>
                 );
@@ -332,7 +347,13 @@ const CompanyProfile = () => {
                             <h3 className="text-lg font-medium text-foreground">Banking Information</h3>
                             <Button
                                 variant={isEditing ? "default" : "outline"}
-                                onClick={() => setIsEditing(!isEditing)}
+                                onClick={() => {
+                                    if (isEditing) {
+                                        handleSave();
+                                    } else {
+                                        setIsEditing(true);
+                                    }
+                                }}
                                 iconName={isEditing ? "Save" : "Edit"}
                             >
                                 {isEditing ? "Save Changes" : "Edit"}
@@ -482,7 +503,7 @@ const CompanyProfile = () => {
                                         <div>
                                             <p className="text-sm text-text-secondary">GST Status</p>
                                             <p className="text-lg font-semibold text-foreground">
-                                                {profileData?.gstNumber ? 'Configured' : 'Pending'}
+                                                {profileData?.gstin ? 'Configured' : 'Pending'}
                                             </p>
                                         </div>
                                     </div>
@@ -496,7 +517,7 @@ const CompanyProfile = () => {
                                         <div>
                                             <p className="text-sm text-text-secondary">Bank Details</p>
                                             <p className="text-lg font-semibold text-foreground">
-                                                {profileData?.bankDetails?.bankName ? 'Configured' : 'Pending'}
+                                                {profileData?.bankName && profileData?.bankAccountNumber ? 'Configured' : 'Pending'}
                                             </p>
                                         </div>
                                     </div>

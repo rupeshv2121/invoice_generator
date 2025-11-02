@@ -12,9 +12,9 @@ let settingsData = {
 
     // Invoice Settings
     invoiceSettings: {
-        invoicePrefix: "EXP",
+        invoicePrefix: "",
         startingNumber: 1,
-        currentNumber: 1001, // Natural number starting from 1001
+        currentNumber: 1, // Natural number starting from 1
         autoGenerateNumber: true,
         showBankDetails: true,
         showTermsAndConditions: true,
@@ -97,16 +97,15 @@ export const updateInvoiceSettings = (settings) => {
 
 /**
  * Get next invoice number
- * @returns {String} Next invoice number with prefix
+ * @returns {Number} Next invoice number as integer
  */
 export const getNextInvoiceNumber = () => {
-    const { invoicePrefix, currentNumber } = settingsData.invoiceSettings;
-    return `${invoicePrefix}-${String(currentNumber).padStart(4, '0')}`;
+    return settingsData.invoiceSettings.currentNumber;
 };
 
 /**
  * Increment invoice number
- * @returns {String} New invoice number
+ * @returns {Number} New invoice number
  */
 export const incrementInvoiceNumber = () => {
     settingsData.invoiceSettings.currentNumber += 1;

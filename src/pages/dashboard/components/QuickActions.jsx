@@ -8,7 +8,7 @@ const QuickActions = () => {
     const actions = [
         {
             title: 'Create New Invoice',
-            description: 'Generate a new invoice for your customer',
+            description: 'Generate a new invoice',
             icon: 'FileText',
             color: 'default',
             onClick: () => navigate('/invoice-creation')

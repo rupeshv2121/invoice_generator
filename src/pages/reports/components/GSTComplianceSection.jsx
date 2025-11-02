@@ -1,38 +1,45 @@
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const GSTComplianceSection = () => {
+const GSTComplianceSection = ({ gstData = {}, invoices = [], dateRange = {} }) => {
     const currentPeriod = {
-        period: 'October 2024',
-        totalSales: 2456789,
-        cgst: 221112,
-        sgst: 221112,
-        igst: 98765,
-        totalTax: 540989,
+        period: dateRange.start && dateRange.end ?
+            `${new Date(dateRange.start).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })} - ${new Date(dateRange.end).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}` :
+            'Current Period',
+        totalSales: invoices.reduce((sum, inv) => sum + (inv.grandTotal || 0), 0),
+        cgst: gstData.cgst || 0,
+        sgst: gstData.sgst || 0,
+        igst: gstData.igst || 0,
+        totalTax: gstData.total || 0,
         filingStatus: 'pending',
-        dueDate: '20/11/2024'
+        dueDate: '20/11/2025'
     };
+
+    const totalTaxable = invoices.reduce((sum, inv) => sum + (inv.subtotal || 0), 0);
+    const cgstTaxable = invoices.filter(inv => (inv.totalCgst || 0) > 0).reduce((sum, inv) => sum + (inv.subtotal || 0), 0);
+    const sgstTaxable = cgstTaxable; // Same as CGST taxable
+    const igstTaxable = invoices.filter(inv => (inv.totalIgst || 0) > 0).reduce((sum, inv) => sum + (inv.subtotal || 0), 0);
 
     const gstBreakdown = [
         {
             type: 'CGST',
             rate: '9%',
-            taxableAmount: 2456789,
-            taxAmount: 221112,
+            taxableAmount: cgstTaxable,
+            taxAmount: gstData.cgst || 0,
             color: 'bg-blue-500'
         },
         {
             type: 'SGST',
             rate: '9%',
-            taxableAmount: 2456789,
-            taxAmount: 221112,
+            taxableAmount: sgstTaxable,
+            taxAmount: gstData.sgst || 0,
             color: 'bg-green-500'
         },
         {
             type: 'IGST',
             rate: '18%',
-            taxableAmount: 548694,
-            taxAmount: 98765,
+            taxableAmount: igstTaxable,
+            taxAmount: gstData.igst || 0,
             color: 'bg-purple-500'
         }
     ];

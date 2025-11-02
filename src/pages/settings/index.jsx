@@ -86,6 +86,12 @@ const Settings = () => {
     };
 
     const handleSave = () => {
+        // Validate invoice settings
+        if (settings.invoiceSettings.currentNumber < 1) {
+            alert('Invoice number must be at least 1');
+            return;
+        }
+
         // Update all settings
         updateTermsAndConditions(settings.termsAndConditions);
         updateInvoiceSettings(settings.invoiceSettings);
@@ -120,13 +126,35 @@ const Settings = () => {
                                     These terms will be automatically added to all invoices
                                 </p>
                             </div>
-                            <Button
-                                variant={isEditing ? "default" : "outline"}
-                                onClick={() => setIsEditing(!isEditing)}
-                                iconName={isEditing ? "Save" : "Edit"}
-                            >
-                                {isEditing ? "Save Changes" : "Edit"}
-                            </Button>
+                            <div className="flex gap-2">
+                                {isEditing && hasUnsavedChanges && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            const settingsData = getSettings();
+                                            setSettings(settingsData);
+                                            setHasUnsavedChanges(false);
+                                            setIsEditing(false);
+                                        }}
+                                        iconName="X"
+                                    >
+                                        Cancel
+                                    </Button>
+                                )}
+                                <Button
+                                    variant={isEditing ? "default" : "outline"}
+                                    onClick={() => {
+                                        if (isEditing) {
+                                            handleSave();
+                                        } else {
+                                            setIsEditing(true);
+                                        }
+                                    }}
+                                    iconName={isEditing ? "Save" : "Edit"}
+                                >
+                                    {isEditing ? "Save Changes" : "Edit"}
+                                </Button>
+                            </div>
                         </div>
 
                         <div className="space-y-4">
@@ -174,13 +202,35 @@ const Settings = () => {
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
                             <h3 className="text-lg font-medium text-foreground">Invoice Settings</h3>
-                            <Button
-                                variant={isEditing ? "default" : "outline"}
-                                onClick={() => setIsEditing(!isEditing)}
-                                iconName={isEditing ? "Save" : "Edit"}
-                            >
-                                {isEditing ? "Save Changes" : "Edit"}
-                            </Button>
+                            <div className="flex gap-2">
+                                {isEditing && hasUnsavedChanges && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            const settingsData = getSettings();
+                                            setSettings(settingsData);
+                                            setHasUnsavedChanges(false);
+                                            setIsEditing(false);
+                                        }}
+                                        iconName="X"
+                                    >
+                                        Cancel
+                                    </Button>
+                                )}
+                                <Button
+                                    variant={isEditing ? "default" : "outline"}
+                                    onClick={() => {
+                                        if (isEditing) {
+                                            handleSave();
+                                        } else {
+                                            setIsEditing(true);
+                                        }
+                                    }}
+                                    iconName={isEditing ? "Save" : "Edit"}
+                                >
+                                    {isEditing ? "Save Changes" : "Edit"}
+                                </Button>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -189,10 +239,16 @@ const Settings = () => {
                                 <input
                                     type="number"
                                     value={settings.invoiceSettings.currentNumber}
-                                    onChange={(e) => handleInvoiceSettingsChange('currentNumber', parseInt(e.target.value))}
+                                    onChange={(e) => {
+                                        const value = parseInt(e.target.value) || 1;
+                                        handleInvoiceSettingsChange('currentNumber', value > 0 ? value : 1);
+                                    }}
                                     disabled={!isEditing}
+                                    min="1"
+                                    step="1"
                                     className="w-full px-3 py-2 border border-border rounded-md bg-card text-foreground disabled:bg-muted disabled:text-text-secondary"
                                 />
+                                <p className="text-xs text-text-secondary">Next invoice number will be: {settings.invoiceSettings.currentNumber}</p>
                             </div>
 
                             <div className="space-y-2">
