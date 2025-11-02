@@ -105,7 +105,7 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
                     Add Item
                 </Button>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-visible">
                 <table className="w-full border-collapse">
                     <thead>
                         <tr className="bg-muted">
@@ -127,25 +127,27 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
                             <th className="border border-border p-2 text-left text-sm font-medium text-foreground">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="relative">
                         {items?.map((item, index) => (
                             <tr key={item?.id} className={index % 2 === 0 ? 'bg-surface' : 'bg-surface-secondary'}>
                                 <td className="border border-border p-2 text-center text-sm">
                                     {index + 1}
                                 </td>
-                                <td className="border border-border p-2">
-                                    <ItemSelector
-                                        value={item?.description}
-                                        onChange={(itemData) => {
-                                            // Update multiple fields when an item is selected
-                                            const updatedItem = { ...item, ...itemData };
-                                            const totals = calculateItemTotals(updatedItem);
-                                            const updatedItems = [...items];
-                                            updatedItems[index] = { ...updatedItem, ...totals };
-                                            onItemsChange(updatedItems);
-                                        }}
-                                        placeholder="Search and select item..."
-                                    />
+                                <td className="border border-border p-2 static">
+                                    <div className="relative">
+                                        <ItemSelector
+                                            value={item?.description}
+                                            onChange={(itemData) => {
+                                                // Update multiple fields when an item is selected
+                                                const updatedItem = { ...item, ...itemData };
+                                                const totals = calculateItemTotals(updatedItem);
+                                                const updatedItems = [...items];
+                                                updatedItems[index] = { ...updatedItem, ...totals };
+                                                onItemsChange(updatedItems);
+                                            }}
+                                            placeholder="Search and select item..."
+                                        />
+                                    </div>
                                 </td>
                                 <td className="border border-border p-2">
                                     <Input
@@ -153,7 +155,9 @@ const InvoiceItemsTable = ({ items, onItemsChange, companyState, customerState }
                                         value={item?.hsnCode}
                                         onChange={(e) => updateItem(index, 'hsnCode', e?.target?.value)}
                                         placeholder="HSN Code"
-                                        className="border-0 p-0 text-sm w-20"
+                                        className="border-0 p-0 text-sm w-16"
+                                        disabled={true}
+                                        readOnly
                                     />
                                 </td>
                                 <td className="border border-border p-2">

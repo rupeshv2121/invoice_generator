@@ -11,9 +11,9 @@ const CustomerStats = ({ stats }) => {
             color: 'text-blue-600'
         },
         {
-            label: 'Active Customers',
-            value: stats?.customersWithInvoices || 0,
-            icon: 'UserCheck',
+            label: 'New This Month',
+            value: stats?.newCustomersThisMonth || 0,
+            icon: 'UserPlus',
             bgColor: 'bg-green-50',
             color: 'text-green-600'
         },
@@ -25,11 +25,11 @@ const CustomerStats = ({ stats }) => {
             color: 'text-indigo-600'
         },
         {
-            label: 'Outstanding Amount',
-            value: `₹${stats?.outstandingAmount?.toFixed(2) || 0}`,
-            icon: 'IndianRupee',
-            bgColor: 'bg-yellow-50',
-            color: 'text-yellow-600'
+            label: 'With Invoices',
+            value: stats?.customersWithInvoices || 0,
+            icon: 'Receipt',
+            bgColor: 'bg-purple-50',
+            color: 'text-purple-600'
         }
     ];
 

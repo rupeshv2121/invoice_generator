@@ -14,7 +14,7 @@ const CompanyCustomerSelector = ({
     const customerOptions = customers?.map(c => ({
         value: c.id,
         label: c.name || c.companyName || c.email,
-        description: `${c.email} - ${c.location} ${c.eximCode ? `(EXIM: ${c.eximCode})` : ''}`
+        description: `${c.email || 'No email'} - ${c.city || c.state || 'Location not set'}`
     }));
 
     return (
@@ -69,17 +69,17 @@ const CompanyCustomerSelector = ({
                         <div>
                             <h4 className="font-medium text-gray-900 mb-2">Your Business Details</h4>
                             <div className="space-y-1 text-gray-600">
-                                <div><strong>Bank:</strong> {myCompanyProfile?.bankDetails?.bankName}</div>
-                                <div><strong>Account:</strong> {myCompanyProfile?.bankDetails?.accountNumber}</div>
-                                <div><strong>IFSC:</strong> {myCompanyProfile?.bankDetails?.ifscCode}</div>
+                                <div><strong>Bank:</strong> {myCompanyProfile?.bankName || 'Not set'}</div>
+                                <div><strong>Account:</strong> {myCompanyProfile?.bankAccountNumber || 'Not set'}</div>
+                                <div><strong>IFSC:</strong> {myCompanyProfile?.bankIfscCode || 'Not set'}</div>
                             </div>
                         </div>
                         <div>
                             <h4 className="font-medium text-gray-900 mb-2">Selected Customer</h4>
                             <div className="space-y-1 text-gray-600">
-                                <div><strong>EXIM Code:</strong> {customers?.find(c => c.id === selectedCustomerId)?.eximCode || 'N/A'}</div>
-                                <div><strong>GST:</strong> {customers?.find(c => c.id === selectedCustomerId)?.gstNumber || 'Unregistered'}</div>
-                                <div><strong>Country:</strong> {customers?.find(c => c.id === selectedCustomerId)?.country || 'N/A'}</div>
+                                <div><strong>EXIM Code:</strong> {customers?.find(c => c.id === selectedCustomerId)?.EximCode || 'N/A'}</div>
+                                <div><strong>GST:</strong> {customers?.find(c => c.id === selectedCustomerId)?.gstin || 'Unregistered'}</div>
+                                <div><strong>Country:</strong> {customers?.find(c => c.id === selectedCustomerId)?.country || 'India'}</div>
 
                             </div>
                         </div>

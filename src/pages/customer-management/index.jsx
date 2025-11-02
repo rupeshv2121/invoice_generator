@@ -65,14 +65,21 @@ const CustomerManagement = () => {
     useEffect(() => {
         let filtered = customers;
 
-        // Search filter - use service for more comprehensive search
+        // Search filter
         if (searchTerm) {
-            filtered = searchCustomers(searchTerm);
+            const searchLower = searchTerm.toLowerCase();
+            filtered = customers.filter(customer =>
+                customer?.name?.toLowerCase().includes(searchLower) ||
+                customer?.companyName?.toLowerCase().includes(searchLower) ||
+                customer?.email?.toLowerCase().includes(searchLower) ||
+                customer?.phone?.includes(searchTerm) ||
+                customer?.gstin?.toLowerCase().includes(searchLower)
+            );
         }
 
         // Location filter
         if (locationFilter) {
-            filtered = filtered?.filter(customer => customer?.location === locationFilter);
+            filtered = filtered?.filter(customer => customer?.city === locationFilter);
         }
 
         // Customer type filter
@@ -82,35 +89,19 @@ const CustomerManagement = () => {
 
         // Status filter
         if (statusFilter) {
-            filtered = filtered?.filter(customer => customer?.status === statusFilter);
+            filtered = filtered?.filter(customer => customer?.isActive === (statusFilter === 'active'));
         }
 
-        // Sort customers
-        // filtered?.sort((a, b) => {
-        //     let aValue = a?.[sortBy];
-        //     let bValue = b?.[sortBy];
-
-        //     if (typeof aValue === 'string') {
-        //         aValue = aValue?.toLowerCase();
-        //         bValue = bValue?.toLowerCase();
-        //     }
-
-        //     if (sortOrder === 'asc') {
-        //         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-        //     } else {
-        //         return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-        //     }
-        // });
-
         setFilteredCustomers(filtered);
-    }, [customers, searchTerm, locationFilter, customerTypeFilter, statusFilter, sortBy, sortOrder]);
+    }, [customers, searchTerm, locationFilter, customerTypeFilter, statusFilter]);
 
-    // Calculate statistics
-    const stats = {
-        // totalCustomers: customers?.length,
-        // activeCustomers: customers?.filter(c => c?.status === 'Active')?.length,
-        // gstRegistered: customers?.filter(c => c?.gstStatus === 'Registered')?.length,
-        // outstandingAmount: 485000 // Mock outstanding amount
+    // Use stats from API
+    const stats = customerStats || {
+        totalCustomers: 0,
+        newCustomersThisMonth: 0,
+        customersWithInvoices: 0,
+        customersWithoutInvoices: 0,
+        gstRegisteredCount: 0
     };
 
     const handleAddCustomer = () => {

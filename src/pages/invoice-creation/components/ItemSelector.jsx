@@ -7,9 +7,9 @@ const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [items, setItems] = useState([]);
     const [filteredItems, setFilteredItems] = useState([]);
-    const dropdownRef = useRef(null);
+    const containerRef = useRef(null);
     const inputRef = useRef(null);
-    const { getItems, searchItems } = useItemService();
+    const { getItems } = useItemService();
 
     // Load all items on component mount
     useEffect(() => {
@@ -27,7 +27,11 @@ const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
         if (searchTerm.trim() === '') {
             setFilteredItems(items);
         } else {
-            const filtered = searchItems(searchTerm);
+            const filtered = items.filter(item =>
+                item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.hsnCode?.toString().includes(searchTerm)
+            );
             setFilteredItems(filtered);
         }
     }, [searchTerm, items]);
@@ -35,7 +39,7 @@ const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
                 setIsOpen(false);
             }
         };
@@ -52,8 +56,8 @@ const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
             description: item.name,
             hsnCode: item.hsnCode,
             unit: item.unit,
-            rate: item.rate,
-            taxRate: item.taxRate || 0
+            rate: item.sellingPrice || item.rate || 0,
+            taxRate: item.igstRate || item.taxRate || 0
         });
         setSearchTerm('');
         setIsOpen(false);
@@ -61,22 +65,13 @@ const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
 
     const handleInputClick = () => {
         setIsOpen(true);
-        // Focus the input for better UX
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
     };
 
     const handleInputChange = (e) => {
         const newValue = e.target.value;
         setSearchTerm(newValue);
 
-        // If not open, treat this as manual entry
         if (!isOpen) {
-            onChange({ description: newValue });
-        }
-
-        if (!isOpen && newValue) {
             setIsOpen(true);
         }
     };
@@ -90,7 +85,7 @@ const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
     };
 
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative" ref={containerRef}>
             <div className="relative">
                 <input
                     ref={inputRef}
@@ -112,7 +107,7 @@ const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
             </div>
 
             {isOpen && (
-                <div className="absolute z-[60] w-96 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto left-0">
+                <div className="relative z-[99999] w-96 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto left-0">
                     {filteredItems.length > 0 ? (
                         <>
                             <div className="px-3 py-2 text-xs text-gray-500 bg-gray-50 border-b">
@@ -128,7 +123,7 @@ const ItemSelector = ({ value, onChange, placeholder = "Search items..." }) => {
                                         {item.name}
                                     </div>
                                     <div className="text-xs text-gray-500 mt-1">
-                                        HSN: {item.hsnCode} | Unit: {item.unit} | Rate: ₹{item.rate}
+                                        HSN: {item.hsnCode} | Unit: {item.unit} | Rate: ₹{item.sellingPrice || item.rate || 0}
                                     </div>
                                 </div>
                             ))}
