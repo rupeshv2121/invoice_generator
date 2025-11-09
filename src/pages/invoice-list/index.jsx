@@ -18,8 +18,6 @@ const InvoiceList = () => {
     const { getInvoices } = useInvoiceService();
     const [previewModalOpen, setPreviewModalOpen] = useState(false);
     const [selectedInvoiceForPreview, setSelectedInvoiceForPreview] = useState(null);
-
-    // State management
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -34,14 +32,14 @@ const InvoiceList = () => {
                 const mapped = (invoicesData || []).map(inv => ({
                     id: inv.id,
                     invoiceNumber: inv.invoiceNumber,
-                    customerName: inv.customer?.name || '',
+                    customerName: inv.customer?.name || inv.customer?.companyName || '',
                     customerEmail: inv.customer?.email || '',
                     date: inv.invoiceDate || inv.date || '',
                     dueDate: inv.dueDate || '',
                     amount: inv.totalAmount || inv.amount || 0,
-                    status: inv.status || 'sent',
-                    // ...add more fields as needed
-                    raw: inv // keep original for preview, etc.
+                    status: inv.status?.toLowerCase() || 'draft',
+                    // Keep the complete raw invoice data with all nested relations
+                    raw: inv
                 }));
                 console.log('Mapped invoices:', mapped);
                 setInvoices(mapped);
@@ -213,49 +211,59 @@ const InvoiceList = () => {
         }
     };
 
-    // Transform mock invoice data for preview modal
+    // Transform invoice data for preview modal
     const transformInvoiceForPreview = (invoice) => {
+        console.log('Transforming invoice for preview:', invoice);
+
+        // Get the raw invoice data
+        const rawInvoice = invoice?.raw || invoice;
+
         return {
             companyData: {
-                name: 'Your Company Name',
-                address: '123 Business Street, City, State 12345',
-                phone: '+1 (555) 123-4567',
-                email: 'info@yourcompany.com',
-                gstin: '27AAACI1681G1Z8',
-                iecCode: 'IEC123456789',
-                bondNumber: 'BOND12345',
-                state: 'Maharashtra',
-                stateCode: '27'
+                name: rawInvoice?.company?.companyName || 'Your Company Name',
+                address: rawInvoice?.company?.address || '',
+                phone: rawInvoice?.company?.phone || '',
+                email: rawInvoice?.company?.email || '',
+                gstin: rawInvoice?.company?.gstin || '',
+                iecCode: rawInvoice?.company?.iecCode || '',
+                arn: rawInvoice?.company?.arn || '',
+                state: rawInvoice?.company?.state || '',
+                stateCode: rawInvoice?.stateCode || '',
+                city: rawInvoice?.company?.city || '',
+                pincode: rawInvoice?.company?.pincode || '',
+                bankName: rawInvoice?.company?.bankName || '',
+                bankAccountNumber: rawInvoice?.company?.bankAccountNumber || '',
+                bankIfscCode: rawInvoice?.company?.bankIfscCode || '',
+                bankBranch: rawInvoice?.company?.bankBranch || ''
             },
             customerData: {
                 billingAddress: {
-                    name: invoice?.customerName || 'Customer Name',
-                    address: '456 Customer Street, Customer City',
-                    eximCode: 'EXIM123',
-                    city: 'Customer City',
-                    country: 'Nepal'
+                    name: rawInvoice?.customer?.name || invoice?.customerName || 'Customer Name',
+                    address: rawInvoice?.customer?.address || '',
+                    eximCode: rawInvoice?.customer?.EximCode || '',
+                    city: rawInvoice?.customer?.city || '',
+                    country: rawInvoice?.customer?.country || 'Nepal'
                 }
             },
             invoiceDetails: {
-                invoiceNumber: invoice?.invoiceNumber || 'INV-001',
-                invoiceDate: invoice?.date || new Date().toISOString().split('T')[0],
-                supplyDate: invoice?.date || new Date().toISOString().split('T')[0],
-                marka: 'MARKA001',
-                transport: 'By Road'
+                invoiceNumber: rawInvoice?.invoiceNumber || invoice?.invoiceNumber || 'INV-001',
+                invoiceDate: rawInvoice?.invoiceDate || invoice?.date || new Date().toISOString().split('T')[0],
+                supplyDate: rawInvoice?.dateOfSupply || rawInvoice?.invoiceDate || invoice?.date || new Date().toISOString().split('T')[0],
+                marka: rawInvoice?.marka || '',
+                transport: rawInvoice?.transportation || ''
             },
-            items: [
-                {
-                    description: 'Sample Product/Service',
-                    hsnCode: '1001',
-                    unit: 'PCS',
-                    quantity: 1,
-                    rate: invoice?.amount || 0,
-                    grossAmount: invoice?.amount || 0,
-                    cgstAmount: (invoice?.amount || 0) * 0.09,
-                    sgstAmount: (invoice?.amount || 0) * 0.09,
-                    igstAmount: 0
-                }
-            ],
+            items: rawInvoice?.invoiceItems?.map(item => ({
+                description: item?.description || '',
+                hsnCode: item?.hsnCode || '',
+                unit: item?.unit || 'PCS',
+                quantity: item?.quantity || 0,
+                rate: parseFloat(item?.rate) || 0,
+                taxableAmount: parseFloat(item?.amount) || 0,
+                cgstAmount: parseFloat(item?.cgstAmount) || 0,
+                sgstAmount: parseFloat(item?.sgstAmount) || 0,
+                igstAmount: parseFloat(item?.igstAmount) || 0,
+                totalAmount: parseFloat(item?.totalAmount) || 0
+            })) || [],
             additionalCharges: {
                 shipping: 0,
                 other: 0

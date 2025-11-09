@@ -1,4 +1,3 @@
-import { FileOutputIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
@@ -75,23 +74,21 @@ const InvoiceActionMenu = ({ invoice, onAction }) => {
     const visibleActions = actions?.filter(action => action?.show !== false);
 
     return (
-        <div className="relative">
+        <div className="relative inline-block">
             <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleMenu}
                 iconName="MoreVertical"
                 className="h-8 w-8 p-0"
-            >
-                <span className=""><FileOutputIcon /> </span>
-            </Button>
+            />
             {isOpen && (
                 <>
                     <div
-                        className="fixed inset-0 z-10"
+                        className="fixed inset-0 z-[100]"
                         onClick={closeMenu}
                     />
-                    <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-border rounded-md shadow-lg z-20">
+                    <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-border rounded-md shadow-lg z-[101]">
                         <div className="py-1">
                             {visibleActions?.map((action, index) => (
                                 <React.Fragment key={action?.action}>

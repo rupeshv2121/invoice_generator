@@ -28,7 +28,13 @@ export const useInvoiceService = () => {
             return response.data;
         } catch (error) {
             console.error('Error creating invoice : ', error);
-            return { success: false, error: error.message };
+            // Return detailed error information from backend
+            const errorMessage = error.response?.data?.details
+                ? JSON.stringify(error.response.data.details, null, 2)
+                : error.response?.data?.error
+                    ? error.response.data.error
+                    : error.message;
+            return { success: false, error: errorMessage };
         }
     }
 

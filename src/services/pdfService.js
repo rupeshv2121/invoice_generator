@@ -100,28 +100,28 @@ export const generateInvoicePDF = (invoiceData) => {
     let yPosition = margin;
 
     // Auto-populate company data from service if not provided
-    const autoCompanyData = companyData?.gstin ? companyData : {
-        gstin: myCompanyProfile?.gstNumber || '09AGIPK4533G1ZD',
-        iecCode: myCompanyProfile?.iecCode || 'AGIPK4533G',
-        arn: myCompanyProfile?.arn || 'AA9604180513ZDE',
-        companyName: myCompanyProfile?.companyName || 'SHRI PASHUPATINATH ENTERPRISES',
-        address: `${myCompanyProfile?.addressLine1 || '19/54 Hanuman Puri, Mahendar Nagar, Aligarh'}${myCompanyProfile?.addressLine2 ? ', ' + myCompanyProfile.addressLine2 : ''}`,
-        city: myCompanyProfile?.city || 'Aligarh',
-        state: myCompanyProfile?.state || 'Uttar Pradesh',
-        stateCode: myCompanyProfile?.stateCode || '09',
-        pincode: myCompanyProfile?.postalCode || '202001',
-        phone: myCompanyProfile?.phone || '+91 8923646841',
-        email: myCompanyProfile?.email || 'ak6999551@gmail.com'
+    const autoCompanyData = {
+        gstin: companyData?.gstin || '09AGIPK4533G1ZD',
+        iecCode: companyData?.iecCode || 'AGIPK4533G',
+        arn: companyData?.arn || 'AA9604180513ZDE',
+        companyName: companyData?.name || 'SHRI PASHUPATINATH ENTERPRISES',
+        address: companyData?.address || '19/54 Hanuman Puri, Mahendar Nagar, Aligarh',
+        city: companyData?.city || 'Aligarh',
+        state: companyData?.state || 'Uttar Pradesh',
+        stateCode: companyData?.stateCode || '09',
+        pincode: companyData?.pincode || '202001',
+        phone: companyData?.phone || '+91 8923646841',
+        email: companyData?.email || 'ak6999551@gmail.com'
     };
 
     // Auto-populate bank details
     const autoBankDetails = {
-        bankName: myCompanyProfile?.bankDetails?.bankName || 'Canara Bank',
-        accountNumber: myCompanyProfile?.bankDetails?.accountNumber || '1250006448551',
-        ifscCode: myCompanyProfile?.bankDetails?.ifscCode || 'CNRB0001274',
-        accountName: myCompanyProfile?.bankDetails?.accountName || autoCompanyData.companyName,
-        accountType: myCompanyProfile?.bankDetails?.accountType || 'Current',
-        branchName: myCompanyProfile?.bankDetails?.branchName || 'Aligarh Main Branch'
+        bankName: companyData?.bankName || 'Canara Bank',
+        accountNumber: companyData?.bankAccountNumber || '1250006448551',
+        ifscCode: companyData?.bankIfscCode || 'CNRB0001274',
+        accountName: companyData?.name || autoCompanyData.companyName,
+        accountType: 'Current',
+        branchName: companyData?.bankBranch || 'Main Branch'
     };
 
     // Calculate totals
@@ -499,7 +499,22 @@ export const generateInvoicePDF = (invoiceData) => {
 
     // Enhanced border structure with professional styling
     drawLine(margin, yPosition, pageWidth - margin, yPosition, 0.5); // Thicker top border
-    yPosition += 0;
+
+    // Calculate fixed footer position - increased to accommodate all footer content
+    const footerStartY = pageHeight - margin - 93; // Fixed position from bottom (93mm for footer sections)
+
+    // Check if we need to add spacing to push footer to bottom
+    if (yPosition < footerStartY) {
+        yPosition = footerStartY; // Move to fixed footer position
+    } else if (yPosition > footerStartY - 10) {
+        // If table is close to footer area, add new page
+        pdf.addPage();
+        drawBorder(margin, margin, contentWidth, pageHeight - (2 * margin));
+        yPosition = margin + 20;
+        // Re-calculate footer position for new page
+        const newFooterStartY = pageHeight - margin - 93;
+        yPosition = newFooterStartY;
+    }
 
     // Main bottom section - 3 rows structure with enhanced styling
     const sectionHeight = 45;
@@ -579,7 +594,7 @@ export const generateInvoicePDF = (invoiceData) => {
     const row2Height = 25; // Increased height for better spacing
 
     // Draw enhanced borders for row 2
-    // drawLine(margin, yPosition + row2Height, pageWidth - margin, yPosition + row2Height, 0.4); // Bottom border
+    drawLine(margin, yPosition + row2Height, pageWidth - margin, yPosition + row2Height, 0.4); // Bottom border
     drawLine(margin, yPosition, margin, yPosition + row2Height, 0.4); // Left border
     drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + row2Height, 0.4); // Right border
     drawLine(rightColumnX, yPosition, rightColumnX, yPosition + row2Height, 0.3); // Vertical separator
@@ -618,21 +633,21 @@ export const generateInvoicePDF = (invoiceData) => {
     yPosition += row2Height;
 
     // Row 3: Terms & Conditions and Signature with enhanced styling
-    const row3Height = 48; // Increased height for signature area
+    const row3Height = 28; // Adjusted height to fit within page
 
     // Draw enhanced borders for row 3
-    // drawLine(margin, yPosition + row3Height, pageWidth - margin, yPosition + row3Height, 0.5); // Thicker bottom border
-    // drawLine(margin, yPosition, margin, yPosition + row3Height, 0.4); // Left border
-    // drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + row3Height, 0.4); // Right border
-    drawLine(rightColumnX, yPosition + 33, rightColumnX, yPosition, 0.3); // Vertical separator
+    drawLine(margin, yPosition + row3Height, pageWidth - margin, yPosition + row3Height, 0.5); // Bottom border
+    drawLine(margin, yPosition, margin, yPosition + row3Height, 0.4); // Left border
+    drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + row3Height, 0.4); // Right border
+    drawLine(rightColumnX, yPosition, rightColumnX, yPosition + row3Height, 0.3); // Vertical separator
 
     // Left side - Enhanced Terms & Conditions
     // Terms header with background
     pdf.setFillColor(240, 242, 247);
-    pdf.rect(margin + 1, yPosition, rightColumnX - margin - 1.5, 6, 'F');
+    pdf.rect(margin + 0.5, yPosition + 0.5, rightColumnX - margin - 1.5, 6, 'F');
     addText('Terms & Conditions', margin + 2, yPosition + 4, { fontSize: 8, fontStyle: 'bold' });
 
-    // Enhanced terms with better formatting
+    // Enhanced terms with better formatting - compact version
     const defaultTerms = [
         { num: '1.', text: 'Country of Origin - India' },
         { num: '2.', text: 'Custom Point - Bhairahwa' },
@@ -642,28 +657,30 @@ export const generateInvoicePDF = (invoiceData) => {
 
     const termsToShow = termsAndConditions?.terms || defaultTerms;
     termsToShow.slice(0, 4).forEach((term, index) => {
-        const termY = yPosition + 12 + (index * 4);
+        const termY = yPosition + 10 + (index * 4);
         if (typeof term === 'object') {
-            addText(term.num, margin + 5, termY, { fontSize: 8, fontStyle: 'bold' });
-            addText(term.text, margin + 10, termY, { fontSize: 8 });
+            addText(term.num, margin + 5, termY, { fontSize: 7, fontStyle: 'bold' });
+            addText(term.text, margin + 10, termY, { fontSize: 7 });
         } else {
-            addText(term, margin + 5, termY, { fontSize: 8 });
+            addText(term, margin + 5, termY, { fontSize: 7 });
         }
     });
 
     // Right side - Enhanced Signature area
-    const signatureWidth = pageWidth - margin - rightColumnX;
+    const signatureWidth = pageWidth - margin - rightColumnX - 1;
     const signatureX = rightColumnX + signatureWidth / 2;
 
-    // Signature box with border
+    // Signature box - centered and within borders
+    const sigBoxWidth = signatureWidth - 10;
+    const sigBoxHeight = 15;
+    const sigBoxX = rightColumnX + 5;
+    const sigBoxY = yPosition + 6;
+
     pdf.setFillColor(250, 250, 250);
-    pdf.rect(rightColumnX + 5, yPosition + 12.5, signatureWidth - 10, 20, 'F');
+    pdf.rect(sigBoxX, sigBoxY, sigBoxWidth, sigBoxHeight, 'F');
 
     // Vertically center the label inside the signature box
-    const signatureBoxTop = yPosition + 16;
-    const signatureBoxHeight = 20;
-    const labelFontSize = 8;
-    const labelY = signatureBoxTop + (signatureBoxHeight / 2) + (labelFontSize / 2.5); // Adjust for font baseline
+    const labelY = sigBoxY + (sigBoxHeight / 2) + 1.5;
     addText('Authorised Signatory', signatureX, labelY, { fontSize: 8, fontStyle: 'bold', align: 'center' });
 
     return pdf;

@@ -342,7 +342,7 @@ const InvoiceCreation = () => {
         const payload = {
             companyProfileId: myCompanyProfile.id,
             customerId: selectedCustomerId,
-            invoiceNumber: invoiceDetails.invoiceNumber,
+            invoiceNumber: String(invoiceDetails.invoiceNumber),
             invoiceDate: invoiceDetails.invoiceDate ? new Date(invoiceDetails.invoiceDate).toISOString() : null,
             dueDate: invoiceDetails.dueDate ? new Date(invoiceDetails.dueDate).toISOString() : null,
             marka: invoiceDetails.marka,
