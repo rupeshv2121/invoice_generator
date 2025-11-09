@@ -370,10 +370,11 @@ export const generateInvoicePDF = (invoiceData) => {
         }
     ];
 
-    // Prepare table data
+    // Prepare table data with minimum rows to fill space
+    const MIN_ROWS = 12; // Minimum number of rows to show
     const tableData = [];
 
-    // Add items data - no more empty rows padding
+    // Add actual items data
     itemsToShow.forEach((item, index) => {
         tableData.push([
             (index + 1).toString(),
@@ -389,6 +390,27 @@ export const generateInvoicePDF = (invoiceData) => {
             formatIndianNumber(item.totalAmount || 0)
         ]);
     });
+
+    // Add empty rows to fill space if items are less than MIN_ROWS
+    const currentRowCount = itemsToShow.length;
+    if (currentRowCount < MIN_ROWS) {
+        const emptyRowsNeeded = MIN_ROWS - currentRowCount;
+        for (let i = 0; i < emptyRowsNeeded; i++) {
+            tableData.push([
+                (currentRowCount + i + 1).toString(), // Serial number
+                '', // Description
+                '', // HSN
+                '', // Unit
+                '', // Qty
+                '', // Rate
+                '', // Amount
+                '', // CGST
+                '', // SGST
+                '', // IGST
+                ''  // Total
+            ]);
+        }
+    }
 
     // Calculate totals
     const totalQty = itemsToShow.reduce((sum, item) => sum + (item.quantity || 0), 0);
@@ -465,7 +487,7 @@ export const generateInvoicePDF = (invoiceData) => {
                 pdf.addPage();
                 // Add border to new page
                 drawBorder(margin, margin, contentWidth, pageHeight - (2 * margin));
-                yPosition = margin + 20;
+                yPosition = margin;
             } else {
                 yPosition = finalY;
             }
@@ -474,9 +496,9 @@ export const generateInvoicePDF = (invoiceData) => {
             pdf.setFillColor(240, 240, 240);
             pdf.rect(margin, yPosition, contentWidth, 8, 'F');
 
-            // Draw total row borders and content
+            // // Draw total row borders and content
             drawLine(margin, yPosition, pageWidth - margin, yPosition);
-            drawLine(margin, yPosition + 8, pageWidth - margin, yPosition + 8);
+            // drawLine(margin, yPosition + 8, pageWidth - margin, yPosition + 8);
             drawLine(margin, yPosition, margin, yPosition + 8);
             drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + 8);
 
@@ -498,10 +520,10 @@ export const generateInvoicePDF = (invoiceData) => {
     }
 
     // Enhanced border structure with professional styling
-    drawLine(margin, yPosition, pageWidth - margin, yPosition, 0.5); // Thicker top border
+    // drawLine(margin, yPosition, pageWidth - margin, yPosition, 0.5); // Thicker top border
 
     // Calculate fixed footer position - increased to accommodate all footer content
-    const footerStartY = pageHeight - margin - 93; // Fixed position from bottom (93mm for footer sections)
+    const footerStartY = pageHeight - margin - 78; // Fixed position from bottom (93mm for footer sections)
 
     // Check if we need to add spacing to push footer to bottom
     if (yPosition < footerStartY) {
@@ -517,7 +539,6 @@ export const generateInvoicePDF = (invoiceData) => {
     }
 
     // Main bottom section - 3 rows structure with enhanced styling
-    const sectionHeight = 45;
     const rightColumnX = pageWidth - 80; // Slightly wider right column
 
     // Row 1: Amount in words and totals with enhanced borders
@@ -594,7 +615,7 @@ export const generateInvoicePDF = (invoiceData) => {
     const row2Height = 25; // Increased height for better spacing
 
     // Draw enhanced borders for row 2
-    drawLine(margin, yPosition + row2Height, pageWidth - margin, yPosition + row2Height, 0.4); // Bottom border
+    drawLine(margin, yPosition + row2Height, margin, yPosition + row2Height, 0.4); // Bottom border
     drawLine(margin, yPosition, margin, yPosition + row2Height, 0.4); // Left border
     drawLine(pageWidth - margin, yPosition, pageWidth - margin, yPosition + row2Height, 0.4); // Right border
     drawLine(rightColumnX, yPosition, rightColumnX, yPosition + row2Height, 0.3); // Vertical separator
@@ -633,7 +654,7 @@ export const generateInvoicePDF = (invoiceData) => {
     yPosition += row2Height;
 
     // Row 3: Terms & Conditions and Signature with enhanced styling
-    const row3Height = 28; // Adjusted height to fit within page
+    const row3Height = 33; // Adjusted height to fit within page
 
     // Draw enhanced borders for row 3
     drawLine(margin, yPosition + row3Height, pageWidth - margin, yPosition + row3Height, 0.5); // Bottom border
@@ -671,16 +692,10 @@ export const generateInvoicePDF = (invoiceData) => {
     const signatureX = rightColumnX + signatureWidth / 2;
 
     // Signature box - centered and within borders
-    const sigBoxWidth = signatureWidth - 10;
-    const sigBoxHeight = 15;
-    const sigBoxX = rightColumnX + 5;
-    const sigBoxY = yPosition + 6;
-
-    pdf.setFillColor(250, 250, 250);
-    pdf.rect(sigBoxX, sigBoxY, sigBoxWidth, sigBoxHeight, 'F');
+    const sigBoxY = yPosition;
 
     // Vertically center the label inside the signature box
-    const labelY = sigBoxY + (sigBoxHeight / 2) + 1.5;
+    const labelY = sigBoxY + 20;
     addText('Authorised Signatory', signatureX, labelY, { fontSize: 8, fontStyle: 'bold', align: 'center' });
 
     return pdf;

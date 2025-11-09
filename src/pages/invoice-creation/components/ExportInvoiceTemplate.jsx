@@ -5,6 +5,7 @@ import { formatIndianNumber, numberToWordsIndian } from '../../../utils/numberUt
 
 const ExportInvoiceTemplate = ({
     companyData,
+    bankDetails,
     receiverData,
     consigneeData,
     invoiceDetails,
@@ -44,14 +45,14 @@ const ExportInvoiceTemplate = ({
         email: myCompanyProfile?.email || 'ak6999551@gmail.com'
     };
 
-    // Auto-populate bank details from company profile
-    const autoBankDetails = {
-        bankName: myCompanyProfile?.bankDetails?.bankName || 'Canara Bank',
-        accountNumber: myCompanyProfile?.bankDetails?.accountNumber || '1250006448551',
-        ifscCode: myCompanyProfile?.bankDetails?.ifscCode || 'CNRB0001274',
-        accountName: myCompanyProfile?.bankDetails?.accountName || autoCompanyData.companyName,
+    // Auto-populate bank details from company profile or use provided bank details
+    const autoBankDetails = bankDetails?.bankName ? bankDetails : {
+        bankName: myCompanyProfile?.bankDetails?.bankName || companyData?.bankName || 'Canara Bank',
+        accountNumber: myCompanyProfile?.bankDetails?.accountNumber || companyData?.bankAccountNumber || '1250006448551',
+        ifscCode: myCompanyProfile?.bankDetails?.ifscCode || companyData?.bankIfscCode || 'CNRB0001274',
+        accountName: myCompanyProfile?.bankDetails?.accountName || companyData?.companyName || autoCompanyData.companyName,
         accountType: myCompanyProfile?.bankDetails?.accountType || 'Current',
-        branchName: myCompanyProfile?.bankDetails?.branchName || 'Aligarh Main Branch'
+        branchName: myCompanyProfile?.bankDetails?.branchName || companyData?.bankBranch || 'Aligarh Main Branch'
     };
 
     // Calculate totals from items

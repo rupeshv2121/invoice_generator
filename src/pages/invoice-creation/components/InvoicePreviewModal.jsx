@@ -9,7 +9,8 @@ const InvoicePreviewModal = ({
     customerData,
     invoiceDetails,
     items,
-    additionalCharges
+    additionalCharges,
+    bankDetails
 }) => {
     if (!isOpen) return null;
 
@@ -43,7 +44,13 @@ const InvoicePreviewModal = ({
 
     const handleDownloadPDF = () => {
         const invoiceData = {
-            companyData,
+            companyData: {
+                ...companyData,
+                bankName: bankDetails?.bankName || companyData?.bankName,
+                bankAccountNumber: bankDetails?.accountNumber || companyData?.bankAccountNumber,
+                bankIfscCode: bankDetails?.ifscCode || companyData?.bankIfscCode,
+                bankBranch: bankDetails?.branchName || companyData?.bankBranch
+            },
             customerData,
             invoiceDetails,
             items,
@@ -69,7 +76,15 @@ const InvoicePreviewModal = ({
             iecCode: companyData?.iecCode,
             arn: companyData?.arn,
             state: companyData?.state,
-            stateCode: companyData?.stateCode
+            stateCode: companyData?.stateCode,
+            city: companyData?.city,
+            pincode: companyData?.pincode
+        },
+        bankDetails: {
+            bankName: bankDetails?.bankName || companyData?.bankName,
+            accountNumber: bankDetails?.accountNumber || companyData?.bankAccountNumber,
+            ifscCode: bankDetails?.ifscCode || companyData?.bankIfscCode,
+            branchName: bankDetails?.branchName || companyData?.bankBranch
         },
         receiverData: {
             name: customerData?.billingAddress?.name,
@@ -177,6 +192,7 @@ const InvoicePreviewModal = ({
                     <div className="p-2 sm:p-4">
                         <ExportInvoiceTemplate
                             companyData={exportInvoiceData.companyData}
+                            bankDetails={exportInvoiceData.bankDetails}
                             receiverData={exportInvoiceData.receiverData}
                             consigneeData={exportInvoiceData.consigneeData}
                             invoiceDetails={exportInvoiceData.invoiceDetails}

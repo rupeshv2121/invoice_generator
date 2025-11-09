@@ -1,248 +1,118 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useInvoiceService } from '../../api/invoice';
 import { downloadInvoicePDF, getInvoicePDFBlob } from '../../services/pdfService';
 
 const PDFPreview = () => {
     const [previewUrl, setPreviewUrl] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [invoices, setInvoices] = useState([]);
+    const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Sample invoice data for testing
-    const sampleInvoiceData = {
-        invoiceDetails: {
-            invoiceNumber: 'EXP-1001',
-            invoiceDate: '06/10/2025',
-            marka: 'MARKA',
-            dateOfSupply: '06/10/2025',
-            state: 'Uttar Pradesh',
-            stateCode: '09',
-            transportation: 'PawanPutra Roadlines'
-        },
-        billedTo: {
-            name: 'JEEVAN HARDWARE',
-            address: 'Kathmandu, kathmandu MC-11, Bhotebahali, 00',
-            gstin: '29ABCDE1234F1Z5',
-            contactNumber: '+977-9876543210'
-        },
-        shippedTo: {
-            name: 'JEEVAN HARDWARE',
-            address: 'Kathmandu, kathmandu MC-11, Bhotebahali, 00',
-            gstin: '29ABCDE1234F1Z5'
-        },
-        items: [
-            {
-                description: 'Safety 1.5" (Door King Brand)',
-                hsnCode: '83024110',
-                unit: 'gz',
-                quantity: 5,
-                rate: 320.00,
-                totalAmount: 1600.00
+    const { getInvoices } = useInvoiceService();
+
+    // Fetch real invoices on component mount
+    useEffect(() => {
+        const fetchInvoices = async () => {
+            setLoading(true);
+            try {
+                const data = await getInvoices();
+                console.log('Fetched invoices:', data);
+                setInvoices(data || []);
+                // Auto-select first invoice if available
+                if (data && data.length > 0) {
+                    setSelectedInvoiceId(data[0].id);
+                }
+            } catch (error) {
+                console.error('Error fetching invoices:', error);
+                setInvoices([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchInvoices();
+    }, []);
+
+    // Get selected invoice data
+    const selectedInvoice = invoices.find(inv => inv.id === selectedInvoiceId);
+
+    // Transform invoice data for PDF service
+    const transformInvoiceForPDF = (invoice) => {
+        if (!invoice) return null;
+
+        const rawInvoice = invoice.raw || invoice;
+
+        return {
+            companyData: {
+                name: rawInvoice?.company?.companyName || 'Your Company Name',
+                companyName: rawInvoice?.company?.companyName || 'Your Company Name',
+                address: rawInvoice?.company?.address || '',
+                city: rawInvoice?.company?.city || '',
+                state: rawInvoice?.company?.state || '',
+                stateCode: rawInvoice?.stateCode || '',
+                pincode: rawInvoice?.company?.pincode || '',
+                phone: rawInvoice?.company?.phone || '',
+                email: rawInvoice?.company?.email || '',
+                gstin: rawInvoice?.company?.gstin || '',
+                iecCode: rawInvoice?.company?.iecCode || '',
+                arn: rawInvoice?.company?.arn || '',
+                bankName: rawInvoice?.company?.bankName || '',
+                bankAccountNumber: rawInvoice?.company?.bankAccountNumber || '',
+                bankIfscCode: rawInvoice?.company?.bankIfscCode || '',
+                bankBranch: rawInvoice?.company?.bankBranch || ''
             },
-            {
-                description: 'Safety 2" (Door King Brand)',
-                hsnCode: '83024110',
-                unit: 'gz',
-                quantity: 10,
-                rate: 360.00,
-                totalAmount: 3600.00
+            customerData: {
+                billingAddress: {
+                    name: rawInvoice?.customer?.name || invoice?.customerName || 'Customer Name',
+                    address: rawInvoice?.customer?.address || '',
+                    city: rawInvoice?.customer?.city || '',
+                    eximCode: rawInvoice?.customer?.EximCode || '',
+                    country: rawInvoice?.customer?.country || 'Nepal'
+                },
+                shippingAddress: {
+                    name: rawInvoice?.customer?.name || invoice?.customerName || 'Customer Name',
+                    address: rawInvoice?.customer?.address || '',
+                    city: rawInvoice?.customer?.city || '',
+                    eximCode: rawInvoice?.customer?.EximCode || '',
+                    country: rawInvoice?.customer?.country || 'Nepal'
+                }
             },
-            {
-                description: 'Safety 4" (Door King Brand)',
-                hsnCode: '83024110',
-                unit: 'gz',
-                quantity: 5,
-                rate: 500.00,
-                totalAmount: 2500.00
+            invoiceDetails: {
+                invoiceNumber: rawInvoice?.invoiceNumber || invoice?.invoiceNumber || '1',
+                invoiceDate: rawInvoice?.invoiceDate || invoice?.date || new Date().toISOString().split('T')[0],
+                supplyDate: rawInvoice?.dateOfSupply || rawInvoice?.invoiceDate || invoice?.date || new Date().toISOString().split('T')[0],
+                marka: rawInvoice?.marka || '',
+                transport: rawInvoice?.transportation || ''
             },
-            {
-                description: 'Tower Bolt 4" (Anti Brand)',
-                hsnCode: '83024110',
-                unit: 'doz',
-                quantity: 200,
-                rate: 174.00,
-                totalAmount: 34800.00
-            },
-            {
-                description: 'Tower Bolt 6" (Anti Brand)',
-                hsnCode: '83024110',
-                unit: 'doz',
-                quantity: 150,
-                rate: 194.00,
-                totalAmount: 29100.00
-            },
-            {
-                description: 'Tower Bolt 8" (Anti Brand)',
-                hsnCode: '83024110',
-                unit: 'doz',
-                quantity: 100,
-                rate: 214.00,
-                totalAmount: 21400.00
-            },
-            {
-                description: 'Door Handle Set (Premium)',
-                hsnCode: '83024110',
-                unit: 'set',
-                quantity: 50,
-                rate: 450.00,
-                totalAmount: 22500.00
-            },
-            {
-                description: 'Window Lock (Standard)',
-                hsnCode: '83024110',
-                unit: 'pcs',
-                quantity: 75,
-                rate: 125.00,
-                totalAmount: 9375.00
-            },
-            {
-                description: 'Door Hinges 4" Heavy Duty',
-                hsnCode: '83024110',
-                unit: 'pair',
-                quantity: 200,
-                rate: 95.00,
-                totalAmount: 19000.00
-            },
-            {
-                description: 'Mortise Lock Set with Keys',
-                hsnCode: '83024110',
-                unit: 'set',
-                quantity: 25,
-                rate: 850.00,
-                totalAmount: 21250.00
-            },
-            {
-                description: 'Cabinet Handle (Aluminum)',
-                hsnCode: '83024110',
-                unit: 'pcs',
-                quantity: 300,
-                rate: 45.00,
-                totalAmount: 13500.00
-            },
-            {
-                description: 'Sliding Door Track System',
-                hsnCode: '83024110',
-                unit: 'set',
-                quantity: 20,
-                rate: 1200.00,
-                totalAmount: 24000.00
-            },
-            // {
-            //     description: 'Door Handle Set (Premium)',
-            //     hsnCode: '83024110',
-            //     unit: 'set',
-            //     quantity: 50,
-            //     rate: 450.00,
-            //     totalAmount: 22500.00
-            // },
-            // {
-            //     description: 'Window Lock (Standard)',
-            //     hsnCode: '83024110',
-            //     unit: 'pcs',
-            //     quantity: 75,
-            //     rate: 125.00,
-            //     totalAmount: 9375.00
-            // },
-            // {
-            //     description: 'Door Hinges 4" Heavy Duty',
-            //     hsnCode: '83024110',
-            //     unit: 'pair',
-            //     quantity: 200,
-            //     rate: 95.00,
-            //     totalAmount: 19000.00
-            // },
-            // {
-            //     description: 'Mortise Lock Set with Keys',
-            //     hsnCode: '83024110',
-            //     unit: 'set',
-            //     quantity: 25,
-            //     rate: 850.00,
-            //     totalAmount: 21250.00
-            // },
-            // {
-            //     description: 'Cabinet Handle (Aluminum)',
-            //     hsnCode: '83024110',
-            //     unit: 'pcs',
-            //     quantity: 300,
-            //     rate: 45.00,
-            //     totalAmount: 13500.00
-            // },
-            // {
-            //     description: 'Sliding Door Track System',
-            //     hsnCode: '83024110',
-            //     unit: 'set',
-            //     quantity: 20,
-            //     rate: 1200.00,
-            //     totalAmount: 24000.00
-            // },
-            // {
-            //     description: 'Security Chain Lock',
-            //     hsnCode: '83024110',
-            //     unit: 'pcs',
-            //     quantity: 100,
-            //     rate: 75.00,
-            //     totalAmount: 7500.00
-            // },
-            // {
-            //     description: 'Door Stopper (Rubber)',
-            //     hsnCode: '83024110',
-            //     unit: 'pcs',
-            //     quantity: 150,
-            //     rate: 25.00,
-            //     totalAmount: 3750.00
-            // },
-            // {
-            //     description: 'Concealed Hinges (Soft Close)',
-            //     hsnCode: '83024110',
-            //     unit: 'pair',
-            //     quantity: 80,
-            //     rate: 165.00,
-            //     totalAmount: 13200.00
-            // },
-            // {
-            //     description: 'Magnetic Door Catch',
-            //     hsnCode: '83024110',
-            //     unit: 'pcs',
-            //     quantity: 120,
-            //     rate: 35.00,
-            //     totalAmount: 4200.00
-            // },
-            // {
-            //     description: 'Pull Handle for Glass Door',
-            //     hsnCode: '83024110',
-            //     unit: 'pcs',
-            //     quantity: 60,
-            //     rate: 275.00,
-            //     totalAmount: 16500.00
-            // },
-            // {
-            //     description: 'Flush Bolt for French Doors',
-            //     hsnCode: '83024110',
-            //     unit: 'set',
-            //     quantity: 40,
-            //     rate: 385.00,
-            //     totalAmount: 15400.00
-            // },
-            // {
-            //     description: 'Door Viewer (Peephole)',
-            //     hsnCode: '83024110',
-            //     unit: 'pcs',
-            //     quantity: 90,
-            //     rate: 55.00,
-            //     totalAmount: 4950.00
-            // },
-            // {
-            //     description: 'Automatic Door Closer',
-            //     hsnCode: '83024110',
-            //     unit: 'pcs',
-            //     quantity: 15,
-            //     rate: 950.00,
-            //     totalAmount: 14250.00
-            // }
-        ]
+            items: rawInvoice?.invoiceItems?.map(item => ({
+                description: item?.description || '',
+                hsnCode: item?.hsnCode || '',
+                unit: item?.unit || 'PCS',
+                quantity: parseFloat(item?.quantity) || 0,
+                rate: parseFloat(item?.rate) || 0,
+                taxableAmount: parseFloat(item?.amount) || 0,
+                cgstAmount: parseFloat(item?.cgstAmount) || 0,
+                sgstAmount: parseFloat(item?.sgstAmount) || 0,
+                igstAmount: parseFloat(item?.igstAmount) || 0,
+                totalAmount: parseFloat(item?.totalAmount) || 0
+            })) || [],
+            additionalCharges: {
+                shipping: 0,
+                other: 0
+            }
+        };
     };
 
+    const invoiceData = transformInvoiceForPDF(selectedInvoice);
+
     const handleDownloadPDF = async () => {
+        if (!invoiceData) {
+            alert('Please select an invoice first');
+            return;
+        }
         setIsGenerating(true);
         try {
-            const result = downloadInvoicePDF(sampleInvoiceData, 'test-invoice.pdf');
+            const result = downloadInvoicePDF(invoiceData, `invoice-${invoiceData.invoiceDetails.invoiceNumber}.pdf`);
             if (result.success) {
                 console.log('PDF downloaded successfully');
             } else {
@@ -258,10 +128,18 @@ const PDFPreview = () => {
     };
 
     const handlePreviewPDF = async () => {
+        if (!invoiceData) {
+            alert('Please select an invoice first');
+            return;
+        }
         setIsGenerating(true);
         try {
-            const result = getInvoicePDFBlob(sampleInvoiceData);
+            const result = getInvoicePDFBlob(invoiceData);
             if (result.success) {
+                // Revoke old URL if exists
+                if (previewUrl) {
+                    URL.revokeObjectURL(previewUrl);
+                }
                 const url = URL.createObjectURL(result.blob);
                 setPreviewUrl(url);
             } else {
@@ -289,94 +167,161 @@ const PDFPreview = () => {
                 <div className="bg-white rounded-lg shadow-lg p-6">
                     <h1 className="text-3xl font-bold text-gray-800 mb-6">PDF Preview & Test</h1>
 
+                    {/* Loading State */}
+                    {loading && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                <p className="text-blue-700">Loading invoices...</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* No Invoices State */}
+                    {!loading && invoices.length === 0 && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <p className="text-yellow-700">No invoices found. Please create an invoice first.</p>
+                        </div>
+                    )}
+
+                    {/* Invoice Selector */}
+                    {!loading && invoices.length > 0 && (
+                        <div className="bg-gray-100 rounded-lg p-4 mb-6">
+                            <h2 className="text-lg font-semibold mb-3">Select Invoice</h2>
+                            <select
+                                value={selectedInvoiceId || ''}
+                                onChange={(e) => {
+                                    setSelectedInvoiceId(e.target.value);
+                                    // Clear preview when changing invoice
+                                    if (previewUrl) {
+                                        URL.revokeObjectURL(previewUrl);
+                                        setPreviewUrl(null);
+                                    }
+                                }}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                {invoices.map((invoice) => (
+                                    <option key={invoice.id} value={invoice.id}>
+                                        Invoice #{invoice.raw?.invoiceNumber || invoice.invoiceNumber} - {invoice.customerName} - ₹{parseFloat(invoice.totalAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
                     {/* Control Panel */}
-                    <div className="bg-gray-100 rounded-lg p-4 mb-6">
-                        <h2 className="text-lg font-semibold mb-4">Test Controls</h2>
-                        <div className="flex flex-wrap gap-4">
-                            <button
-                                onClick={handleDownloadPDF}
-                                disabled={isGenerating}
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                            >
-                                {isGenerating ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                        Generating...
-                                    </>
-                                ) : (
-                                    <>
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Download PDF
-                                    </>
-                                )}
-                            </button>
-
-                            <button
-                                onClick={handlePreviewPDF}
-                                disabled={isGenerating}
-                                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                            >
-                                {isGenerating ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                        Generating...
-                                    </>
-                                ) : (
-                                    <>
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        Preview PDF
-                                    </>
-                                )}
-                            </button>
-
-                            {previewUrl && (
+                    {!loading && invoices.length > 0 && (
+                        <div className="bg-gray-100 rounded-lg p-4 mb-6">
+                            <h2 className="text-lg font-semibold mb-4">Test Controls</h2>
+                            <div className="flex flex-wrap gap-4">
                                 <button
-                                    onClick={clearPreview}
-                                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                                    onClick={handleDownloadPDF}
+                                    disabled={isGenerating}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    Clear Preview
+                                    {isGenerating ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            Generating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            Download PDF
+                                        </>
+                                    )}
                                 </button>
-                            )}
-                        </div>
-                    </div>
 
-                    {/* Sample Data Display */}
-                    <div className="bg-gray-100 rounded-lg p-4 mb-6">
-                        <h2 className="text-lg font-semibold mb-4">Sample Invoice Data</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <h3 className="font-medium text-gray-700 mb-2">Invoice Details</h3>
-                                <div className="space-y-1 text-gray-600">
-                                    <p><span className="font-medium">Number:</span> {sampleInvoiceData.invoiceDetails.invoiceNumber}</p>
-                                    <p><span className="font-medium">Date:</span> {sampleInvoiceData.invoiceDetails.invoiceDate}</p>
-                                    <p><span className="font-medium">State:</span> {sampleInvoiceData.invoiceDetails.state}</p>
-                                    <p><span className="font-medium">Transportation:</span> {sampleInvoiceData.invoiceDetails.transportation}</p>
+                                <button
+                                    onClick={handlePreviewPDF}
+                                    disabled={isGenerating}
+                                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {isGenerating ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            Generating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            Preview PDF
+                                        </>
+                                    )}
+                                </button>
+
+                                {previewUrl && (
+                                    <button
+                                        onClick={clearPreview}
+                                        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        Clear Preview
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Invoice Data Display */}
+                    {!loading && invoices.length > 0 && invoiceData && (
+                        <div className="bg-gray-100 rounded-lg p-4 mb-6">
+                            <h2 className="text-lg font-semibold mb-4">Selected Invoice Data</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                <div>
+                                    <h3 className="font-medium text-gray-700 mb-2">Company Details</h3>
+                                    <div className="space-y-1 text-gray-600">
+                                        <p><span className="font-medium">Name:</span> {invoiceData.companyData.companyName}</p>
+                                        <p><span className="font-medium">GSTIN:</span> {invoiceData.companyData.gstin}</p>
+                                        <p><span className="font-medium">IEC:</span> {invoiceData.companyData.iecCode}</p>
+                                        <p><span className="font-medium">City:</span> {invoiceData.companyData.city}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 className="font-medium text-gray-700 mb-2">Invoice Details</h3>
+                                    <div className="space-y-1 text-gray-600">
+                                        <p><span className="font-medium">Number:</span> {invoiceData.invoiceDetails.invoiceNumber}</p>
+                                        <p><span className="font-medium">Date:</span> {invoiceData.invoiceDetails.invoiceDate}</p>
+                                        <p><span className="font-medium">Marka:</span> {invoiceData.invoiceDetails.marka || 'N/A'}</p>
+                                        <p><span className="font-medium">Transport:</span> {invoiceData.invoiceDetails.transport || 'N/A'}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 className="font-medium text-gray-700 mb-2">Customer</h3>
+                                    <div className="space-y-1 text-gray-600">
+                                        <p><span className="font-medium">Name:</span> {invoiceData.customerData.billingAddress.name}</p>
+                                        <p><span className="font-medium">City:</span> {invoiceData.customerData.billingAddress.city}</p>
+                                        <p><span className="font-medium">Country:</span> {invoiceData.customerData.billingAddress.country}</p>
+                                        <p><span className="font-medium">Exim Code:</span> {invoiceData.customerData.billingAddress.eximCode || 'N/A'}</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <h3 className="font-medium text-gray-700 mb-2">Customer</h3>
-                                <div className="space-y-1 text-gray-600">
-                                    <p><span className="font-medium">Name:</span> {sampleInvoiceData.billedTo.name}</p>
-                                    <p><span className="font-medium">GSTIN:</span> {sampleInvoiceData.billedTo.gstin}</p>
-                                    <p><span className="font-medium">Contact:</span> {sampleInvoiceData.billedTo.contactNumber}</p>
+                            <div className="mt-4">
+                                <h3 className="font-medium text-gray-700 mb-2">Items ({invoiceData.items.length})</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-gray-600 text-sm">
+                                    <div>
+                                        <span className="font-medium">Subtotal:</span> ₹{invoiceData.items.reduce((sum, item) => sum + item.taxableAmount, 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                    </div>
+                                    <div>
+                                        <span className="font-medium">IGST:</span> ₹{invoiceData.items.reduce((sum, item) => sum + item.igstAmount, 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                    </div>
+                                    <div>
+                                        <span className="font-medium">Total:</span> ₹{invoiceData.items.reduce((sum, item) => sum + item.totalAmount, 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                    </div>
+                                    <div>
+                                        <span className="font-medium">Items:</span> {invoiceData.items.length}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-4">
-                            <h3 className="font-medium text-gray-700 mb-2">Items ({sampleInvoiceData.items.length})</h3>
-                            <div className="text-gray-600 text-sm">
-                                Total Amount: ₹{sampleInvoiceData.items.reduce((sum, item) => sum + item.totalAmount, 0).toLocaleString('en-IN')}
-                            </div>
-                        </div>
-                    </div>
+                    )}
 
                     {/* PDF Preview */}
                     {previewUrl && (
@@ -400,11 +345,12 @@ const PDFPreview = () => {
                     <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <h3 className="text-lg font-semibold text-blue-800 mb-2">Instructions</h3>
                         <ul className="list-disc list-inside space-y-1 text-blue-700 text-sm">
+                            <li><strong>Select Invoice:</strong> Choose any invoice from your invoice list to test PDF generation</li>
                             <li><strong>Download PDF:</strong> Generates and downloads the PDF file directly to your computer</li>
                             <li><strong>Preview PDF:</strong> Shows the PDF in an embedded viewer below for testing</li>
-                            <li><strong>Sample Data:</strong> Uses predefined invoice data for consistent testing</li>
+                            <li><strong>Real Data:</strong> Uses actual invoice data from your database for accurate testing</li>
                             <li>Check the browser console for any error messages or debugging information</li>
-                            <li>Test different screen sizes and ensure the PDF layout remains consistent</li>
+                            <li>Test different invoices to ensure the PDF layout remains consistent</li>
                         </ul>
                     </div>
                 </div>

@@ -552,6 +552,7 @@ const InvoiceCreation = () => {
                 invoiceDetails={invoiceDetails}
                 items={invoiceItems}
                 additionalCharges={additionalCharges}
+                bankDetails={autoPopulatedBankDetails}
             />
         </div >
     );

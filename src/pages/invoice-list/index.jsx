@@ -236,6 +236,12 @@ const InvoiceList = () => {
                 bankIfscCode: rawInvoice?.company?.bankIfscCode || '',
                 bankBranch: rawInvoice?.company?.bankBranch || ''
             },
+            bankDetails: {
+                bankName: rawInvoice?.company?.bankName || '',
+                accountNumber: rawInvoice?.company?.bankAccountNumber || '',
+                ifscCode: rawInvoice?.company?.bankIfscCode || '',
+                branchName: rawInvoice?.company?.bankBranch || ''
+            },
             customerData: {
                 billingAddress: {
                     name: rawInvoice?.customer?.name || invoice?.customerName || 'Customer Name',
