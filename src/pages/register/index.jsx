@@ -180,7 +180,7 @@ const Register = () => {
             })
 
             console.log(data, error)
-            
+
             if (error) {
                 setErrors({ general: error.message || 'Registration failed. Please try again.' });
                 return;

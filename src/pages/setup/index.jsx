@@ -1,10 +1,10 @@
 import { Building2, CreditCard, MapPin, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { useMyCompanyService } from '../../api/myCompany';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { useAuth } from '../../context/AuthContext';
 
 const Setup = () => {
     const navigate = useNavigate();
@@ -180,13 +180,13 @@ const Setup = () => {
         } catch (error) {
             console.error('Error creating profile:', error);
             console.error('Error response:', error.response?.data);
-            
-            const errorMessage = error.response?.data?.details 
+
+            const errorMessage = error.response?.data?.details
                 ? `Validation error: ${JSON.stringify(error.response.data.details)}`
-                : error.response?.data?.error 
-                ? error.response.data.error
-                : 'Failed to create company profile. Please try again.';
-            
+                : error.response?.data?.error
+                    ? error.response.data.error
+                    : 'Failed to create company profile. Please try again.';
+
             alert(errorMessage);
         } finally {
             setSaving(false);
@@ -209,19 +209,17 @@ const Setup = () => {
             <div className="flex items-center justify-between">
                 {[1, 2, 3, 4].map((step) => (
                     <div key={step} className="flex items-center flex-1">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
-                            step === currentStep
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${step === currentStep
                                 ? 'bg-indigo-600 text-white'
                                 : step < currentStep
-                                ? 'bg-green-500 text-white'
-                                : 'bg-gray-200 text-gray-600'
-                        }`}>
+                                    ? 'bg-green-500 text-white'
+                                    : 'bg-gray-200 text-gray-600'
+                            }`}>
                             {step < currentStep ? '✓' : step}
                         </div>
                         {step < 4 && (
-                            <div className={`flex-1 h-1 mx-2 ${
-                                step < currentStep ? 'bg-green-500' : 'bg-gray-200'
-                            }`} />
+                            <div className={`flex-1 h-1 mx-2 ${step < currentStep ? 'bg-green-500' : 'bg-gray-200'
+                                }`} />
                         )}
                     </div>
                 ))}
@@ -572,7 +570,7 @@ const Setup = () => {
                                 Skip
                             </Button>
                         )}
-                        
+
                         {currentStep < 4 ? (
                             <Button onClick={handleNext}>
                                 Next

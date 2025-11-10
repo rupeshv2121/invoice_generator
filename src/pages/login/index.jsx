@@ -82,7 +82,7 @@ const Login = () => {
                 // Check if user has completed company profile setup
                 try {
                     const companyProfile = await getMyCompany();
-                    
+
                     if (companyProfile && companyProfile.id) {
                         // User has completed setup, go to dashboard
                         navigate('/dashboard', { replace: true });
@@ -122,7 +122,7 @@ const Login = () => {
             if (session) {
                 try {
                     const companyProfile = await getMyCompany();
-                    
+
                     if (companyProfile && companyProfile.id) {
                         navigate("/dashboard", { replace: true });
                     } else {
@@ -134,7 +134,7 @@ const Login = () => {
                 }
             }
         };
-        
+
         checkSessionAndProfile();
     }, [session]);
     if (loading) {
