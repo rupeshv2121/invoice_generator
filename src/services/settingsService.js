@@ -1,6 +1,41 @@
 // Settings Service for managing application settings including terms & conditions
 
-let settingsData = {
+// Storage key for localStorage
+const STORAGE_KEY = 'invoiceGeneratorSettings';
+
+// Load settings from localStorage or use defaults
+const loadSettings = () => {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            // Merge with defaults to ensure new fields are present
+            return {
+                ...getDefaultSettings(),
+                ...parsed,
+                invoiceSettings: {
+                    ...getDefaultSettings().invoiceSettings,
+                    ...parsed.invoiceSettings
+                }
+            };
+        }
+    } catch (error) {
+        console.error('Error loading settings from localStorage:', error);
+    }
+    return getDefaultSettings();
+};
+
+// Save settings to localStorage
+const saveSettings = () => {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settingsData));
+    } catch (error) {
+        console.error('Error saving settings to localStorage:', error);
+    }
+};
+
+// Get default settings structure
+const getDefaultSettings = () => ({
     // Terms & Conditions that will be automatically added to invoices
     termsAndConditions: [
         "Payment is due within 30 days of invoice date.",
@@ -50,7 +85,10 @@ let settingsData = {
         numberFormat: "indian", // indian, international
         showAdvancedFields: false
     }
-};
+});
+
+// Initialize settings from localStorage or defaults
+let settingsData = loadSettings();
 
 /**
  * Get all settings
@@ -74,6 +112,7 @@ export const getTermsAndConditions = () => {
  */
 export const updateTermsAndConditions = (terms) => {
     settingsData.termsAndConditions = [...terms];
+    saveSettings();
 };
 
 /**
@@ -93,6 +132,7 @@ export const updateInvoiceSettings = (settings) => {
         ...settingsData.invoiceSettings,
         ...settings
     };
+    saveSettings();
 };
 
 /**
@@ -109,6 +149,7 @@ export const getNextInvoiceNumber = () => {
  */
 export const incrementInvoiceNumber = () => {
     settingsData.invoiceSettings.currentNumber += 1;
+    saveSettings(); // Persist the incremented number
     return getNextInvoiceNumber();
 };
 
@@ -129,6 +170,7 @@ export const updateDefaultValues = (values) => {
         ...settingsData.defaultValues,
         ...values
     };
+    saveSettings();
 };
 
 /**
@@ -148,51 +190,13 @@ export const updateDisplayPreferences = (preferences) => {
         ...settingsData.display,
         ...preferences
     };
+    saveSettings();
 };
 
 /**
  * Reset settings to default
  */
 export const resetToDefault = () => {
-    settingsData = {
-        termsAndConditions: [
-            "Payment is due within 30 days of invoice date.",
-            "Late payments may incur additional charges.",
-            "All disputes must be raised within 7 days of invoice receipt.",
-            "Goods once sold will not be taken back.",
-            "Subject to jurisdiction of exporter's location only."
-        ],
-        invoiceSettings: {
-            startingNumber: 1,
-            currentNumber: 1001,
-            autoGenerateNumber: true,
-            showBankDetails: true,
-            showTermsAndConditions: true,
-            showCompanyLogo: true,
-            defaultCurrency: "USD",
-            defaultPaymentTerms: "30 Days from Invoice Date",
-            showHSNCode: true,
-            showExportCompliance: true
-        },
-        defaultValues: {
-            paymentTerms: "30 Days from Invoice Date",
-            dueDays: 30,
-            currency: "USD",
-            shippingTerms: "FOB",
-            bankCharges: "On Account of Buyer",
-            marka: "",
-            transport: ""
-        },
-        notifications: {
-            emailOnInvoiceCreation: true,
-            emailOnPaymentReceived: true,
-            reminderBeforeDueDate: 3
-        },
-        display: {
-            theme: "light",
-            dateFormat: "DD/MM/YYYY",
-            numberFormat: "indian",
-            showAdvancedFields: false
-        }
-    };
+    settingsData = getDefaultSettings();
+    saveSettings();
 };

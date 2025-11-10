@@ -13,22 +13,22 @@ const Register = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
         // Personal Details
-        fullName: 'Rupesh Varshney',
-        email: 'rupeshvarshney7@gmail.com',
-        phone: '1234567890',
+        fullName: '',
+        email: '',
+        phone: '',
 
         // Business Information
-        companyName: 'Rupesh Traders',
+        companyName: '',
         // businessType: '',
         // industry: '',
 
         // Account Credentials
-        password: 'Rupesh@1234',
-        confirmPassword: 'Rupesh@1234',
+        password: '',
+        confirmPassword: '',
 
         // GST Information
-        gstRegistered: true,
-        gstin: '29AAAPL1234C1Z5',
+        gstRegistered: false,
+        gstin: '',
 
         // Legal
         termsAccepted: false,
@@ -180,13 +180,25 @@ const Register = () => {
             })
 
             console.log(data, error)
-            if (data.session) {
-                setSession(data.session);
-                navigate("/dashboard", { replace: true });
+            
+            if (error) {
+                setErrors({ general: error.message || 'Registration failed. Please try again.' });
+                return;
             }
-            else {
-                // If email confirmation is ON, session will be null
-                alert("Please check your email to confirm your account.");
+
+            // Check if user was created successfully
+            if (data.user) {
+                // If session exists, user can login immediately (email confirmation disabled)
+                if (data.session) {
+                    setSession(data.session);
+                    navigate("/setup", { replace: true });
+                } else {
+                    // Email confirmation is required
+                    alert("Registration successful! Please check your email to confirm your account, then login.");
+                    navigate("/login", { replace: true });
+                }
+            } else {
+                setErrors({ general: 'Registration failed. Please try again.' });
             }
         } catch (error) {
             setErrors({ general: 'Registration failed. Please try again.' });

@@ -1,6 +1,7 @@
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useMyCompanyService } from '../../api/myCompany';
 import Button from '../../components/ui/Button';
 import { Checkbox } from '../../components/ui/Checkbox';
 import Input from '../../components/ui/Input';
@@ -10,6 +11,7 @@ import { supabase } from '../../supabaseClient';
 const Login = () => {
     const navigate = useNavigate();
     const { session, setSession, loading } = useAuth();
+    const { getMyCompany } = useMyCompanyService();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -77,8 +79,22 @@ const Login = () => {
                 // Optional: store session in localStorage
                 localStorage.setItem('supabaseSession', JSON.stringify(data.session));
 
-                // Navigate to dashboard
-                navigate('/dashboard', { replace: true });
+                // Check if user has completed company profile setup
+                try {
+                    const companyProfile = await getMyCompany();
+                    
+                    if (companyProfile && companyProfile.id) {
+                        // User has completed setup, go to dashboard
+                        navigate('/dashboard', { replace: true });
+                    } else {
+                        // User hasn't completed setup, redirect to setup wizard
+                        navigate('/setup', { replace: true });
+                    }
+                } catch (error) {
+                    // If error checking profile, assume setup not complete
+                    console.error('Error checking company profile:', error);
+                    navigate('/setup', { replace: true });
+                }
             } else {
                 setErrors({ general: 'Login failed. Please check your credentials.' });
             }
@@ -102,7 +118,24 @@ const Login = () => {
     };
 
     useEffect(() => {
-        if (session) navigate("/dashboard", { replace: true });
+        const checkSessionAndProfile = async () => {
+            if (session) {
+                try {
+                    const companyProfile = await getMyCompany();
+                    
+                    if (companyProfile && companyProfile.id) {
+                        navigate("/dashboard", { replace: true });
+                    } else {
+                        navigate("/setup", { replace: true });
+                    }
+                } catch (error) {
+                    console.error('Error checking company profile:', error);
+                    navigate("/setup", { replace: true });
+                }
+            }
+        };
+        
+        checkSessionAndProfile();
     }, [session]);
     if (loading) {
         return (

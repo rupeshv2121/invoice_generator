@@ -17,6 +17,7 @@ import PDFPreview from "./pages/pdf-preview";
 import Register from "./pages/register";
 import Reports from "./pages/reports";
 import Settings from "./pages/settings";
+import Setup from "./pages/setup";
 
 const Routes = () => {
     return (
@@ -29,6 +30,16 @@ const Routes = () => {
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+
+                        {/* Setup Route - Semi-Protected (requires auth but not company profile) */}
+                        <Route
+                            path="/setup"
+                            element={
+                                <ProtectedRoute>
+                                    <Setup />
+                                </ProtectedRoute>
+                            }
+                        />
 
                         {/* Protected Routes */}
                         <Route
