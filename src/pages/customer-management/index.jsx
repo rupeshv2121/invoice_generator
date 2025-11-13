@@ -142,17 +142,31 @@ const CustomerManagement = () => {
             console.log("Saving customer data:", customerData);
 
             if (modalMode === 'add') {
-                await addCustomer(customerData);
+                const result = await addCustomer(customerData);
+                console.log("Customer created successfully:", result);
             } else {
-                await updateCustomer(selectedCustomer.id, customerData);
+                const result = await updateCustomer(selectedCustomer.id, customerData);
+                console.log("Customer updated successfully:", result);
             }
 
-            await loadCustomers(); // Reload customers after save
+            // Reload customers after save
+            await loadCustomers();
+
+            // Close modal and reset
             setIsModalOpen(false);
             setSelectedCustomer(null);
+
+            // Show success message
+            alert(modalMode === 'add' ? 'Customer added successfully!' : 'Customer updated successfully!');
         } catch (error) {
             console.error('Error saving customer:', error);
-            alert('Error saving customer. Please try again.');
+            console.error('Error response:', error?.response?.data);
+
+            // Show specific error message
+            const errorMessage = error?.response?.data?.error ||
+                error?.response?.data?.message ||
+                'Error saving customer. Please try again.';
+            alert(errorMessage);
         }
     };
 

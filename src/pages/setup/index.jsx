@@ -2,6 +2,7 @@ import { Building2, CreditCard, MapPin, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMyCompanyService } from '../../api/myCompany';
+import { useSubscriptionService } from '../../api/subscription';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { useAuth } from '../../context/AuthContext';
@@ -10,6 +11,7 @@ const Setup = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { createCompany, getMyCompany } = useMyCompanyService();
+    const { createTrialSubscription } = useSubscriptionService();
 
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -176,6 +178,16 @@ const Setup = () => {
             console.log('Creating company profile with data:', profileData);
             const result = await createCompany(profileData);
             console.log('Company profile created successfully:', result);
+
+            // Create trial subscription
+            try {
+                const subscription = await createTrialSubscription();
+                console.log('Trial subscription created:', subscription);
+            } catch (subError) {
+                console.warn('Trial subscription creation failed (user may already have one):', subError);
+                // Continue anyway - subscription might already exist
+            }
+
             navigate('/dashboard', { replace: true });
         } catch (error) {
             console.error('Error creating profile:', error);
@@ -210,10 +222,10 @@ const Setup = () => {
                 {[1, 2, 3, 4].map((step) => (
                     <div key={step} className="flex items-center flex-1">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${step === currentStep
-                                ? 'bg-indigo-600 text-white'
-                                : step < currentStep
-                                    ? 'bg-green-500 text-white'
-                                    : 'bg-gray-200 text-gray-600'
+                            ? 'bg-indigo-600 text-white'
+                            : step < currentStep
+                                ? 'bg-green-500 text-white'
+                                : 'bg-gray-200 text-gray-600'
                             }`}>
                             {step < currentStep ? '✓' : step}
                         </div>

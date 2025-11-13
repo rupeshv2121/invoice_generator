@@ -3,6 +3,8 @@ import { useCustomersService } from '../../api/customers';
 import { useDashboardService } from '../../api/dashboard';
 import { useInvoiceService } from '../../api/invoice';
 import { useItemService } from '../../api/items';
+import SubscriptionBanner from '../../components/SubscriptionBanner';
+import SubscriptionStatusCard from '../../components/SubscriptionStatusCard';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
@@ -190,6 +192,9 @@ const Dashboard = () => {
                         </p>
                     </div>
 
+                    {/* Subscription Banner */}
+                    <SubscriptionBanner />
+
                     {loading ? (
                         <div className="flex justify-center items-center py-20">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -229,7 +234,11 @@ const Dashboard = () => {
                                 <div className="xl:col-span-2">
                                     <RecentInvoicesTable invoices={dashboardData?.recentInvoices} />
                                 </div>
-                                <div>
+                                <div className="space-y-6">
+                                    {/* Subscription Status Card */}
+                                    <SubscriptionStatusCard />
+
+                                    {/* Payment Reminders */}
                                     <PaymentReminders reminders={dashboardData?.paymentReminders} />
                                 </div>
                             </div>

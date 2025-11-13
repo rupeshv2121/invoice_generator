@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useSubscription } from '../../context/SubscriptionContext';
 import { supabase } from '../../supabaseClient';
 import Icon from '../AppIcon';
 import Button from './Button';
@@ -11,6 +12,12 @@ const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { setSession } = useAuth();
+    const {
+        subscription,
+        isTrialActive,
+        getDaysRemaining,
+        getSubscriptionPlan
+    } = useSubscription();
 
     const navigationItems = [
         { label: 'Dashboard', path: '/dashboard', icon: 'LayoutDashboard' },
@@ -77,6 +84,24 @@ const Header = () => {
 
                 {/* Right Side Actions */}
                 <div className="flex items-center space-x-4">
+                    {/* Subscription Badge (Desktop) */}
+                    {subscription && (
+                        <Link
+                            to="/pricing"
+                            className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 hover:border-indigo-300 transition-all cursor-pointer group"
+                        >
+                            <Icon name="Crown" size={14} className="text-indigo-600" />
+                            <span className="text-xs font-medium text-indigo-700">
+                                {isTrialActive() ? (
+                                    <>Trial: {getDaysRemaining()}d left</>
+                                ) : (
+                                    <>{getSubscriptionPlan()}</>
+                                )}
+                            </span>
+                            <Icon name="ChevronRight" size={12} className="text-indigo-400 group-hover:translate-x-0.5 transition-transform" />
+                        </Link>
+                    )}
+
                     {/* User Profile Dropdown */}
                     <div className="relative">
                         <Button
