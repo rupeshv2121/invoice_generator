@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useCustomersService } from '../../api/customers';
 import { useInvoiceService } from '../../api/invoice';
 import Breadcrumb from '../../components/ui/Breadcrumb';
@@ -135,15 +135,15 @@ const Reports = () => {
             const monthlyRevenue = [];
             const startDateObj = new Date(startDate);
             const endDateObj = new Date(endDate);
-            
+
             // Calculate the number of months in the range
-            const monthDiff = (endDateObj.getFullYear() - startDateObj.getFullYear()) * 12 + 
-                             (endDateObj.getMonth() - startDateObj.getMonth());
-            
+            const monthDiff = (endDateObj.getFullYear() - startDateObj.getFullYear()) * 12 +
+                (endDateObj.getMonth() - startDateObj.getMonth());
+
             // If range is less than 12 months, show only that range
             // Otherwise, show last 12 months
             const monthsToShow = Math.min(monthDiff + 1, 12);
-            
+
             for (let i = monthsToShow - 1; i >= 0; i--) {
                 const monthDate = new Date(endDateObj.getFullYear(), endDateObj.getMonth() - i, 1);
                 const monthName = monthDate.toLocaleString('default', { month: 'short' });
