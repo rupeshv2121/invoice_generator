@@ -1,7 +1,7 @@
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const GSTComplianceSection = ({ gstData = {}, invoices = [], dateRange = {} }) => {
+const GSTComplianceSection = ({ gstData = {}, invoices = [], dateRange = {}, loading = false }) => {
     const currentPeriod = {
         period: dateRange.start && dateRange.end ?
             `${new Date(dateRange.start).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })} - ${new Date(dateRange.end).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}` :
@@ -60,6 +60,19 @@ const GSTComplianceSection = ({ gstData = {}, invoices = [], dateRange = {} }) =
             default: return 'text-text-secondary bg-muted';
         }
     };
+
+    if (loading) {
+        return (
+            <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+                    <h2 className="text-lg sm:text-xl font-semibold text-foreground">GST Compliance</h2>
+                </div>
+                <div className="flex items-center justify-center py-20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-card rounded-lg border border-border p-4 sm:p-6">

@@ -1,7 +1,7 @@
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const CustomerAnalysis = ({ topCustomers = [], invoices = [] }) => {
+const CustomerAnalysis = ({ topCustomers = [], invoices = [], loading = false }) => {
     // Use provided data or fallback to empty array
     const defaultTopCustomers = topCustomers.length > 0 ? topCustomers : [];
 
@@ -98,6 +98,18 @@ const CustomerAnalysis = ({ topCustomers = [], invoices = [] }) => {
             case 'poor': return 'TrendingDown';
             default: return 'Circle';
         }
+    };
+
+    if (loading) {
+        return (
+            <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4 sm:mb-6">Customer Analysis</h2>
+                <div className="flex items-center justify-center py-20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+            </div>
+        );
+    }
     };
 
     return (

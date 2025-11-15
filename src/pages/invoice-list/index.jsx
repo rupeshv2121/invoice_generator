@@ -4,6 +4,7 @@ import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
+import { SkeletonTable } from '../../components/ui/SkeletonLoader';
 import { downloadInvoicePDF } from '../../services/pdfService';
 
 import { useInvoiceService } from '../../api/invoice';
@@ -353,12 +354,7 @@ const InvoiceList = () => {
 
                     {/* Loading State */}
                     {loading ? (
-                        <div className="flex justify-center items-center py-20">
-                            <div className="flex flex-col items-center space-y-4">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                                <p className="text-text-secondary">Loading invoices...</p>
-                            </div>
-                        </div>
+                        <SkeletonTable rows={10} columns={6} />
                     ) : (
                         <>
                             {/* Invoice Table */}

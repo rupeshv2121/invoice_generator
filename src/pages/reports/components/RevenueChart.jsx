@@ -1,6 +1,6 @@
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-const RevenueChart = ({ monthlyRevenue = [], paymentStatus = [] }) => {
+const RevenueChart = ({ monthlyRevenue = [], paymentStatus = [], loading = false }) => {
     // Use provided data or fallback to empty arrays
     const defaultMonthlyRevenue = monthlyRevenue.length > 0 ? monthlyRevenue : [];
     const defaultPaymentStatus = paymentStatus.length > 0 ? paymentStatus : [
@@ -8,6 +8,25 @@ const RevenueChart = ({ monthlyRevenue = [], paymentStatus = [] }) => {
         { name: 'Pending', value: 0, color: '#F59E0B' },
         { name: 'Overdue', value: 0, color: '#EF4444' }
     ];
+
+    if (loading) {
+        return (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 bg-card rounded-lg border border-border p-4 sm:p-6">
+                    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4">Monthly Revenue Trends</h3>
+                    <div className="h-64 sm:h-80 flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    </div>
+                </div>
+                <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
+                    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4">Payment Status</h3>
+                    <div className="h-48 sm:h-64 flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('en-IN', {

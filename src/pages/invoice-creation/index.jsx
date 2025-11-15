@@ -6,6 +6,7 @@ import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
+import { SkeletonInvoiceForm } from '../../components/ui/SkeletonLoader';
 import { downloadInvoicePDF } from '../../services/pdfService';
 import { getDefaultInvoiceValues, getNextInvoiceNumber, incrementInvoiceNumber } from '../../services/settingsService';
 // import { downloadSimpleInvoicePDF } from '../../services/simplePdfService';
@@ -404,12 +405,7 @@ const InvoiceCreation = () => {
 
                     {/* Loading State */}
                     {(loadingCompany || customersLoading || itemsLoading) ? (
-                        <div className="flex justify-center items-center py-20">
-                            <div className="flex flex-col items-center space-y-4">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                                <p className="text-text-secondary">Loading invoice form...</p>
-                            </div>
-                        </div>
+                        <SkeletonInvoiceForm />
                     ) : (
                         <>
                             <div className="flex items-center justify-between mb-6">

@@ -8,6 +8,7 @@ import SubscriptionStatusCard from '../../components/SubscriptionStatusCard';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Header from '../../components/ui/Header';
 import QuickActionButton from '../../components/ui/QuickActionButton';
+import { SkeletonDashboard } from '../../components/ui/SkeletonLoader';
 import { useAuth } from '../../context/AuthContext';
 import GSTSummary from './components/GSTSummary';
 import InvoiceChart from './components/InvoiceChart';
@@ -196,9 +197,7 @@ const Dashboard = () => {
                     <SubscriptionBanner />
 
                     {loading ? (
-                        <div className="flex justify-center items-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                        </div>
+                        <SkeletonDashboard />
                     ) : (
                         <>
                             {/* Metrics Cards */}

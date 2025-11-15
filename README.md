@@ -1,362 +1,200 @@
-# InvoicePro - Professional Invoice Management System<!--
+# InvoicePro - Professional Invoice Management System
 
-README for the Invoice Generator frontend (part of the invoice_generator project).
+<div>This README describes how to run the frontend and how it integrates with the backend service (invoice_generator_server) that provides the API and database.
 
-<div align="center">This README describes how to run the frontend and how it integrates with the backend
+[InvoicePro Logo](https://img.shields.io/badge/InvoicePro-Invoice%20Management-4F46E5?style=for-the-badge&logo=receipt&logoColor=white)
 
-service (invoice_generator_server) that provides the API and database.
-
-![InvoicePro Logo](https://img.shields.io/badge/InvoicePro-Invoice%20Management-4F46E5?style=for-the-badge&logo=receipt&logoColor=white)-->
-
-
-
-[![React](https://img.shields.io/badge/React-18.x-61DAFB?style=flat-square&logo=react&logoColor=white)](https://reactjs.org/)# Invoice Generator — Frontend
-
-[![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
-
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)This repository contains the React frontend for the Invoice Generator project.
-
-[![Supabase](https://img.shields.io/badge/Supabase-Auth-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)It pairs with the `invoice_generator_server` backend (Prisma + Express) located
-
-in the sibling folder `invoice_generator_server` of the workspace.
+This repository contains the React frontend for the Invoice Generator project. It pairs with the `invoice_generator_server` backend (Prisma + Express) located
 
 *A modern, feature-rich invoice generation platform with GST compliance, subscription management, and real-time analytics.*
 
-This README covers:
-
-[Live Demo](#) • [Documentation](#features) • [Backend Repo](../invoice_generator_server)- Project overview
-
-- Local setup and dev commands
-
-</div>- Environment variables and required services
-
-- How the frontend talks to the backend (API shape)
-
----- Quick troubleshooting notes (including recent companyProfileId change)
-
-
-
-## 📋 Table of Contents---
-
-
-
-- [Overview](#overview)## Project overview
+## 📋 Table of Contents
+---
+- [Project Overview](#project-overview)
 
 - [Key Features](#key-features)
 
-- [Tech Stack](#tech-stack)The Invoice Generator frontend is a React (Vite) application. It provides a UI
+- [Tech Stack](#tech-stack)
 
-- [Getting Started](#getting-started)for managing companies, customers, items, and invoices. The frontend uses the
+- [Getting Started](#getting-started)
 
-- [Project Structure](#project-structure)backend API at `http://localhost:3001` by default to perform CRUD operations.
+- [Project Structure](#project-structure)
 
 - [Features in Detail](#features-in-detail)
 
-- [Environment Variables](#environment-variables)Key areas:
+- [Environment Variables](#environment-variables)
 
-- [Scripts](#scripts)- Customer management (create, list, update, delete)
+- [Scripts](#scripts)
 
-- [Architecture](#architecture)- Item management
+- [Architecture](#architecture)
 
-- [Contributing](#contributing)- Invoice creation and preview (PDF)
-
-- Company profile & settings
+- [Contributing](#contributing)
 
 ---
 
-The backend (server) project is expected to be in `../invoice_generator_server`.
-
-## 🎯 OverviewThe backend runs on port `3001` by default and uses Prisma to connect to a
-
-PostgreSQL database.
+## 🎯 Overview : The backend runs on port `3001` by default and uses Prisma to connect to a PostgreSQL database.
 
 **InvoicePro** is a comprehensive SaaS-based invoice management system designed specifically for Indian businesses. It provides GST-compliant invoice generation, customer relationship management, inventory tracking, and subscription-based access control with a clean, intuitive user interface.
 
-## Prerequisites
-
 ### Why InvoicePro?
 
-- Node.js 18+ (or recent LTS)
-
-- ✅ **GST Compliant**: Automatic CGST, SGST, and IGST calculations- npm or pnpm
-
+- ✅ **GST Compliant**: Automatic CGST, SGST, and IGST calculations.
 - ✅ **Subscription-Based**: Flexible pricing with 7-day trial and usage limits- PostgreSQL (or a hosted DB) for the backend
 
-- ✅ **Real-time Analytics**: Dashboard with charts, metrics, and payment reminders- Optional: Visual Studio Code (recommended)
+- ✅ **Real-time Analytics**: Dashboard with charts, metrics, and payment reminders.
 
-- ✅ **Professional PDFs**: Generate print-ready invoices with custom branding
+- ✅ **Professional PDFs**: Generate print-ready invoices.
 
 - ✅ **Cloud-Based**: Access from anywhere with secure authentication## Setup (frontend)
 
 - ✅ **Mobile Responsive**: Works seamlessly on all devices
 
-1. Install dependencies
-
 ---
-
+### Key Features
 ```cmd
-
-## ✨ Key Featurescd e:\\Project\\INVOICE\\invoice_generator
 
 npm install
+🔐 Authentication & Authorization 
 
-### 🔐 Authentication & Authorization```
+- Supabase Auth Integration: Email/password authentication with session management
 
-- **Supabase Auth Integration**: Email/password authentication with session management
+- Protected Routes: Role-based access control with route guards2.
 
-- **Protected Routes**: Role-based access control with route guards2. Environment variables
+- Auto-login: Persistent sessions with automatic token refresh
 
-- **Auto-login**: Persistent sessions with automatic token refresh
+- Profile Management: Complete company profile with GST and bank details create.
 
-- **Profile Management**: Complete company profile with GST and bank detailsCreate a `.env` in the frontend if you need to override the API base URL. By
+📊 Dashboard & Analytics
 
-default the frontend uses `http://localhost:3001` as the API base.
+- Real-time Metrics: Total revenue, invoices, customers, and pending payments.
 
-### 📊 Dashboard & Analytics
+- Interactive Charts: Monthly revenue trends and invoice status distribution
 
-- **Real-time Metrics**: Total revenue, invoices, customers, and pending paymentsExample `.env` entries (optional):
+- Payment Reminders: Automatic tracking of overdue invoices.
 
-- **Interactive Charts**: Monthly revenue trends and invoice status distribution
+- GST Summary: CGST, SGST, IGST breakdown with compliance status
 
-- **Payment Reminders**: Automatic tracking of overdue invoicesVITE_API_BASE_URL=http://localhost:3001
+- Quick Actions: Fast access to create invoice, add customer, etc.
 
-- **GST Summary**: CGST, SGST, IGST breakdown with compliance status
 
-- **Quick Actions**: Fast access to create invoice, add customer, etc.3. Start the frontend dev server
 
+💳 Subscription Management
+- Trial System: 7-day free trial with 10 invoice limit.
+- Multiple Plans: FREE, BASIC, PROFESSIONAL, ENTERPRISE tiers with varying limits.
+  - FREE: ₹0 (Trial - 10 invoices, 50 customers, 100 items)
+  - BASIC: ₹499/month (100 invoices, 200 customers, 500 items).
+  - PROFESSIONAL: ₹999/month (Unlimited everything).
+  - ENTERPRISE: ₹2499/month (Unlimited + premium support)
 
+- Usage Tracking: Real-time invoice, customer, and item usage counters.
+- Auto-expiry: Automatic trial expiration and renewal reminders
+- Upgrade Prompts: In-app notifications when nearing limits
 
-### 💳 Subscription Management```cmd
+📄 Invoice Management
 
-- **Trial System**: 7-day free trial with 10 invoice limitnpm run dev
+- Invoice Creation: Multi-step wizard with real-time validation.
+- GST Calculations: Automatic tax computation based on customer state.
+- PDF Generation: Professional A4 invoices.
+- Bulk Operations: Filter, search, export, and manage multiple invoices 
+- Status Tracking: Draft, Sent, Paid, Overdue with color coding
+- Preview Mode: See exactly how invoice will look before saving
 
-- **Multiple Plans**: ```
 
-  - **FREE**: ₹0 (Trial - 10 invoices, 50 customers, 100 items)
+👥 Customer Management
 
-  - **BASIC**: ₹499/month (100 invoices, 200 customers, 500 items)The app runs on Vite’s default port (usually `5173`). Open the URL shown in
+- Customer Database: Comprehensive client information storage.
+- GST Details: GSTIN, PAN, and state for tax calculations.
+- Purchase History: Track all invoices per customer with totals.
+- Quick Actions: Add, edit, delete with inline validation.
+- Search & Filter: Find customers quickly by name, company, or GSTIN.
 
-  - **PROFESSIONAL**: ₹999/month (Unlimited everything)the terminal (for example `http://localhost:5173`).
 
-  - **ENTERPRISE**: ₹2499/month (Unlimited + premium support)
+📦 Items/Products Management `Item`, `Invoice`, etc.
 
-- **Usage Tracking**: Real-time invoice, customer, and item usage counters## Backend (quick notes)
+- Inventory Tracking: Manage products and services catalog.
+- Pricing Control: Set rates, tax rates, HSN/SAC codes, and units
+- Reusable Items: Quick selection during invoice creation with autofill.
+- Bulk Import: CSV upload for bulk item addition.
 
-- **Auto-expiry**: Automatic trial expiration and renewal reminders
 
-- **Visual Indicators**: Banners, badges, and progress bars showing subscription statusThe backend lives in `e:\\Project\\INVOICE\\invoice_generator_server`.
+📈 Reports & Compliance
 
-You need to run it alongside the frontend.
+- GST Reports: GSTR-1 and GSTR-3B ready data exports.
+- Revenue Reports: Monthly, quarterly, yearly revenue breakdowns.
+- Export Options: CSV, Excel, PDF formats.
+- Tax Summaries: Detailed CGST, SGST, IGST calculations for compliance.
 
-### 📄 Invoice Management
+🎨 UI/UX Features
 
-- **Invoice Creation**: Multi-step wizard with real-time validationQuick start for the backend:
+- Modern Design: Clean, professional interface with Tailwind CSS
+- Responsive Layout: Mobile-first design that works on all screen sizes.
+- Loading States: Smooth transitions with skeleton loaders
+- Error Handling: User-friendly error messages with actionable suggestions.
+- Accessibility: Keyboard navigation and screen reader support
 
-- **GST Calculations**: Automatic tax computation based on customer state
 
-- **PDF Generation**: Professional A4 invoices with company branding```cmd
+🛠️ Tech Stack
 
-- **Invoice Templates**: Customizable layouts with logo uploadcd e:\\Project\\INVOICE\\invoice_generator_server
+Frontend Framework - 
+- React 18.x - Modern UI library with hooks and concurrent features.
+- Vite 5.x - Lightning-fast build tool and dev server with HMR.
+- React Router DOM 6.x - Client-side routing with nested routes.
 
-- **Bulk Operations**: Filter, search, export, and manage multiple invoicesnpm install
+Styling & UI - 
+- Tailwind CSS 3.x - Utility-first CSS framework.
+- Lucide React - Beautiful, consistent icon library (600+ icons)
+- Custom Components - Reusable UI component library (buttons, inputs, modals).
 
-- **Status Tracking**: Draft, Sent, Paid, Overdue with color codingnpm run dev   # or npm start depending on scripts
+State Management & Data -
+- Context API - Global state management (AuthContext, SubscriptionContext).
+- Axios - Promise-based HTTP client with interceptors	for API calls.
+- React Hooks - useState, useEffect, useContext, useNavigate, and custom hooks name, companyName, address, city, state, pincode, country, phone, email, EximCode, gstin, pan
 
-- **Preview Mode**: See exactly how invoice will look before saving```
+Authentication	
 
+- Supabase - Backend-as-a-Service for authentication and user management
+- JWT Tokens - Secure API authentication with Bearer tokens.
+- Express REST API - Node.js backend server (separate repository)	authenticated user (if present).
 
+PDF Generation - 
+- jsPDF - Client-side PDF generation library
+- jsPDF-AutoTable - Table generation plugin for invoices
+- Custom PDF Service - GST-compliant invoice template engine
 
-### 👥 Customer ManagementThe backend uses Prisma and expects a `.env` with `DATABASE_URL` (Postgres).
+Development Tools - 
+- ESLint - Code linting with React and accessibility rules.
+- PostCSS - CSS processing with Tailwind plugin.
+- Autoprefixer - Automatic vendor prefixing for CSS.
 
-- **Customer Database**: Comprehensive client information storageIf you change the Prisma schema, run migrations or `prisma db push` and
+```
 
-- **GST Details**: GSTIN, PAN, and state for tax calculations`npx prisma generate`.
+### Setup (frontend)
 
-- **Purchase History**: Track all invoices per customer with totals
-
-- **Quick Actions**: Add, edit, delete with inline validation## Database / Prisma notes
-
-- **Search & Filter**: Find customers quickly by name, company, or GSTIN
-
-- The backend uses Prisma with a `schema.prisma` that defines `CompanyProfile`,
-
-### 📦 Items/Products Management	`Customer`, `Item`, `Invoice`, etc.
-
-- **Inventory Tracking**: Manage products and services catalog- If you update the Prisma schema, run:
-
-- **Pricing Control**: Set rates, tax rates, HSN/SAC codes, and units
-
-- **Reusable Items**: Quick selection during invoice creation with autofill```cmd
-
-- **Bulk Import**: CSV upload for bulk item addition (future)cd e:\\Project\\INVOICE\\invoice_generator_server
-
-npx prisma migrate dev --name your-migration-name
-
-### 📈 Reports & Compliancenpx prisma generate
-
-- **GST Reports**: GSTR-1 and GSTR-3B ready data export```
-
-- **Revenue Reports**: Monthly, quarterly, yearly revenue breakdowns
-
-- **Export Options**: CSV, Excel, PDF formatsor (if you prefer to push schema changes without migrations in dev):
-
-- **Tax Summaries**: Detailed CGST, SGST, IGST calculations
-
-```cmd
-
-### 🎨 UI/UX Featuresnpx prisma db push
-
-- **Modern Design**: Clean, professional interface with Tailwind CSSnpx prisma generate
-
-- **Responsive Layout**: Mobile-first design that works on all screen sizes```
-
-- **Loading States**: Smooth transitions with skeleton loaders
-
-- **Error Handling**: User-friendly error messages with actionable suggestions### Important: companyProfileId recent change
-
-- **Accessibility**: Keyboard navigation and screen reader support
-
-During recent work, `Customer.companyProfileId` was made optional in the Prisma
-
----schema because customers can be created without first creating a company
-
-profile. If you encounter Prisma errors about `companyProfileId` during
-
-## 🛠️ Tech Stack`prisma.customer.create()` (Unknown argument or required field), ensure you have:
-
-
-
-### Frontend Framework- Updated the Prisma schema (makes `companyProfileId` optional) and applied the
-
-- **React 18.x** - Modern UI library with hooks and concurrent features	change to the database with `prisma migrate` or `prisma db push`.
-
-- **Vite 5.x** - Lightning-fast build tool and dev server with HMR- Regenerated the Prisma client (`npx prisma generate`).
-
-- **React Router DOM 6.x** - Client-side routing with nested routes
-
-If the server responds with a 500 and an error containing "Unknown argument
-
-### Styling & UI`companyProfileId`", it means the Prisma schema in the database does not match
-
-- **Tailwind CSS 3.x** - Utility-first CSS frameworkthe generated client used by the server. Re-run migrations and `prisma generate`.
-
-- **Lucide React** - Beautiful, consistent icon library (600+ icons)
-
-- **Custom Components** - Reusable UI component library (buttons, inputs, modals)## Frontend — API expectations
-
-
-
-### State Management & Data- The frontend sends customer objects with a flat structure matching the backend DTO:
-
-- **Context API** - Global state management (AuthContext, SubscriptionContext)
-
-- **Axios** - Promise-based HTTP client with interceptors	{
-
-- **React Hooks** - useState, useEffect, useContext, useNavigate, and custom hooks		name, companyName, address, city, state, pincode, country,
-
-		phone, email, EximCode, gstin, pan
-
-### Authentication & Backend	}
-
-- **Supabase** - Backend-as-a-Service for authentication and user management
-
-- **JWT Tokens** - Secure API authentication with Bearer tokens- The backend assigns `companyProfileId` automatically based on the
-
-- **Express REST API** - Node.js backend server (separate repository)	authenticated user (if present). Don't include `companyProfileId` from the frontend.
-
-
-
-### PDF Generation## Common tasks / Commands
-
-- **jsPDF** - Client-side PDF generation library
-
-- **jsPDF-AutoTable** - Table generation plugin for invoices- Install frontend deps: `npm install`
-
-- **Custom PDF Service** - GST-compliant invoice template engine- Run frontend dev server: `npm run dev`
-
-- Build for production: `npm run build`
-
-### Development Tools
-
-- **ESLint** - Code linting with React and accessibility rulesBackend (in `invoice_generator_server`):
-
-- **PostCSS** - CSS processing with Tailwind- Install backend deps: `npm install`
-
-- **Autoprefixer** - Automatic vendor prefixing for CSS- Run backend server (dev): `npm run dev` or `npm start`
-
-- Run Prisma migrate: `npx prisma migrate dev --name <name>`
-
----
-
-## Troubleshooting
-
-## 🚀 Getting Started
-
-- 500 error when creating a customer: check backend logs and Prisma errors.
-
-### Prerequisites	- If error mentions `companyProfileId` unknown/required: ensure Prisma schema
-
-		and generated client are up-to-date.
-
-Make sure you have the following installed:	- Regenerate client: `npx prisma generate`.
-
-- **Node.js** (v18 or higher) - [Download](https://nodejs.org/)
-
-- **npm** or **yarn** - Package manager- Frontend shows no customers even though DB has data:
-
-- **Supabase account** - [Sign up](https://supabase.com/)	- The backend GET `/api/customer` route filters by `isActive: true` and may
-
-- **Backend server** - See [invoice_generator_server](../invoice_generator_server)		optionally restrict results to the authenticated user's company. Check the
-
-		backend server logs to see the `where` clause and whether a company filter
-
-### Installation		is applied.
-
-
-
-1. **Clone the repository**## Testing CRUD (quick manual test)
-
+1. **Clone the repository**
    ```bash
+   git clone https://github.com/rupeshv2121/invoice_generator.git1. Start backend and frontend cd invoice_generator
+   ```
 
-   git clone https://github.com/rupeshv2121/invoice_generator.git1. Start backend and frontend
-
-   cd invoice_generator2. Open the app and go to Customers
-
-   ```3. Create a customer using the UI (fill the required fields: companyName,
-
-	 name, address)
-
-2. **Install dependencies**4. Confirm in backend logs that `POST /api/customer` returned 201 and that the
-
-   ```bash	 created customer appears in `GET /api/customer`
-
+2. **Install dependencies**
+   ```bash
    npm install
+   ```
 
-   ```## Contributing
+3. **Configure environment variables**   
 
+   Create a `.env` file in the root directory:
+   1. Update the backend DTO schema (zod) in `invoice_generator_server/src/dto`
 
+   2. Update the Prisma schema and run migrations
+      VITE_SUPABASE_URL=your_supabase_project_url
 
-3. **Configure environment variables**If you modify DTOs or the Prisma schema:
+   3. Regenerate the Prisma client (`npx prisma generate`)
+          VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-   
+   4. Keep the frontend DTOs and field names aligned with backend DTOs
+          VITE_API_BASE_URL=http://localhost:3001
 
-   Create a `.env` file in the root directory:1. Update the backend DTO schema (zod) in `invoice_generator_server/src/dto`
-
-   ```env2. Update the Prisma schema and run migrations
-
-   VITE_SUPABASE_URL=your_supabase_project_url3. Regenerate the Prisma client (`npx prisma generate`)
-
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key4. Keep the frontend DTOs and field names aligned with backend DTOs
-
-   VITE_API_BASE_URL=http://localhost:3001
-
-   ```## Useful links
-
-
-
-4. **Start the backend server**- Prisma docs: https://www.prisma.io/docs
-
-   - Vite docs: https://vitejs.dev/
+4. **Start the backend server** - 
 
    In a separate terminal, navigate to the backend folder and start the server:
 
@@ -364,11 +202,7 @@ Make sure you have the following installed:	- Regenerate client: `npx prisma gen
 
    cd ../invoice_generator_server
 
-   npm run devIf you'd like, I can also:
-
-   ```- Add a short `CONTRIBUTING.md` or developer notes file
-
-- Add quick unit/integration tests for the customer API
+   nodemon index.js
 
 5. **Start the frontend development server**- Create scripts to run both frontend and backend together (npm workspace or
 
@@ -380,15 +214,12 @@ Make sure you have the following installed:	- Regenerate client: `npx prisma gen
 
 
 
-6. **Open in browser**---
-
+6. **Open in browser**
    ```
-
    http://localhost:5173# Frontend (concise developer guide)
 
    ```
 
-This README focuses only on the frontend app located in `invoice_generator`.
 
 ### Quick Setup GuideIt is a Vite + React application (TailwindCSS) that communicates with a
 

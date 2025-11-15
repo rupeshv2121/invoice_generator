@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useCustomersService } from '../../api/customers';
 import { useInvoiceService } from '../../api/invoice';
 import Breadcrumb from '../../components/ui/Breadcrumb';
@@ -45,24 +45,29 @@ const Reports = () => {
 
         setStartDate(firstDay?.toISOString()?.split('T')?.[0]);
         setEndDate(lastDay?.toISOString()?.split('T')?.[0]);
-
-        // Auto-refresh data every 5 minutes
-        const interval = setInterval(() => {
-            setLastUpdated(new Date());
-            fetchReportData();
-        }, 300000);
-
-        return () => clearInterval(interval);
     }, []);
 
     // Fetch data when date range changes
     useEffect(() => {
         if (startDate && endDate) {
             fetchReportData();
+            setLastUpdated(new Date());
         }
     }, [startDate, endDate]);
 
-    const fetchReportData = async () => {
+    // Auto-refresh data every 5 minutes (separate from date changes)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (startDate && endDate) {
+                fetchReportData();
+                setLastUpdated(new Date());
+            }
+        }, 300000); // 5 minutes
+
+        return () => clearInterval(interval);
+    }, [startDate, endDate]);
+
+    const fetchReportData = useCallback(async () => {
         try {
             setLoading(true);
 
@@ -126,15 +131,26 @@ const Reports = () => {
                 return custDate >= new Date(startDate) && custDate <= new Date(endDate);
             }).length;
 
-            // Calculate monthly revenue for last 12 months
+            // Calculate monthly revenue based on selected date range
             const monthlyRevenue = [];
-            for (let i = 11; i >= 0; i--) {
-                const monthDate = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
+            const startDateObj = new Date(startDate);
+            const endDateObj = new Date(endDate);
+            
+            // Calculate the number of months in the range
+            const monthDiff = (endDateObj.getFullYear() - startDateObj.getFullYear()) * 12 + 
+                             (endDateObj.getMonth() - startDateObj.getMonth());
+            
+            // If range is less than 12 months, show only that range
+            // Otherwise, show last 12 months
+            const monthsToShow = Math.min(monthDiff + 1, 12);
+            
+            for (let i = monthsToShow - 1; i >= 0; i--) {
+                const monthDate = new Date(endDateObj.getFullYear(), endDateObj.getMonth() - i, 1);
                 const monthName = monthDate.toLocaleString('default', { month: 'short' });
                 const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
                 const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
 
-                const monthInvoices = invoices.filter(inv => {
+                const monthInvoices = filteredInvoices.filter(inv => {
                     const invDate = new Date(inv.invoiceDate);
                     return invDate >= monthStart && invDate <= monthEnd && (inv.status === 'Paid' || inv.status === 'paid');
                 });
@@ -226,7 +242,7 @@ const Reports = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [startDate, endDate, getInvoices, getCustomers]);
 
     const handleQuickDateSelect = (range) => {
         const now = new Date();
@@ -332,6 +348,7 @@ const Reports = () => {
                         <RevenueChart
                             monthlyRevenue={reportData.monthlyRevenue}
                             paymentStatus={reportData.paymentStatus}
+                            loading={loading}
                         />
                     </div>
 
@@ -341,6 +358,7 @@ const Reports = () => {
                             gstData={reportData.gstBreakdown}
                             invoices={reportData.invoices}
                             dateRange={{ start: startDate, end: endDate }}
+                            loading={loading}
                         />
                     </div>
 
@@ -349,6 +367,7 @@ const Reports = () => {
                         <CustomerAnalysis
                             topCustomers={reportData.topCustomers}
                             invoices={reportData.invoices}
+                            loading={loading}
                         />
                     </div>
 
