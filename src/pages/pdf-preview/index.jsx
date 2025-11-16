@@ -107,7 +107,7 @@ const PDFPreview = () => {
 
     const handleDownloadPDF = async () => {
         if (!invoiceData) {
-            alert('Please select an invoice first');
+            toast.warning('Please select an invoice first');
             return;
         }
         setIsGenerating(true);
@@ -117,19 +117,19 @@ const PDFPreview = () => {
                 console.log('PDF downloaded successfully');
             } else {
                 console.error('Failed to download PDF:', result.error);
-                alert('Failed to download PDF: ' + result.error);
+                toast.error('Failed to download PDF: ' + result.error);
             }
         } catch (error) {
             console.error('Error downloading PDF:', error);
-            alert('Error downloading PDF: ' + error.message);
+            toast.error('Error downloading PDF: ' + error.message);
         } finally {
             setIsGenerating(false);
         }
     };
 
-    const handlePreviewPDF = async () => {
+    const handleGeneratePreview = async () => {
         if (!invoiceData) {
-            alert('Please select an invoice first');
+            toast.warning('Please select an invoice first');
             return;
         }
         setIsGenerating(true);
@@ -144,11 +144,11 @@ const PDFPreview = () => {
                 setPreviewUrl(url);
             } else {
                 console.error('Failed to generate PDF blob:', result.error);
-                alert('Failed to generate preview: ' + result.error);
+                toast.error('Failed to generate preview: ' + result.error);
             }
         } catch (error) {
             console.error('Error generating PDF preview:', error);
-            alert('Error generating preview: ' + error.message);
+            toast.error('Error generating preview: ' + error.message);
         } finally {
             setIsGenerating(false);
         }

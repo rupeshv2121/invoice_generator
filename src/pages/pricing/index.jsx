@@ -1,6 +1,7 @@
 import { Check, Crown, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useSubscriptionService } from '../../api/subscription';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Header from '../../components/ui/Header';
@@ -36,7 +37,7 @@ const Pricing = () => {
         }
 
         // For now, just show an alert
-        alert(`Payment integration coming soon! Selected plan: ${planName}`);
+        toast.info(`Payment integration coming soon! Selected plan: ${planName}`);
     };
 
     if (loading) {
@@ -126,8 +127,8 @@ const Pricing = () => {
                                         <button
                                             onClick={() => handleSelectPlan(plan.name)}
                                             className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${isProfessional
-                                                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl'
-                                                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                                                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl'
+                                                : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                                                 }`}
                                         >
                                             {plan.name === 'FREE' ? (

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useItemService } from '../../api/items.js';
 
 import Breadcrumb from '../../components/ui/Breadcrumb';
@@ -98,11 +99,11 @@ const ItemsManagement = () => {
                 await loadItems();
             } else {
                 console.error('❌ Delete failed:', result?.error || 'Unknown error');
-                alert('Error deleting item: ' + (result?.error || 'Something went wrong'));
+                toast.error('Error deleting item: ' + (result?.error || 'Something went wrong'));
             }
         } catch (error) {
             console.error('Error deleting item:', error);
-            alert('Failed to delete item.');
+            toast.error('Failed to delete item.');
         }
     };
 
@@ -127,7 +128,7 @@ const ItemsManagement = () => {
             }
 
             if (response?.success !== false) {
-                alert(editingItem ? 'Item updated!' : 'Item added!');
+                toast.success(editingItem ? 'Item updated!' : 'Item added!');
                 await loadItems();
                 return { success: true };
             } else {
@@ -142,7 +143,7 @@ const ItemsManagement = () => {
 
     const handleBulkDelete = async () => {
         if (selectedItems.length === 0) {
-            alert('Please select items to delete');
+            toast.warning('Please select items to delete');
             return;
         }
 
@@ -155,16 +156,16 @@ const ItemsManagement = () => {
 
             setSelectedItems([]);
             loadItems();
-            alert(`${successCount} items deleted successfully`);
+            toast.success(`${successCount} items deleted successfully`);
         }
     };
 
     const handleExport = () => {
         const result = exportItems();
         if (result.success) {
-            alert('Items exported successfully');
+            toast.success('Items exported successfully');
         } else {
-            alert('Error exporting items: ' + result.error);
+            toast.error('Error exporting items: ' + result.error);
         }
     };
 
@@ -178,12 +179,12 @@ const ItemsManagement = () => {
                 const result = importItems(e.target.result);
                 if (result.success) {
                     loadItems();
-                    alert(`${result.itemsCount} items imported successfully`);
+                    toast.success(`${result.itemsCount} items imported successfully`);
                 } else {
-                    alert('Error importing items: ' + result.error);
+                    toast.error('Error importing items: ' + result.error);
                 }
             } catch (error) {
-                alert('Error reading file: ' + error.message);
+                toast.error('Error reading file: ' + error.message);
             }
         };
         reader.readAsText(file);

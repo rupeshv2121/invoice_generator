@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import Icon from '../../components/AppIcon';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Button from '../../components/ui/Button';
@@ -88,7 +89,7 @@ const Settings = () => {
     const handleSave = () => {
         // Validate invoice settings
         if (settings.invoiceSettings.currentNumber < 1) {
-            alert('Invoice number must be at least 1');
+            toast.warning('Invoice number must be at least 1');
             return;
         }
 
@@ -100,7 +101,7 @@ const Settings = () => {
 
         setHasUnsavedChanges(false);
         setIsEditing(false);
-        alert('Settings saved successfully!');
+        toast.success('Settings saved successfully!');
     };
 
     const tabs = [

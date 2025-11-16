@@ -42,7 +42,7 @@ const CustomerModal = ({
                 city: customer?.city || '',
                 state: customer?.state || '',
                 pincode: customer?.pincode || '',
-                country: customer?.country || 'India'
+                country: customer?.country || ''
             });
         } else if (mode === 'add') {
             setFormData({
@@ -57,7 +57,7 @@ const CustomerModal = ({
                 city: '',
                 state: '',
                 pincode: '',
-                country: 'India'
+                country: ''
             });
         }
     }, [customer, mode]);

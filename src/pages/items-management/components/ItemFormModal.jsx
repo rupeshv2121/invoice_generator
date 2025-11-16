@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
@@ -67,12 +68,12 @@ const ItemFormModal = ({ isOpen, onClose, onSave, editingItem }) => {
                 if (result.errors) {
                     setErrors(result.errors);
                 } else {
-                    alert('Error saving item: ' + (result.error || 'Unknown error'));
+                    toast.error('Error saving item: ' + (result.error || 'Unknown error'));
                 }
             }
         } catch (error) {
             console.error('Error saving item:', error);
-            alert('Error saving item: ' + error.message);
+            toast.error('Error saving item: ' + error.message);
         } finally {
             setSaving(false);
         }

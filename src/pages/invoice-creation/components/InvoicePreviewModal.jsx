@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import Button from '../../../components/ui/Button';
 import { downloadInvoicePDF } from '../../../services/pdfService';
 import ExportInvoiceTemplate from './ExportInvoiceTemplate';
@@ -59,9 +60,9 @@ const InvoicePreviewModal = ({
 
         const result = downloadInvoicePDF(invoiceData);
         if (result.success) {
-            alert('PDF downloaded successfully!');
+            toast.success('PDF downloaded successfully!');
         } else {
-            alert('Error downloading PDF: ' + result.error);
+            toast.error('Error downloading PDF: ' + result.error);
         }
     };
 

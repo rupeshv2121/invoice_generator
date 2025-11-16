@@ -189,9 +189,9 @@ const InvoiceList = () => {
                 const invoiceData = transformInvoiceForPreview(invoice);
                 const result = downloadInvoicePDF(invoiceData);
                 if (result.success) {
-                    alert('PDF downloaded successfully!');
+                    toast.success('PDF downloaded successfully!');
                 } else {
-                    alert('Error downloading PDF: ' + result.error);
+                    toast.error('Error downloading PDF: ' + result.error);
                 }
                 break;
             case 'send': console.log('Sending invoice:', invoice?.id);

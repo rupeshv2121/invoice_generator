@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useCustomersService } from '../../api/customers';
 import { useMyCompanyService } from '../../api/myCompany';
 import Breadcrumb from '../../components/ui/Breadcrumb';
@@ -301,7 +302,7 @@ const InvoiceCreation = () => {
             // Try the main PDF service first
             const result = downloadInvoicePDF(invoiceData);
             if (result.success) {
-                alert('PDF downloaded successfully!');
+                toast.success('PDF downloaded successfully!');
             } else {
                 throw new Error(result.error);
             }
@@ -311,18 +312,18 @@ const InvoiceCreation = () => {
             try {
                 const fallbackResult = downloadSimpleInvoicePDF(invoiceData);
                 if (fallbackResult.success) {
-                    alert('PDF downloaded successfully! (using simplified format)');
+                    toast.success('PDF downloaded successfully! (using simplified format)');
                 } else {
-                    alert('Error downloading PDF: ' + fallbackResult.error);
+                    toast.error('Error downloading PDF: ' + fallbackResult.error);
                 }
             } catch (fallbackError) {
-                alert('Error downloading PDF: ' + fallbackError.message);
+                toast.error('Error downloading PDF: ' + fallbackError.message);
             }
         }
     };
 
     const handleSaveDraft = () => {
-        alert('Invoice saved as draft successfully!');
+        toast.success('Invoice saved as draft successfully!');
         navigate('/invoice-list');
     };
 
@@ -333,7 +334,7 @@ const InvoiceCreation = () => {
 
         // Check if company profile exists
         if (!myCompanyProfile?.id) {
-            alert('Please create a company profile first before creating an invoice.');
+            toast.error('Please create a company profile first before creating an invoice.');
             return;
         }
 
@@ -372,13 +373,13 @@ const InvoiceCreation = () => {
             if (result && !result.error) {
                 // Increment invoice number after successful creation
                 incrementInvoiceNumber();
-                alert('Invoice generated successfully!');
+                toast.success('Invoice generated successfully!');
                 navigate('/invoice-list');
             } else {
                 throw new Error(result.error || 'Unknown error');
             }
         } catch (error) {
-            alert('Error generating invoice: ' + error.message);
+            toast.error('Error generating invoice: ' + error.message);
         } finally {
             setIsSubmitting(false);
         }
@@ -386,11 +387,11 @@ const InvoiceCreation = () => {
 
     const validateForm = () => {
         if (!customerData?.selectedCustomer) {
-            alert('Please select a customer');
+            toast.warning('Please select a customer');
             return false;
         }
         if (invoiceItems?.some(item => !item?.description || item?.quantity <= 0 || item?.rate <= 0)) {
-            alert('Please fill all item details correctly');
+            toast.warning('Please fill all item details correctly');
             return false;
         }
         return true;

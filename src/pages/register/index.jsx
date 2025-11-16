@@ -1,6 +1,7 @@
 import { Building, CheckCircle, Eye as EyeIcon, EyeOff, Mail, Phone, User } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Button from '../../components/ui/Button';
 import { Checkbox } from '../../components/ui/Checkbox';
 import Input from '../../components/ui/Input';
@@ -194,7 +195,7 @@ const Register = () => {
                     navigate("/setup", { replace: true });
                 } else {
                     // Email confirmation is required
-                    alert("Registration successful! Please check your email to confirm your account, then login.");
+                    toast.success("Registration successful! Please check your email to confirm your account, then login.");
                     navigate("/login", { replace: true });
                 }
             } else {

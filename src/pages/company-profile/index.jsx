@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useMyCompanyService } from '../../api/myCompany';
 import Icon from '../../components/AppIcon';
 import Breadcrumb from '../../components/ui/Breadcrumb';
@@ -100,7 +101,7 @@ const CompanyProfile = () => {
 
             setIsEditing(false);
             setHasUnsavedChanges(false);
-            alert('Company profile updated successfully!');
+            toast.success('Company profile updated successfully!');
 
             // Reload data from server to ensure sync
             const freshData = await getMyCompany();
@@ -111,7 +112,7 @@ const CompanyProfile = () => {
         } catch (err) {
             console.error('Error saving company profile:', err);
             console.error('Error response:', err.response?.data);
-            alert('Error saving company profile: ' + (err.response?.data?.message || err.message || 'Unknown error'));
+            toast.error('Error saving company profile: ' + (err.response?.data?.message || err.message || 'Unknown error'));
         } finally {
             setLoading(false);
         }

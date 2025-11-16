@@ -1,6 +1,7 @@
 import { Building2, CreditCard, MapPin, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useMyCompanyService } from '../../api/myCompany';
 import { useSubscriptionService } from '../../api/subscription';
 import Button from '../../components/ui/Button';
@@ -143,7 +144,7 @@ const Setup = () => {
     const handleFinish = async () => {
         // Validate all required steps before submitting
         if (!validateStep(1) || !validateStep(2)) {
-            alert('Please complete all required fields in previous steps');
+            toast.warning('Please complete all required fields in previous steps');
             return;
         }
 
@@ -199,7 +200,7 @@ const Setup = () => {
                     ? error.response.data.error
                     : 'Failed to create company profile. Please try again.';
 
-            alert(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setSaving(false);
         }

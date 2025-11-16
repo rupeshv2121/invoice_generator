@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useCustomersService } from '../../api/customers';
 import Icon from '../../components/AppIcon';
 import Breadcrumb from '../../components/ui/Breadcrumb';
@@ -128,12 +129,13 @@ const CustomerManagement = () => {
                 const result = await deleteCustomer(customer.id);
                 if (result.success) {
                     loadCustomers(); // Reload customers after deletion
+                    toast.success('Customer deleted successfully!');
                 } else {
-                    alert(result.error || 'Error deleting customer. Customer not found.');
+                    toast.error(result.error || 'Error deleting customer. Customer not found.');
                 }
             } catch (error) {
                 console.error('Error deleting customer:', error);
-                alert('Error deleting customer. Please try again.');
+                toast.error('Error deleting customer. Please try again.');
             }
         }
     };
@@ -158,7 +160,7 @@ const CustomerManagement = () => {
             setSelectedCustomer(null);
 
             // Show success message
-            alert(modalMode === 'add' ? 'Customer added successfully!' : 'Customer updated successfully!');
+            toast.success(`Customer ${modalMode === 'add' ? 'added' : 'updated'} successfully!`);
         } catch (error) {
             console.error('Error saving customer:', error);
             console.error('Error response:', error?.response?.data);
@@ -167,7 +169,7 @@ const CustomerManagement = () => {
             const errorMessage = error?.response?.data?.error ||
                 error?.response?.data?.message ||
                 'Error saving customer. Please try again.';
-            alert(errorMessage);
+            toast.error(errorMessage);
         }
     };
 

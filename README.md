@@ -79,6 +79,7 @@ npm install
 
 
 💳 Subscription Management
+
 - Trial System: 7-day free trial with 10 invoice limit.
 - Multiple Plans: FREE, BASIC, PROFESSIONAL, ENTERPRISE tiers with varying limits.
   - FREE: ₹0 (Trial - 10 invoices, 50 customers, 100 items)
@@ -198,146 +199,78 @@ Development Tools -
 
    In a separate terminal, navigate to the backend folder and start the server:
 
-   ```bash---
-
+   ```bash
    cd ../invoice_generator_server
 
    nodemon index.js
-
-5. **Start the frontend development server**- Create scripts to run both frontend and backend together (npm workspace or
-
-   ```bash	a single `dev` script)
-
-   npm start
-
-   ```Happy to continue and wire in any of the above.
-
-
+    ```
 
 6. **Open in browser**
    ```
-   http://localhost:5173# Frontend (concise developer guide)
+   http://localhost:5173
 
    ```
 
-
-### Quick Setup GuideIt is a Vite + React application (TailwindCSS) that communicates with a
-
-separate backend API (expected at `http://localhost:3001`). Keep backend
-
-1. **Register an account** at `/register`and frontend field contracts aligned (DTOs) when changing forms or models.
-
-   - Fill in personal details, company name, GST info
-
-   - Create a strong passwordQuick facts
-
-- Stack: React 18, Vite, Tailwind CSS
-
-2. **Verify your email** (if email confirmation is enabled in Supabase)- Main source: `src/`
-
-- Dev server: `vite` (script: `npm run dev` / `npm start`)
-
-3. **Complete setup wizard** at `/setup`
-
-   - **Step 1**: Company details (name, phone, email, website)Project structure (important folders)
-
-   - **Step 2**: Address (street, city, state, pincode, country)- `src/` — React entry and pages (routes, components, services)
-
-   - **Step 3**: GST & Tax info (GSTIN, PAN, ARN, IEC - optional)	- `src/pages` — page-level components (customers, invoices, settings)
-
-   - **Step 4**: Bank details (account, IFSC, branch - optional)	- `src/components` — shared UI components
-
-	- `src/api` — small client wrappers (e.g. `useCustomersService`) that call the backend
-
-4. **Trial subscription starts automatically** 🎉	- `src/services` — utilities for PDF, items, settings
-
-   - 7 days free- `public/` — static assets
-
-   - 10 invoices
-
-   - 50 customersEnvironment
-
-   - 100 items- Default API base is `http://localhost:3001`. Override with a Vite env var
-
-	in `.env`: `VITE_API_BASE_URL=http://localhost:3001`
-
-5. **Start creating invoices!**
-
-Install & run (Windows CMD examples)
-
----```cmd
-
-cd e:\Project\INVOICE\invoice_generator
-
-## 📁 Project Structurenpm install
-
-npm run dev   # or npm start
+## 📁 Project Structure
 
 ``````
-
 invoice_generator/
 
-├── public/                      # Static assetsBuild / preview
+├── public/                     # Static assetsBuild / preview
 
-├── src/```cmd
+├── src/
 
-│   ├── api/                     # API service layernpm run build
+│   ├── api/                    # API service layernpm run build
 
 │   │   ├── api.js              # Axios instance with interceptorsnpm run serve
 
-│   │   ├── customers.js        # Customer CRUD operations```
+│   │   ├── customers.js        # Customer CRUD operations
 
 │   │   ├── invoice.js          # Invoice CRUD operations
 
-│   │   ├── items.js            # Items CRUD operationsAPI contract notes (frontend ↔ backend)
+│   │   ├── items.js            # Items CRUD operations
 
-│   │   ├── myCompany.js        # Company profile management- Customers: frontend sends a flat object matching backend DTO:
+│   │   ├── myCompany.js        # Company profile management- Customers: frontend sends a flat object matching backend DTO
 
 │   │   ├── subscription.js     # Subscription API calls	`{ name, companyName, address, city, state, pincode, country, phone, email, EximCode, gstin, pan }`
 
-│   │   └── dashboard.js        # Dashboard data fetching- Do NOT send `companyProfileId` from the frontend — the backend assigns it
-
-│   │	from the authenticated user. Keep DTOs in sync (backend: `src/dto/*`).
+│   │   └── dashboard.js        # Dashboard data fetching-from the authenticated user. Keep DTOs in sync (backend: `src/dto/*`).
 
 │   ├── components/             # Reusable React components
 
 │   │   ├── ui/                 # Base UI componentsDebugging tips
 
-│   │   │   ├── Button.jsx      # Customizable button component- If customers do not appear: check backend `GET /api/customer` response (the
+│   │   │   ├── Button.jsx      # Customizable button component
 
-│   │   │   ├── Input.jsx       # Form input with validation	backend may filter by `isActive` or by company). Use browser devtools Network
+│   │   │   ├── Input.jsx       # Form input with validation
 
 │   │   │   ├── Modal.jsx       # Modal dialog component	tab to inspect requests and server responses.
 
-│   │   │   ├── Select.jsx      # Dropdown select component- If you see a 500 with Prisma errors mentioning `companyProfileId`, the
+│   │   │   ├── Select.jsx      # Dropdown select component
 
-│   │   │   ├── Checkbox.jsx    # Checkbox component	backend Prisma schema and generated client may be out of sync. Re-generate
+│   │   │   ├── Checkbox.jsx    # Checkbox component
 
-│   │   │   ├── Header.jsx      # App header with navigation	the Prisma client on the backend (`npx prisma generate`) after applying
+│   │   │   ├── Header.jsx      # App header with navigation
 
-│   │   │   ├── Breadcrumb.jsx  # Breadcrumb navigation	migrations.
+│   │   │   ├── Breadcrumb.jsx  # Breadcrumb navigation
 
 │   │   │   └── QuickActionButton.jsx # Floating action button
 
-│   │   ├── SubscriptionBanner.jsx     # Trial/expiry bannersHow to contribute small changes
+│   │   ├── SubscriptionBanner.jsx     # Trial/expiry banners
 
-│   │   ├── SubscriptionStatusCard.jsx # Subscription widget1. Keep frontend field names aligned with backend DTOs.
+│   │   ├── SubscriptionStatusCard.jsx # Subscription widget
 
-│   │   ├── ErrorBoundary.jsx   # Error boundary wrapper2. Update `src/api/*` methods to match any changed endpoints.
+│   │   ├── ErrorBoundary.jsx   # Error boundary wrapper
 
-│   │   ├── ProtectedRoute.jsx  # Route authentication wrapper3. Run the frontend locally and use the backend logs to verify API calls.
+│   │   ├── ProtectedRoute.jsx  # Route authentication wrapper
 
 │   │   └── ScrollToTop.jsx     # Auto-scroll on route change
 
-│   │If you'd like, I can also:
+│   ├── context/                # React Context providers
 
-│   ├── context/                # React Context providers- Add a short `CONTRIBUTING.md` for frontend conventions
-
-│   │   ├── AuthContext.jsx    # Authentication state & methods- Add frontend unit tests for `src/api` wrappers
+│   │   ├── AuthContext.jsx    # Authentication state & methods
 
 │   │   └── SubscriptionContext.jsx  # Subscription state & limits
-
-│   │---
 
 │   ├── pages/                  # Page components (routes)
 
@@ -413,9 +346,7 @@ invoice_generator/
 ├── tailwind.config.js         # Tailwind theme & plugins
 ├── vite.config.js             # Vite build configuration
 └── README.md                  # This file
-```
-
----
+``````
 
 ## 🎨 Features in Detail
 
@@ -647,11 +578,6 @@ VITE_FRONTEND_URL=http://localhost:5173
    - **Project URL** → `VITE_SUPABASE_URL`
    - **anon/public key** → `VITE_SUPABASE_ANON_KEY`
 
-**Important Notes:**
-- Never commit `.env` file to Git
-- Use different Supabase projects for dev/staging/production
-- Backend must be running for API calls to work
-
 ---
 
 ## 📜 Scripts
@@ -762,10 +688,6 @@ axios.interceptors.response.use(
   <Dashboard />
 </ProtectedRoute>
 
-// ProtectedRoute checks:
-// 1. Is user authenticated?
-// 2. Has user completed setup?
-// 3. Redirect accordingly
 ```
 
 **Lazy Loading** (Future Optimization):
