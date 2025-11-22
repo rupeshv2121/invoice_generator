@@ -48,18 +48,18 @@ const SocialProofSection = () => {
         <section className="py-20 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Stats Section */}
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-8">
+                <div className="text-center mb-12 sm:mb-16">
+                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 px-4">
                         Trusted by Thousands of Indian Businesses
                     </h2>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
                         {stats?.map((stat, index) => (
                             <div key={index} className="text-center">
-                                <div className="text-3xl lg:text-4xl font-bold text-blue-600 mb-2">
+                                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-600 mb-1 sm:mb-2">
                                     {stat?.value}
                                 </div>
-                                <div className="text-gray-600 font-medium">
+                                <div className="text-xs sm:text-sm text-gray-600 font-medium">
                                     {stat?.label}
                                 </div>
                             </div>
@@ -67,13 +67,13 @@ const SocialProofSection = () => {
                     </div>
 
                     {/* Trusted By */}
-                    <div className="mb-16">
-                        <p className="text-gray-600 mb-6">Trusted by various business types:</p>
-                        <div className="flex flex-wrap justify-center gap-4">
+                    <div className="mb-12 sm:mb-16 px-4">
+                        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Trusted by various business types:</p>
+                        <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
                             {trustedBy?.map((type, index) => (
                                 <span
                                     key={index}
-                                    className="px-4 py-2 bg-white text-gray-700 rounded-full border border-gray-200 font-medium"
+                                    className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 rounded-full border border-gray-200 font-medium text-xs sm:text-sm\"
                                 >
                                     {type}
                                 </span>

@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 const HeroSection = () => {
     const keyBenefits = [
         'GST Compliant Invoicing',
-        'Automated Tax Calculations',
-        'Professional Templates',
-        'Real-time Reports'
+        'Automated CGST/SGST/IGST',
+        'Customer & Item Management',
+        'Subscription Plans Available'
     ];
 
     return (
@@ -22,15 +22,15 @@ const HeroSection = () => {
                             </div>
 
                             <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                                Create Professional
-                                <span className="text-blue-600 block">GST Invoices</span>
-                                in Minutes
+                                InvoicePro
+                                <span className="text-blue-600 block text-5xl my-5" >GST Invoice Manager</span>
+
                             </h1>
 
                             <p className="text-xl text-gray-600 leading-relaxed">
-                                Streamline your invoicing process with automated GST calculations,
-                                professional templates, and comprehensive compliance reporting.
-                                Perfect for Indian businesses of all sizes.
+                                Complete SaaS platform with automated GST calculations,
+                                customer management, inventory tracking, and subscription-based access.
+                                Generate professional PDF invoices with GSTR-1 & GSTR-3B compliance.
                             </p>
                         </div>
 
@@ -49,31 +49,31 @@ const HeroSection = () => {
                             <Link
                                 as={Link}
                                 to="/dashboard"
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-1 rounded-lg font-semibold text-lg flex items-center justify-center group transition-all duration-200"
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-base sm:text-lg flex items-center justify-center group transition-all duration-200"
                             >
                                 Start Free Trial
                                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                             </Link>
 
-                            <button className="border-2 border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg flex items-center justify-center group transition-all duration-200">
+                            <button className="border-2 border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600 px-6 sm:px-8 py-3 rounded-lg font-semibold text-base sm:text-lg flex items-center justify-center group transition-all duration-200">
                                 <Play className="mr-2 h-5 w-5" />
                                 Watch Demo
                             </button>
                         </div>
 
                         {/* Stats */}
-                        <div className="flex items-center space-x-8 pt-4">
+                        <div className="grid grid-cols-3 gap-4 sm:flex sm:items-center sm:space-x-8 pt-4">
                             <div className="text-center">
-                                <div className="text-2xl font-bold text-gray-900">10,000+</div>
-                                <div className="text-sm text-gray-600">Happy Businesses</div>
+                                <div className="text-xl sm:text-2xl font-bold text-gray-900">7 Days</div>
+                                <div className="text-xs sm:text-sm text-gray-600">Free Trial</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-2xl font-bold text-gray-900">500K+</div>
-                                <div className="text-sm text-gray-600">Invoices Generated</div>
+                                <div className="text-xl sm:text-2xl font-bold text-gray-900">100%</div>
+                                <div className="text-xs sm:text-sm text-gray-600">GST Compliant</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-2xl font-bold text-gray-900">99.9%</div>
-                                <div className="text-sm text-gray-600">GST Compliance</div>
+                                <div className="text-xl sm:text-2xl font-bold text-gray-900">4 Plans</div>
+                                <div className="text-xs sm:text-sm text-gray-600">To Choose From</div>
                             </div>
                         </div>
                     </div>

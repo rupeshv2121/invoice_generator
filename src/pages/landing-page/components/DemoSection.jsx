@@ -9,35 +9,35 @@ const DemoSection = () => {
 
     const demoSteps = [
         {
-            title: 'Add Customer Details',
-            description: 'Start by selecting or adding customer information with GST details',
+            title: 'Select Customer & Company',
+            description: 'Choose from existing customers or add new ones with GSTIN validation',
             preview: {
-                title: 'Customer Information',
-                fields: ['Company Name: ABC Enterprises', 'GSTIN: 09ABCDE1234F1Z5', 'Address: Mumbai, Maharashtra']
+                title: 'Customer Selection',
+                fields: ['Company: TechCorp Pvt Ltd', 'GSTIN: 27AABCT1234L1ZM', 'State: Maharashtra (27)']
             }
         },
         {
-            title: 'Add Products/Services',
-            description: 'Add items with HSN codes and tax rates',
+            title: 'Add Invoice Items',
+            description: 'Select from inventory or add new items with HSN codes and rates',
             preview: {
                 title: 'Invoice Items',
-                fields: ['Product: Laptop Computer', 'HSN: 8471', 'Rate: ₹50,000', 'GST: 18%']
+                fields: ['Item: Web Development', 'HSN: 998314', 'Qty: 1', 'Rate: ₹50,000']
             }
         },
         {
-            title: 'Auto GST Calculation',
-            description: 'Watch as GST is automatically calculated based on location and product type',
+            title: 'Automatic GST Calculation',
+            description: 'CGST/SGST or IGST automatically calculated based on customer state',
             preview: {
-                title: 'Tax Summary',
-                fields: ['CGST (9%): ₹4,500', 'SGST (9%): ₹4,500', 'Total: ₹59,000']
+                title: 'Tax Breakdown',
+                fields: ['Subtotal: ₹50,000', 'CGST (9%): ₹4,500', 'SGST (9%): ₹4,500', 'Total: ₹59,000']
             }
         },
         {
-            title: 'Generate & Send',
-            description: 'Create professional invoice and send via email or WhatsApp',
+            title: 'Generate PDF Invoice',
+            description: 'Download professional GST-compliant PDF with all details',
             preview: {
-                title: 'Invoice Ready',
-                fields: ['Format: PDF', 'Status: Generated', 'Actions: Email, WhatsApp, Download']
+                title: 'Invoice Generated',
+                fields: ['Status: Paid/Pending/Overdue', 'Format: A4 PDF', 'Export: Download/Preview']
             }
         }
     ];
@@ -109,10 +109,10 @@ const DemoSection = () => {
                         </div>
 
                         {/* Demo Controls */}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4">
                             <Button
                                 onClick={isPlaying ? () => setIsPlaying(false) : handlePlayDemo}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2"
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2"
                             >
                                 {isPlaying ? (
                                     <Pause className="h-5 w-5" />
@@ -124,7 +124,7 @@ const DemoSection = () => {
 
                             <Button
                                 onClick={handleRestart}
-                                className="border border-gray-300 text-white hover:border-blue-600 hover:text-blue-600 px-6 py-3 rounded-lg flex items-center space-x-2"
+                                className="border border-gray-300 text-white hover:border-blue-600 hover:text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2"
                             >
                                 <RotateCcw className="h-5 w-5" />
                                 <span>Restart</span>
@@ -132,15 +132,15 @@ const DemoSection = () => {
                         </div>
 
                         {/* Try Now CTA */}
-                        <div className="p-6 bg-white rounded-xl border border-gray-200">
-                            <h4 className="font-semibold text-gray-900 mb-2">
+                        <div className="p-4 sm:p-6 bg-white rounded-xl border border-gray-200">
+                            <h4 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">
                                 Ready to try it yourself?
                             </h4>
-                            <p className="text-gray-600 mb-4">
+                            <p className="text-gray-600 mb-4 text-sm sm:text-base">
                                 Create your first invoice in minutes with our free trial.
                             </p>
                             <Button
-                                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2"
+                                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center justify-center space-x-2 w-full sm:w-auto"
                             >
                                 <ExternalLink className="h-4 w-4" />
                                 <Link to="/dashboard">Start Free Trial</Link>

@@ -5,32 +5,32 @@ const FeaturesSection = () => {
         {
             icon: Calculator,
             title: 'Automated GST Calculations',
-            description: 'Automatically calculate CGST, SGST, and IGST based on customer location and product categories. Never worry about tax errors again.'
+            description: 'Automatic CGST, SGST, and IGST calculations based on customer state. Supports intra-state and inter-state GST with real-time tax computation.'
         },
         {
             icon: FileText,
-            title: 'Professional Templates',
-            description: 'Choose from beautiful, customizable invoice templates that reflect your brand identity and maintain professional standards.'
+            title: 'Professional PDF Invoices',
+            description: 'Generate GST-compliant A4 invoices with jsPDF. Includes company logo, bank details, HSN codes, and complete tax breakdowns.'
         },
         {
             icon: Users,
-            title: 'Customer Management',
-            description: 'Organize customer information, track payment history, and maintain detailed records for better relationship management.'
+            title: 'Customer & Item Management',
+            description: 'Complete CRM with customer profiles, purchase history, GSTIN validation. Inventory tracking with HSN/SAC codes and bulk CSV import.'
         },
         {
             icon: BarChart3,
-            title: 'Compliance Reporting',
-            description: 'Generate GSTR-1, GSTR-3B reports instantly. Stay compliant with Indian tax regulations effortlessly.'
+            title: 'Reports & Analytics',
+            description: 'Real-time dashboard with revenue trends, payment reminders, GST summaries. Export GSTR-1 and GSTR-3B ready data in CSV/Excel/PDF.'
         },
         {
             icon: Shield,
-            title: 'Secure & Reliable',
-            description: 'Bank-grade security with automatic backups. Your business data is always safe and accessible when you need it.'
+            title: 'Subscription Plans',
+            description: '7-day free trial with tiered plans (FREE/BASIC/PROFESSIONAL/ENTERPRISE). Usage tracking with automatic limit enforcement and renewal reminders.'
         },
         {
             icon: Zap,
-            title: 'Lightning Fast',
-            description: 'Create invoices in under 30 seconds. Send them instantly via email or WhatsApp to your customers.'
+            title: 'Modern Tech Stack',
+            description: 'Built with React 18, Vite, Tailwind CSS, Supabase Auth, Express REST API, Prisma ORM, and PostgreSQL for blazing-fast performance.'
         }
     ];
 
@@ -49,25 +49,25 @@ const FeaturesSection = () => {
                 </div>
 
                 {/* Features Grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                     {features?.map((feature, index) => {
                         const IconComponent = feature?.icon;
                         return (
                             <div
                                 key={index}
-                                className="group p-8 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
+                                className="group p-6 sm:p-8 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
                             >
-                                <div className="mb-6">
+                                <div className="mb-4 sm:mb-6">
                                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-100 group-hover:bg-blue-600 transition-colors duration-300">
                                         <IconComponent className="h-6 w-6 text-blue-600 group-hover:text-white transition-colors duration-300" />
                                     </div>
                                 </div>
 
-                                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3">
                                     {feature?.title}
                                 </h3>
 
-                                <p className="text-gray-600 leading-relaxed">
+                                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                                     {feature?.description}
                                 </p>
                             </div>
@@ -76,8 +76,8 @@ const FeaturesSection = () => {
                 </div>
 
                 {/* Bottom CTA */}
-                <div className="text-center mt-16">
-                    <div className="inline-flex items-center px-6 py-3 bg-blue-50 text-blue-700 rounded-full font-medium">
+                <div className="text-center mt-12 sm:mt-16 px-4">
+                    <div className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-blue-50 text-blue-700 rounded-full font-medium text-sm sm:text-base">
                         <span>And many more features to explore</span>
                     </div>
                 </div>

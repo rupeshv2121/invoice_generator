@@ -26,31 +26,31 @@ const CTASection = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
                 <div className="text-center space-y-12">
                     {/* Main CTA */}
-                    <div className="space-y-6">
-                        <h2 className="text-4xl lg:text-5xl font-bold leading-tight">
+                    <div className="space-y-4 sm:space-y-6">
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight px-4">
                             Ready to Transform Your
                             <span className="block text-yellow-300">Invoicing Process?</span>
                         </h2>
 
-                        <p className="text-xl lg:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
+                        <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed px-4">
                             Join thousands of Indian businesses who have already simplified their
                             GST invoicing with InvoicePro. Start your free trial today.
                         </p>
                     </div>
 
                     {/* Quick Stats */}
-                    <div className="flex flex-wrap justify-center gap-8 lg:gap-16">
+                    <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-16 max-w-2xl mx-auto px-4">
                         {quickStats?.map((stat, index) => {
                             const IconComponent = stat?.icon;
                             return (
                                 <div key={index} className="text-center">
-                                    <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-3">
-                                        <IconComponent className="h-8 w-8 text-yellow-300" />
+                                    <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-2xl mb-2 sm:mb-3">
+                                        <IconComponent className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-300" />
                                     </div>
-                                    <div className="text-2xl lg:text-3xl font-bold text-white">
+                                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
                                         {stat?.value}
                                     </div>
-                                    <div className="text-blue-200 font-medium">
+                                    <div className="text-xs sm:text-sm text-blue-200 font-medium">
                                         {stat?.label}
                                     </div>
                                 </div>
@@ -59,11 +59,11 @@ const CTASection = () => {
                     </div>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center px-4">
                         <Link
                             as={Link}
                             to="/register"
-                            className="bg-yellow-400 hover:bg-yellow-500 text-white px-8 py-2 rounded-xl font-bold text-lg flex items-center group transition-all duration-200 shadow-2xl"
+                            className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 sm:px-8 py-3 rounded-xl font-bold text-base sm:text-lg flex items-center justify-center group transition-all duration-200 shadow-2xl"
                         >
                             Start Your Free Trial
                             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -72,31 +72,31 @@ const CTASection = () => {
                         <Link
                             as={Link}
                             to="/login"
-                            className="border-2 border-white/30 hover:border-white hover:bg-white/10 text-white px-8 py-2 rounded-xl font-semibold text-lg transition-all duration-200"
+                            className="border-2 border-white/30 hover:border-white hover:bg-white/10 text-white px-6 sm:px-8 py-3 rounded-xl font-semibold text-base sm:text-lg transition-all duration-200 text-center"
                         >
                             Sign In to Your Account
                         </Link>
                     </div>
 
                     {/* Trust Indicators */}
-                    <div className="space-y-6">
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                    <div className="space-y-4 sm:space-y-6 px-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-4xl mx-auto">
                             {urgencyPoints?.map((point, index) => (
                                 <div key={index} className="flex items-center space-x-2 text-blue-100">
-                                    <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                                    <span className="text-sm font-medium">{point}</span>
+                                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 flex-shrink-0" />
+                                    <span className="text-xs sm:text-sm font-medium">{point}</span>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="inline-flex items-center space-x-8 p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+                        <div className="inline-flex flex-col sm:flex-row items-center gap-3 sm:gap-8 p-3 sm:p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
                             <div className="flex items-center space-x-2">
                                 <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                                <span className="text-sm text-blue-100">SSL Secured</span>
+                                <span className="text-xs sm:text-sm text-blue-100">SSL Secured</span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                                <span className="text-sm text-blue-100">GDPR Compliant</span>
+                                <span className="text-xs sm:text-sm text-blue-100">GDPR Compliant</span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <div className="w-3 h-3 bg-blue-400 rounded-full"></div>

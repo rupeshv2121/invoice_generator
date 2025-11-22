@@ -74,7 +74,7 @@ const InvoiceActionMenu = ({ invoice, onAction }) => {
     const visibleActions = actions?.filter(action => action?.show !== false);
 
     return (
-        <div className="relative inline-block">
+        <div className=" ">
             <Button
                 variant="ghost"
                 size="sm"
@@ -88,7 +88,7 @@ const InvoiceActionMenu = ({ invoice, onAction }) => {
                         className="fixed inset-0 z-[100]"
                         onClick={closeMenu}
                     />
-                    <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-border rounded-md shadow-lg z-[101]">
+                    <div className="absolute top-[73%] right-[15%] w-48 bg-white border border-border rounded-md shadow-lg">
                         <div className="py-1">
                             {visibleActions?.map((action, index) => (
                                 <React.Fragment key={action?.action}>

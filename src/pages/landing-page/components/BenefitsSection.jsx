@@ -61,13 +61,13 @@ const BenefitsSection = () => {
                 </div>
 
                 {/* Pain Points & Solutions */}
-                <div className="space-y-12 mb-20">
+                <div className="space-y-6 sm:space-y-8 lg:space-y-12 mb-12 sm:mb-16 lg:mb-20">
                     {painPoints?.map((item, index) => {
                         const IconComponent = item?.icon;
                         return (
                             <div
                                 key={index}
-                                className={`flex flex-col lg:flex-row items-center gap-12 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''
+                                className={`flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-12 ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''
                                     }`}
                             >
                                 {/* Content */}

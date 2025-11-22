@@ -8,58 +8,79 @@ const PricingSection = () => {
 
     const plans = [
         {
-            name: 'Starter',
-            description: 'Perfect for freelancers and small businesses',
-            monthlyPrice: 299,
-            yearlyPrice: 2499,
-            savings: 'Save ₹1,089',
+            name: 'FREE (Trial)',
+            description: '7-day free trial to explore all features',
+            monthlyPrice: 0,
+            yearlyPrice: 0,
+            savings: '7 Days Free',
             features: [
-                'Up to 50 invoices/month',
+                '10 invoices limit',
+                '50 customers limit',
+                '100 items limit',
                 'GST compliant invoicing',
                 'Basic customer management',
-                'Email support',
-                '2 invoice templates',
-                'Basic reporting'
+                'PDF invoice generation',
+                'Email support'
             ],
             popular: false,
             cta: 'Start Free Trial'
         },
         {
-            name: 'Professional',
-            description: 'Ideal for growing businesses',
-            monthlyPrice: 699,
-            yearlyPrice: 5999,
-            savings: 'Save ₹2,389',
+            name: 'BASIC',
+            description: 'Perfect for small businesses',
+            monthlyPrice: 499,
+            yearlyPrice: 4990,
+            savings: 'Save ₹1,000',
             features: [
-                'Unlimited invoices',
-                'Advanced GST features',
-                'Complete customer management',
-                'Priority email support',
-                '10+ invoice templates',
-                'Advanced analytics',
-                'Payment tracking',
-                'Bulk operations',
-                'Custom branding'
+                '100 invoices/month',
+                '200 customers',
+                '500 items',
+                'GST compliant invoicing',
+                'Customer management',
+                'Item inventory tracking',
+                'PDF generation',
+                'Email support',
+                'Basic reports'
             ],
-            popular: true,
-            cta: 'Start Free Trial'
+            popular: false,
+            cta: 'Choose Basic'
         },
         {
-            name: 'Enterprise',
-            description: 'For large businesses with advanced needs',
-            monthlyPrice: 1499,
-            yearlyPrice: 12999,
-            savings: 'Save ₹5,989',
+            name: 'PROFESSIONAL',
+            description: 'Most popular for growing businesses',
+            monthlyPrice: 999,
+            yearlyPrice: 9990,
+            savings: 'Save ₹2,000',
+            features: [
+                'Unlimited invoices',
+                'Unlimited customers',
+                'Unlimited items',
+                'Advanced GST features',
+                'GSTR-1 & GSTR-3B exports',
+                'Priority support',
+                'Advanced analytics',
+                'Payment tracking',
+                'Custom templates'
+            ],
+            popular: true,
+            cta: 'Choose Professional'
+        },
+        {
+            name: 'ENTERPRISE',
+            description: 'For large businesses with custom needs',
+            monthlyPrice: 2499,
+            yearlyPrice: 24990,
+            savings: 'Save ₹5,000',
             features: [
                 'Everything in Professional',
                 'Multi-user access',
-                'Advanced integrations',
-                'Phone & email support',
-                'Custom invoice templates',
                 'API access',
-                'Dedicated account manager',
+                'Custom integrations',
+                'Dedicated support',
+                'Custom workflows',
                 'Advanced compliance tools',
-                'Custom workflows'
+                'Training & onboarding',
+                'SLA guarantee'
             ],
             popular: false,
             cta: 'Contact Sales'
@@ -110,12 +131,12 @@ const PricingSection = () => {
                 </div>
 
                 {/* Pricing Cards */}
-                <div className="grid md:grid-cols-3 gap-8 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mb-12 sm:mb-16">
                     {plans?.map((plan, index) => (
                         <div
                             key={index}
-                            className={`relative rounded-2xl border-2 p-8 ${plan?.popular
-                                    ? 'border-blue-500 bg-blue-50 scale-105' : 'border-gray-200 bg-white hover:border-blue-300'
+                            className={`relative rounded-2xl border-2 p-6 sm:p-8 ${plan?.popular
+                                ? 'border-blue-500 bg-blue-50 md:scale-105' : 'border-gray-200 bg-white hover:border-blue-300'
                                 } transition-all duration-300`}
                         >
                             {plan?.popular && (
@@ -171,7 +192,7 @@ const PricingSection = () => {
                                 as={plan?.cta === 'Contact Sales' ? 'button' : Link}
                                 to={plan?.cta === 'Contact Sales' ? undefined : '/register'}
                                 className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 ${plan?.popular
-                                        ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'border-2 border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
+                                    ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'border-2 border-gray-300 hover:border-blue-600 text-gray-700 hover:text-blue-600'
                                     }`}
                             >
                                 {plan?.cta}
